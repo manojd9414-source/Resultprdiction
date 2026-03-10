@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10th Result Predictor 🎓</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a1a;
+    --card: #12122a;
+    --accent: #ff6b35;
+    --accent2: #ffd700;
+    --green: #00e676;
+    --red: #ff1744;
+    --text: #f0f0ff;
+    --muted: #8888aa;
+    --border: #2a2a4a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Baloo 2', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(255,107,53,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(100,60,255,0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    text-align: center;
+    padding: 40px 20px 30px;
+  }
+
+  .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent), #ff9500);
+    color: #000;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    margin-top: 10px;
+    font-size: 1rem;
+  }
+
+  .subject-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+  }
+
+  .subject-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    transition: border-color 0.3s;
+  }
+
+  .subject-card:hover {
+    border-color: var(--accent);
+  }
+
+  .subject-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--accent2);
+  }
+
+  .subject-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .option-btn {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 9px 10px;
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    line-height: 1.3;
+  }
+
+  .option-btn:hover {
+    border-color: var(--accent);
+    background: rgba(255,107,53,0.08);
+  }
+
+  .option-btn.selected {
+    border-color: var(--accent);
+    background: rgba(255,107,53,0.18);
+    color: var(--accent2);
+    font-weight: 600;
+  }
+
+  .predict-btn {
+    display: block;
+    width: 100%;
+    max-width: 360px;
+    margin: 36px auto 0;
+    padding: 18px;
+    background: linear-gradient(135deg, var(--accent), #ff9500);
+    color: #000;
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .predict-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(255,107,53,0.4);
+  }
+
+  .predict-btn:active { transform: translateY(0); }
+
+  /* Result Section */
+  #result-section {
+    display: none;
+    margin-top: 40px;
+    animation: fadeUp 0.6s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    text-align: center;
+  }
+
+  .result-card.pass { border-color: var(--green); }
+  .result-card.fail { border-color: var(--red); }
+
+  .result-emoji {
+    font-size: 4rem;
+    margin-bottom: 10px;
+    animation: bounce 0.8s ease infinite alternate;
+  }
+
+  @keyframes bounce {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-12px); }
+  }
+
+  .result-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+
+  .pass .result-title { color: var(--green); }
+  .fail .result-title { color: var(--red); }
+
+  .percentage-display {
+    font-size: 4.5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin: 20px 0;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subject-scores {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+  }
+
+  .score-chip {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 6px;
+    font-size: 0.8rem;
+  }
+
+  .score-chip .sub-name {
+    color: var(--muted);
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.72rem;
+  }
+
+  .score-chip .sub-score {
+    font-weight: 800;
+    font-size: 1.1rem;
+  }
+
+  .score-chip.low .sub-score { color: var(--red); }
+  .score-chip.mid .sub-score { color: var(--accent); }
+  .score-chip.high .sub-score { color: var(--green); }
+
+  .roast-box {
+    margin-top: 24px;
+    padding: 20px;
+    border-radius: 14px;
+    font-size: 1rem;
+    line-height: 1.7;
+    text-align: left;
+  }
+
+  .roast-box.gali {
+    background: rgba(255,23,68,0.1);
+    border: 1.5px solid rgba(255,23,68,0.3);
+    color: #ffcdd2;
+  }
+
+  .roast-box.praise {
+    background: rgba(0,230,118,0.08);
+    border: 1.5px solid rgba(0,230,118,0.3);
+    color: #b9f6ca;
+  }
+
+  .roast-box.average {
+    background: rgba(255,214,0,0.08);
+    border: 1.5px solid rgba(255,214,0,0.3);
+    color: #fff9c4;
+  }
+
+  .roast-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+    opacity: 0.7;
+  }
+
+  .try-again-btn {
+    display: inline-block;
+    margin-top: 24px;
+    padding: 12px 30px;
+    background: transparent;
+    border: 2px solid var(--muted);
+    color: var(--muted);
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .try-again-btn:hover {
+    border-color: var(--text);
+    color: var(--text);
+  }
+
+  .error-msg {
+    background: rgba(255,23,68,0.1);
+    border: 1px solid rgba(255,23,68,0.4);
+    color: #ff8a80;
+    padding: 14px 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    display: none;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    padding: 40px 20px 30px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="badge">🎓 Class 10th Special</div>
+    <h1>Result Predictor</h1>
+    <p class="subtitle">Paper kaisa gaya? Sach bata — hum predict karenge 😈</p>
+  </header>
+
+  <div id="form-section">
+    <div class="subject-grid" id="subject-grid"></div>
+
+    <div class="error-msg" id="error-msg">⚠️ Sab subjects ka jawab de bhai! Ek bhi chhoda mat!</div>
+
+    <button class="predict-btn" onclick="predictResult()">🔮 Result Predict Karo!</button>
+  </div>
+
+  <div id="result-section">
+    <div class="result-card" id="result-card">
+      <div class="result-emoji" id="result-emoji"></div>
+      <div class="result-title" id="result-title"></div>
+      <div style="color: var(--muted); font-size:0.9rem; margin-top:4px;" id="result-sub"></div>
+      <div class="percentage-display" id="percentage-display"></div>
+      <div class="subject-scores" id="subject-scores"></div>
+      <div class="roast-box" id="roast-box">
+        <div class="roast-label" id="roast-label"></div>
+        <div id="roast-text"></div>
+      </div>
+      <button class="try-again-btn" onclick="resetForm()">🔄 Phir Se Try Karo</button>
+    </div>
+  </div>
+
+  <footer>
+    Ye sirf mazak ke liye hai 😂 | Asli result board pe aayega bhai!
+  </footer>
+</div>
+
+<script>
+const subjects = [
+  {
+    id: 'hindi', name: 'हिंदी', icon: '📖',
+    options: [
+      { label: '😊 Bahut acha gaya, sab aa gaya tha', score: 88 },
+      { label: '🙂 Theek-thaak, 70-80% kiya hoga', score: 72 },
+      { label: '😐 Beech ka — kuch aaya kuch nahi', score: 55 },
+      { label: '😬 Mushkil tha, bohot kuch chhoda', score: 38 },
+      { label: '💀 Ekdum bakwaas gaya, kuch nahi aaya', score: 20 },
+    ]
+  },
+  {
+    id: 'math', name: 'गणित', icon: '📐',
+    options: [
+      { label: '🔥 Sab solve ho gaye, easy tha', score: 90 },
+      { label: '✅ Zyada tar theek rahe, 2-3 chhode', score: 68 },
+      { label: '😅 Aadhe se zyada attempt kiye', score: 50 },
+      { label: '😨 Kuch hi aaya, calculator yaad aaya', score: 30 },
+      { label: '☠️ Pura paper saaf gaya, kuch nahi aaya', score: 15 },
+    ]
+  },
+  {
+    id: 'science', name: 'विज्ञान', icon: '🔬',
+    options: [
+      { label: '⚗️ Chemistry, Physics sab tha yaad', score: 85 },
+      { label: '🧪 Zyada tar portion cover tha', score: 68 },
+      { label: '🤔 Theory aayi par numericals nahi', score: 52 },
+      { label: '😓 Definitions bhi yaad nahi thi', score: 33 },
+      { label: '💣 Science ne maar diya bilkul', score: 18 },
+    ]
+  },
+  {
+    id: 'sst', name: 'सामाजिक विज्ञान', icon: '🌍',
+    options: [
+      { label: '📚 History, Geography sab ready tha', score: 87 },
+      { label: '🗺️ Kuch chapters chhoot gaye the', score: 70 },
+      { label: '🏛️ Dates aur maps mein atak gaya', score: 54 },
+      { label: '😵 Sirf NCERT first page yaad tha', score: 32 },
+      { label: '🗑️ SST ne haath khade karwa diye', score: 17 },
+    ]
+  },
+  {
+    id: 'sanskrit', name: 'संस्कृत', icon: '🕉️',
+    options: [
+      { label: '🙏 Shlok, translation sab ghola tha', score: 86 },
+      { label: '📜 Kuch grammar chhoot gayi thi', score: 65 },
+      { label: '😶 Sirf ek-do chapters yaad the', score: 48 },
+      { label: '🤦 Shayad Google Translate chahiye tha', score: 28 },
+      { label: '💩 Sanskrit ne kapde faad diye', score: 12 },
+    ]
+  },
+  {
+    id: 'english', name: 'English', icon: '🇬🇧',
+    options: [
+      { label: '🎯 Grammar, writing sab was perfect', score: 89 },
+      { label: '📝 Essay aur letters theek the', score: 71 },
+      { label: '🤷 Reading comprehension mein atka', score: 53 },
+      { label: '😬 Tenses bhi yaad nahi aaye', score: 31 },
+      { label: '🔇 English... kya hoti hai yaar?', score: 16 },
+    ]
+  }
+];
+
+const selections = {};
+
+function buildForm() {
+  const grid = document.getElementById('subject-grid');
+  grid.innerHTML = '';
+  subjects.forEach(sub => {
+    const card = document.createElement('div');
+    card.className = 'subject-card';
+    card.innerHTML = `
+      <div class="subject-title">
+        <div class="subject-icon">${sub.icon}</div>
+        ${sub.name}
+      </div>
+      <div class="options-grid">
+        ${sub.options.map((opt, i) => `
+          <button class="option-btn" onclick="selectOption('${sub.id}', ${opt.score}, this, '${sub.id}-${i}')">
+            ${opt.label}
+          </button>
+        `).join('')}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function selectOption(subjectId, score, el, btnId) {
+  // Deselect others in same subject
+  const allBtns = el.closest('.options-grid').querySelectorAll('.option-btn');
+  allBtns.forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selections[subjectId] = score;
+  document.getElementById('error-msg').style.display = 'none';
+}
+
+function predictResult() {
+  const filled = subjects.every(s => selections[s.id] !== undefined);
+  if (!filled) {
+    const err = document.getElementById('error-msg');
+    err.style.display = 'block';
+    err.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  // Calculate scores
+  const subjectResults = subjects.map(s => ({
+    name: s.name, icon: s.icon, id: s.id, score: selections[s.id]
+  }));
+
+  const total = subjectResults.reduce((sum, s) => sum + s.score, 0);
+  const percentage = Math.round(total / subjects.length);
+  const passed = subjectResults.every(s => s.score >= 33);
+
+  // Build result UI
+  const card = document.getElementById('result-card');
+  card.className = 'result-card ' + (passed ? 'pass' : 'fail');
+
+  document.getElementById('result-emoji').textContent = percentage >= 75 ? '🏆' : percentage >= 55 ? '😊' : percentage >= 33 ? '😬' : '💀';
+  document.getElementById('result-title').textContent = passed ? 'PASS 🎉' : 'FAIL 😭';
+  document.getElementById('result-sub').textContent = passed ? 'Badhai ho! (Shayad 😅)' : 'Bhai... agla saal taiyaar kar lo';
+  document.getElementById('percentage-display').textContent = percentage + '%';
+
+  // Subject chips
+  const scoresDiv = document.getElementById('subject-scores');
+  scoresDiv.innerHTML = subjectResults.map(s => {
+    const cls = s.score >= 70 ? 'high' : s.score >= 40 ? 'mid' : 'low';
+    return `<div class="score-chip ${cls}">
+      <span class="sub-name">${s.icon} ${s.name}</span>
+      <span class="sub-score">${s.score}/100</span>
+    </div>`;
+  }).join('');
+
+  // Roast / Praise
+  const roastBox = document.getElementById('roast-box');
+  const roastLabel = document.getElementById('roast-label');
+  const roastText = document.getElementById('roast-text');
+
+  if (percentage >= 75) {
+    roastBox.className = 'roast-box praise';
+    roastLabel.textContent = '🏅 Topper Hai Tu!';
+    roastText.innerHTML = `Wah bhai wah! ${percentage}% — Maa-Baap ka naam roshan kar diya tune! 🎉<br><br>
+    Tu toh future engineer/doctor lag raha hai! Bas padhai mat chhodna. Teri copy dekh ke teacher bhi khush hogi. Sach mein gazab hai tu! 🌟 Keep it up champion!`;
+  } else if (percentage >= 55) {
+    roastBox.className = 'roast-box average';
+    roastLabel.textContent = '😐 Average Banda';
+    roastText.innerHTML = `${percentage}%... Theek hai, bura nahi hai. Par topper bhi nahi hai. 😅<br><br>
+    Teri zindagi "na idhar ka, na udhar ka" wali hai abhi. Phone rakh aur thoda aur padh le yaar. 
+    Maa ke samne toh bol sakta hai pass hua — par aankh milane ki himmat hai kya? 😂 
+    Agli baar thoda zyada mehnat kar, itna bhi nahi poochh raha tera!`;
+  } else if (percentage >= 33) {
+    roastBox.className = 'roast-box gali';
+    roastLabel.textContent = '😡 Jugaad Pass';
+    roastText.innerHTML = `Sirf ${percentage}%?! Bhai tu toh just-just nikal gaya hai! 😤<br><br>
+    <strong>Bewakoof kahin ka!</strong> Itna mushkil tha kya padhna?! Din mein 10 ghante YouTube dekhta hai, 
+    10 minute bhi book nahi khola?! Teri toh... 🤬<br><br>
+    Chal, next year maths aur science pe dhyan de. Warna yahi jugaad zindagi bhar chalega. 
+    <strong>Nalayak!</strong> Papa ko mat bata percentage, seedha marksheet chhupa de pehle! 😂`;
+  } else {
+    roastBox.className = 'roast-box gali';
+    roastLabel.textContent = '💀 Bhai... Fail';
+    roastText.innerHTML = `${percentage}%?! ARE YOU SERIOUS?! 😡🤬<br><br>
+    <strong>BC, kya kar raha tha poore saal?!</strong> Padhne ke alawa sab kiya tune! 
+    Game khela, reel dekhi, doston ke saath ghuma — sab kiya sirf ek kaam nahi kiya — PADHA NAHI! 😤<br><br>
+    <strong>Haramkhor!</strong> Maa-Baap din raat mehnat karte hain aur tu fail ho gaya?! 
+    Teri toh aisi ki taisi! Ek baar ghar jaake dekh unka chehra, sharma aa jayegi! 😤<br><br>
+    Ab ghar mein kya munh lekar ghusega?! <strong>Chutiye!</strong> Agli baar uthke padh — 
+    warna delivery wala banna padega! Teri kismat mein toh... 🔥<br><br>
+    <em>(Yaar seriously, agli baar mehnat kar. Tu kar sakta hai! 💪)</em>`;
+  }
+
+  document.getElementById('form-section').style.display = 'none';
+  const resultSection = document.getElementById('result-section');
+  resultSection.style.display = 'block';
+  resultSection.scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetForm() {
+  Object.keys(selections).forEach(k => delete selections[k]);
+  document.getElementById('form-section').style.display = 'block';
+  document.getElementById('result-section').style.display = 'none';
+  buildForm();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+buildForm();
+</script>
+</body>
+</html>
