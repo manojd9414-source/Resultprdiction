@@ -3,868 +3,1513 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Board Result Predictor 🎓</title>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<title>Jai Bhawani Tailor</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi:ital@0;1&family=Mukta:wght@400;600;700&family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>
+/* ===== CSS VARIABLES ===== */
 :root {
-  --bg: #060612;
-  --surface: #0e0e24;
-  --card: #13132e;
-  --border: #1e1e45;
-  --accent: #f7931e;
-  --accent2: #ffe44d;
-  --blue: #4f9cff;
-  --green: #00e676;
-  --red: #ff3d5a;
-  --purple: #b47cff;
-  --text: #eeeeff;
-  --muted: #7070aa;
-  --pass-glow: rgba(0,230,118,0.15);
-  --fail-glow: rgba(255,61,90,0.15);
+  --saffron:      #E8650A;
+  --saffron-deep: #C4500A;
+  --saffron-glow: #FF8C38;
+  --gold:         #D4A017;
+  --gold-light:   #F5C842;
+  --indigo:       #1A1F5E;
+  --indigo-mid:   #2D3494;
+  --cream:        #FDF6EC;
+  --cream-dark:   #F5EAD7;
+  --ink:          #1C1410;
+  --ink-soft:     #4A3728;
+  --muted:        #8B7355;
+  --white:        #FFFFFF;
+  --success:      #2E7D32;
+  --danger:       #C62828;
+  --card-shadow:  0 4px 24px rgba(28,20,16,0.12);
+  --radius:       14px;
+  --radius-sm:    8px;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Baloo 2', sans-serif;
+  font-family: 'DM Sans', 'Mukta', sans-serif;
+  background: var(--cream);
+  color: var(--ink);
   min-height: 100vh;
-  overflow-x: hidden;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(232,101,10,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(26,31,94,0.06) 0%, transparent 60%);
 }
 
-/* Animated BG */
-body::before {
+/* ===== HEADER ===== */
+.app-header {
+  background: linear-gradient(135deg, var(--indigo) 0%, var(--indigo-mid) 50%, #3D45A8 100%);
+  color: var(--white);
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 20px rgba(26,31,94,0.35);
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+  gap: 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+
+.brand-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--saffron), var(--gold));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 2px 12px rgba(232,101,10,0.4);
+}
+
+.brand-text { line-height: 1.2; }
+.brand-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.brand-tagline {
+  font-size: 11px;
+  opacity: 0.65;
+  font-weight: 300;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.header-right { display: flex; align-items: center; gap: 12px; }
+
+.lang-toggle {
+  display: flex;
+  background: rgba(255,255,255,0.12);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.lang-btn {
+  padding: 6px 14px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.lang-btn.active {
+  background: var(--saffron);
+  color: var(--white);
+  border-radius: 6px;
+}
+
+/* ===== NAV TABS ===== */
+.nav-tabs {
+  background: var(--white);
+  border-bottom: 2px solid var(--cream-dark);
+  position: sticky;
+  top: 68px;
+  z-index: 90;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0;
+  padding: 0 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-inner::-webkit-scrollbar { display: none; }
+
+.nav-tab {
+  padding: 14px 22px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: 'DM Sans', 'Mukta', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.22s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.nav-tab:hover { color: var(--saffron); }
+.nav-tab.active {
+  color: var(--saffron-deep);
+  border-bottom-color: var(--saffron);
+  font-weight: 600;
+}
+.tab-icon { font-size: 16px; }
+
+/* ===== MAIN CONTENT ===== */
+.main { max-width: 1100px; margin: 0 auto; padding: 28px 24px 60px; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+  margin-bottom: 28px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--indigo);
+  line-height: 1.2;
+}
+.page-subtitle { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+/* ===== DASHBOARD STATS ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.stat-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  box-shadow: var(--card-shadow);
+  border-left: 4px solid var(--saffron);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(28,20,16,0.15); }
+.stat-card:nth-child(2) { border-left-color: var(--gold); }
+.stat-card:nth-child(3) { border-left-color: var(--success); }
+.stat-card:nth-child(4) { border-left-color: var(--indigo-mid); }
+.stat-card::after {
   content: '';
-  position: fixed; inset: 0;
-  background:
-    radial-gradient(ellipse 60% 40% at 15% 10%, rgba(79,156,255,0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 50% at 85% 90%, rgba(247,147,30,0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(180,124,255,0.04) 0%, transparent 70%);
-  pointer-events: none; z-index: 0;
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.05;
+}
+.stat-label { font-size: 12px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); }
+.stat-value { font-size: 32px; font-weight: 700; color: var(--indigo); margin-top: 6px; font-family: 'DM Sans', sans-serif; }
+.stat-icon { font-size: 28px; position: absolute; right: 20px; top: 18px; opacity: 0.2; }
+
+/* ===== CARD ===== */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--indigo);
+  margin-bottom: 22px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--cream-dark);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card-title .icon { font-size: 20px; }
+
+/* ===== SECTION DIVIDER ===== */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 18px;
+}
+.section-divider-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--saffron-deep);
+  white-space: nowrap;
+  background: linear-gradient(90deg, var(--saffron), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.section-divider::before, .section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--cream-dark);
 }
 
-/* Floating particles */
-.particle { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; animation: float linear infinite; opacity: 0.3; }
-@keyframes float {
-  from { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-  10% { opacity: 0.3; }
-  90% { opacity: 0.3; }
-  to { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+/* ===== FORM GRID ===== */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+.form-grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full-width { grid-column: 1 / -1; }
+
+label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--ink-soft);
+  text-transform: uppercase;
 }
 
-.container { max-width: 860px; margin: 0 auto; padding: 20px 16px 60px; position: relative; z-index: 1; }
+input[type="text"],
+input[type="number"],
+input[type="tel"],
+input[type="date"],
+select,
+textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--cream-dark);
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', 'Mukta', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--cream);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  outline: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--saffron);
+  box-shadow: 0 0 0 3px rgba(232,101,10,0.12);
+  background: var(--white);
+}
+select { cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238B7355' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+textarea { resize: vertical; min-height: 90px; }
 
-/* ── HEADER ── */
-header { text-align: center; padding: 44px 0 36px; }
-.header-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: linear-gradient(135deg, rgba(247,147,30,0.2), rgba(255,228,77,0.1));
-  border: 1px solid rgba(247,147,30,0.4);
-  color: var(--accent2); font-size: 11px; font-weight: 800;
-  padding: 5px 16px; border-radius: 20px; letter-spacing: 2px;
-  text-transform: uppercase; margin-bottom: 18px;
+.measurement-unit {
+  display: flex;
+  align-items: center;
+  gap: 0;
 }
-h1 {
-  font-size: clamp(2.2rem, 7vw, 3.6rem); font-weight: 900; line-height: 1.05;
-  background: linear-gradient(135deg, #ffe44d 0%, #f7931e 50%, #ff6b8a 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+.measurement-unit input { border-radius: var(--radius-sm) 0 0 var(--radius-sm); border-right: none; }
+.measurement-unit .unit-label {
+  padding: 11px 12px;
+  background: var(--cream-dark);
+  border: 1.5px solid var(--cream-dark);
+  border-left: none;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
-.subtitle { color: var(--muted); margin-top: 12px; font-size: 1rem; }
 
-/* ── STEP INDICATOR ── */
-.steps {
-  display: flex; align-items: center; justify-content: center;
-  gap: 0; margin: 32px 0 28px;
+/* ===== PAYMENT SECTION ===== */
+.payment-card {
+  background: linear-gradient(135deg, var(--indigo) 0%, var(--indigo-mid) 100%);
+  border-radius: var(--radius);
+  padding: 24px;
+  color: var(--white);
+  margin-top: 8px;
 }
-.step {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
+.payment-card label { color: rgba(255,255,255,0.75); }
+.payment-card input {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+  color: var(--white);
+}
+.payment-card input::placeholder { color: rgba(255,255,255,0.4); }
+.payment-card input:focus {
+  background: rgba(255,255,255,0.15);
+  border-color: var(--gold-light);
+  box-shadow: 0 0 0 3px rgba(245,200,66,0.2);
+}
+.balance-display {
+  background: rgba(255,255,255,0.12);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1.5px solid rgba(255,255,255,0.15);
+}
+.balance-display .bal-label { font-size: 12px; font-weight: 600; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.5px; }
+.balance-display .bal-value { font-size: 22px; font-weight: 700; color: var(--gold-light); }
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', 'Mukta', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+  text-decoration: none;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--saffron), var(--saffron-deep));
+  color: var(--white);
+  box-shadow: 0 4px 14px rgba(232,101,10,0.35);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--saffron-glow), var(--saffron));
+  box-shadow: 0 6px 20px rgba(232,101,10,0.45);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: translateY(0); }
+.btn-secondary {
+  background: var(--cream-dark);
+  color: var(--ink-soft);
+}
+.btn-secondary:hover { background: #E8D9C5; }
+.btn-outline {
+  background: transparent;
+  color: var(--saffron);
+  border: 1.5px solid var(--saffron);
+}
+.btn-outline:hover { background: rgba(232,101,10,0.08); }
+.btn-sm { padding: 7px 14px; font-size: 12px; }
+.btn-danger { background: var(--danger); color: var(--white); }
+.btn-success { background: var(--success); color: var(--white); font-size:12px; padding: 6px 12px;}
+.btn-ghost { background: transparent; color: var(--muted); padding: 6px 10px; }
+.btn-ghost:hover { color: var(--saffron); background: rgba(232,101,10,0.06); }
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--cream-dark);
+  flex-wrap: wrap;
+}
+
+/* ===== SEARCH TAB ===== */
+.search-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.search-input-wrap {
+  flex: 1;
+  min-width: 220px;
   position: relative;
 }
-.step-circle {
-  width: 38px; height: 38px; border-radius: 50%;
-  border: 2px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; font-weight: 800; color: var(--muted);
-  background: var(--card); transition: all 0.3s;
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  opacity: 0.4;
+  pointer-events: none;
 }
-.step.active .step-circle { border-color: var(--accent); color: var(--accent2); background: rgba(247,147,30,0.15); }
-.step.done .step-circle { border-color: var(--green); color: var(--green); background: rgba(0,230,118,0.1); }
-.step-label { font-size: 0.68rem; color: var(--muted); font-weight: 700; letter-spacing: 0.5px; }
-.step.active .step-label { color: var(--accent); }
-.step.done .step-label { color: var(--green); }
-.step-line { width: 60px; height: 2px; background: var(--border); margin-bottom: 18px; transition: background 0.3s; }
-.step-line.done { background: var(--green); }
-
-/* ── SELECTOR CARDS ── */
-.selector-row {
-  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 28px;
-}
-@media(max-width:600px){ .selector-row { grid-template-columns: 1fr; } }
-
-.selector-card {
-  background: var(--card); border: 1.5px solid var(--border);
-  border-radius: 14px; padding: 16px 18px; cursor: pointer; transition: all 0.25s;
-}
-.selector-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-.selector-card.active { border-color: var(--accent); background: rgba(247,147,30,0.1); }
-.sel-label { font-size: 0.7rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
-.sel-value { font-size: 1.05rem; font-weight: 800; }
-.selector-card.active .sel-value { color: var(--accent2); }
-
-/* ── SECTION TITLE ── */
-.section-title {
-  font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
-  letter-spacing: 2px; color: var(--muted); margin-bottom: 14px;
-  display: flex; align-items: center; gap: 8px;
-}
-.section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-/* ── CLASS / BOARD TOGGLES ── */
-.toggle-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
-.toggle-btn {
-  padding: 9px 20px; border-radius: 10px;
-  border: 1.5px solid var(--border); background: transparent;
-  color: var(--muted); font-family: 'Baloo 2', sans-serif;
-  font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
-}
-.toggle-btn:hover { border-color: var(--accent); color: var(--text); }
-.toggle-btn.active { border-color: var(--accent); background: rgba(247,147,30,0.15); color: var(--accent2); }
-
-/* ── SUBJECTS ── */
-.subjects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-@media(max-width:580px){ .subjects-grid { grid-template-columns: 1fr; } }
-
-.subject-card {
-  background: var(--card); border: 1.5px solid var(--border);
-  border-radius: 16px; padding: 18px 18px 20px; transition: border-color 0.25s;
-}
-.subject-card:hover { border-color: rgba(247,147,30,0.4); }
-.subject-card.filled { border-color: rgba(79,156,255,0.5); }
-
-.sub-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-.sub-icon {
-  width: 38px; height: 38px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; background: rgba(255,255,255,0.06);
-}
-.sub-name { font-size: 1rem; font-weight: 800; }
-.sub-total { font-size: 0.72rem; color: var(--muted); }
-
-/* Range Slider */
-.range-container { position: relative; padding-top: 6px; }
-.range-labels { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--muted); margin-bottom: 10px; }
-
-.dual-range { position: relative; height: 36px; }
-.dual-range input[type=range] {
-  position: absolute; width: 100%; top: 50%; transform: translateY(-50%);
-  -webkit-appearance: none; appearance: none;
-  height: 4px; background: transparent; outline: none; pointer-events: none;
-}
-.dual-range input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none;
-  width: 20px; height: 20px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  cursor: pointer; pointer-events: all;
-  box-shadow: 0 2px 8px rgba(247,147,30,0.5);
-  border: 2px solid var(--bg);
-  transition: transform 0.15s;
-}
-.dual-range input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-.dual-range input[type=range]::-moz-range-thumb {
-  width: 20px; height: 20px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  cursor: pointer; pointer-events: all;
-  box-shadow: 0 2px 8px rgba(247,147,30,0.5);
-  border: 2px solid var(--bg);
-}
-.range-track {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  height: 4px; width: 100%; border-radius: 4px;
-  background: var(--border); pointer-events: none;
-}
-.range-fill {
-  position: absolute; height: 100%; border-radius: 4px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  pointer-events: none; transition: all 0.1s;
+.search-input-wrap input {
+  padding-left: 42px;
+  width: 100%;
 }
 
-.score-display {
-  text-align: center; margin-top: 8px;
-  font-size: 1.1rem; font-weight: 800; color: var(--accent2);
+.filter-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.filter-pill {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1.5px solid var(--cream-dark);
+  background: var(--white);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: all 0.2s;
+}
+.filter-pill.active {
+  background: var(--saffron);
+  border-color: var(--saffron);
+  color: var(--white);
+}
+.filter-pill:hover:not(.active) { border-color: var(--saffron); color: var(--saffron); }
+
+/* ===== ORDER CARDS ===== */
+.orders-list { display: flex; flex-direction: column; gap: 14px; }
+
+.order-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 12px rgba(28,20,16,0.08);
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.order-card:hover { box-shadow: var(--card-shadow); transform: translateY(-1px); }
+
+.order-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--cream-dark);
+  flex-wrap: wrap;
+  gap: 10px;
+  cursor: pointer;
+}
+.order-id-name { display: flex; align-items: center; gap: 12px; }
+.order-id { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; }
+.order-customer { font-size: 16px; font-weight: 700; color: var(--indigo); }
+.order-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.order-date { font-size: 12px; color: var(--muted); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
   letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
-.score-display span { color: var(--muted); font-size: 0.75rem; font-weight: 600; }
-
-/* ── PREDICT BUTTON ── */
-.predict-btn {
-  display: block; width: 100%; max-width: 420px; margin: 36px auto 0;
-  padding: 20px; position: relative; overflow: hidden;
-  background: linear-gradient(135deg, #f7931e, #ffe44d);
-  color: #000; font-family: 'Baloo 2', sans-serif;
-  font-size: 1.2rem; font-weight: 900; border: none;
-  border-radius: 16px; cursor: pointer; transition: all 0.25s;
-  letter-spacing: 0.5px;
-}
-.predict-btn::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
-  opacity: 0; transition: opacity 0.2s;
-}
-.predict-btn:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(247,147,30,0.45); }
-.predict-btn:hover::before { opacity: 1; }
-.predict-btn:active { transform: translateY(0); }
-
-.error-msg {
-  background: rgba(255,61,90,0.1); border: 1px solid rgba(255,61,90,0.4);
-  color: #ff8a9a; padding: 14px 20px; border-radius: 12px;
-  margin-top: 18px; display: none; text-align: center; font-weight: 700;
+.badge-pending { background: rgba(212,160,23,0.15); color: #9A6F00; }
+.badge-completed { background: rgba(46,125,50,0.12); color: var(--success); }
+.badge-cloth {
+  background: rgba(45,52,148,0.1);
+  color: var(--indigo-mid);
+  padding: 3px 10px;
 }
 
-/* ── RESULT ── */
-#result-section { display: none; animation: fadeUp 0.7s ease; }
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(40px); }
-  to   { opacity: 1; transform: translateY(0); }
+.order-card-body { padding: 16px 20px 14px; }
+
+.measurements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.measure-item {
+  background: var(--cream);
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: center;
+}
+.measure-key { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+.measure-val { font-size: 15px; font-weight: 700; color: var(--indigo); margin-top: 2px; }
+
+.order-payment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--cream);
+  border-radius: var(--radius-sm);
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.pay-item { text-align: center; }
+.pay-label { font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px; }
+.pay-val { font-size: 16px; font-weight: 700; color: var(--indigo); }
+.pay-val.balance-due { color: var(--danger); }
+.pay-val.balance-paid { color: var(--success); }
+
+.order-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--cream-dark);
+  background: rgba(0,0,0,0.01);
+  flex-wrap: wrap;
 }
 
-.result-hero {
-  border-radius: 24px; padding: 40px 32px 36px;
-  text-align: center; border: 2px solid;
-  position: relative; overflow: hidden; margin-bottom: 20px;
-}
-.result-hero.pass { border-color: var(--green); background: linear-gradient(160deg, var(--card), rgba(0,230,118,0.05)); }
-.result-hero.fail { border-color: var(--red); background: linear-gradient(160deg, var(--card), rgba(255,61,90,0.05)); }
-.result-hero.close { border-color: var(--accent); background: linear-gradient(160deg, var(--card), rgba(247,147,30,0.05)); }
-
-.result-hero::before {
-  content: ''; position: absolute; top: -60px; right: -60px;
-  width: 200px; height: 200px; border-radius: 50%;
-  opacity: 0.06;
-}
-.result-hero.pass::before { background: var(--green); }
-.result-hero.fail::before { background: var(--red); }
-
-.result-emoji { font-size: 4.5rem; animation: bounce 1s ease infinite alternate; }
-@keyframes bounce { from { transform: translateY(0) scale(1); } to { transform: translateY(-14px) scale(1.05); } }
-
-.result-verdict {
-  font-size: 2.4rem; font-weight: 900; margin: 12px 0 4px; line-height: 1;
-}
-.pass .result-verdict { color: var(--green); }
-.fail .result-verdict { color: var(--red); }
-.close .result-verdict { color: var(--accent); }
-
-.result-board-info { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; }
-
-.big-percent {
-  font-size: 5.5rem; font-weight: 900; line-height: 1;
-  background: linear-gradient(135deg, var(--accent2), var(--accent));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
-.grade-badge {
-  display: inline-block; padding: 5px 18px; border-radius: 20px;
-  font-size: 0.9rem; font-weight: 800; margin-top: 10px;
-  letter-spacing: 1px;
+.order-notes {
+  background: rgba(232,101,10,0.05);
+  border-left: 3px solid var(--saffron);
+  padding: 8px 12px;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-top: 10px;
+  font-style: italic;
 }
 
-/* Subject breakdown */
-.breakdown-title {
-  font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
-  letter-spacing: 2px; color: var(--muted); margin: 28px 0 14px;
-  display: flex; align-items: center; gap: 8px;
+/* COLLAPSIBLE */
+.order-card-body { display: none; }
+.order-card.expanded .order-card-body { display: block; }
+.order-actions { display: none; }
+.order-card.expanded .order-actions { display: flex; }
+.expand-arrow {
+  font-size: 14px;
+  transition: transform 0.25s;
+  color: var(--muted);
 }
-.breakdown-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.order-card.expanded .expand-arrow { transform: rotate(180deg); }
 
-.breakdown-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-@media(max-width:500px){ .breakdown-grid { grid-template-columns: repeat(2,1fr); } }
-
-.breakdown-chip {
-  background: var(--surface); border: 1.5px solid var(--border);
-  border-radius: 12px; padding: 12px 10px; text-align: center;
-  transition: border-color 0.2s;
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--muted);
 }
-.breakdown-chip.high { border-color: rgba(0,230,118,0.4); }
-.breakdown-chip.mid  { border-color: rgba(247,147,30,0.3); }
-.breakdown-chip.low  { border-color: rgba(255,61,90,0.4); }
+.empty-state .empty-icon { font-size: 56px; margin-bottom: 16px; opacity: 0.5; }
+.empty-state h3 { font-size: 18px; font-weight: 600; color: var(--ink-soft); margin-bottom: 8px; }
+.empty-state p { font-size: 14px; }
 
-.chip-icon { font-size: 1.3rem; }
-.chip-name { font-size: 0.68rem; color: var(--muted); margin: 3px 0; font-weight: 700; }
-.chip-score { font-size: 1.15rem; font-weight: 900; }
-.breakdown-chip.high .chip-score { color: var(--green); }
-.breakdown-chip.mid  .chip-score { color: var(--accent); }
-.breakdown-chip.low  .chip-score { color: var(--red); }
-.chip-percent { font-size: 0.7rem; color: var(--muted); }
-
-/* Bar chart */
-.bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.bar-sub  { font-size: 0.75rem; color: var(--muted); width: 80px; flex-shrink: 0; text-align: right; }
-.bar-wrap { flex: 1; height: 10px; background: var(--border); border-radius: 6px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 6px; transition: width 1s ease; }
-.bar-val  { font-size: 0.75rem; font-weight: 800; width: 50px; text-align: right; flex-shrink: 0; }
-
-/* ROAST */
-.roast-card {
-  border-radius: 18px; padding: 24px; margin-top: 20px;
-  border: 1.5px solid;
+/* ===== TOAST ===== */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
 }
-.roast-card.praise { border-color: rgba(0,230,118,0.3); background: rgba(0,230,118,0.05); }
-.roast-card.warn   { border-color: rgba(255,228,77,0.3); background: rgba(255,228,77,0.04); }
-.roast-card.roast  { border-color: rgba(255,61,90,0.35); background: rgba(255,61,90,0.05); }
-
-.roast-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-.roast-icon { font-size: 1.8rem; }
-.roast-title { font-size: 1rem; font-weight: 800; }
-.roast-card.praise .roast-title { color: var(--green); }
-.roast-card.warn   .roast-title { color: var(--accent2); }
-.roast-card.roast  .roast-title { color: var(--red); }
-.roast-body { font-size: 0.92rem; line-height: 1.75; color: var(--text); }
-.roast-body strong { color: var(--red); }
-.roast-body em { color: var(--muted); font-style: normal; }
-
-/* Again btn */
-.again-btn {
-  display: block; width: 100%; max-width: 340px; margin: 28px auto 0;
-  padding: 14px; background: transparent;
-  border: 2px solid var(--border); color: var(--muted);
-  font-family: 'Baloo 2', sans-serif; font-size: 1rem; font-weight: 700;
-  border-radius: 14px; cursor: pointer; transition: all 0.2s;
+.toast {
+  padding: 14px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--white);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideInToast 0.3s ease, fadeOutToast 0.4s ease 2.6s forwards;
+  pointer-events: auto;
+  max-width: 320px;
 }
-.again-btn:hover { border-color: var(--text); color: var(--text); }
+.toast-success { background: var(--success); }
+.toast-error { background: var(--danger); }
+.toast-info { background: var(--indigo-mid); }
+@keyframes slideInToast {
+  from { opacity:0; transform: translateX(30px); }
+  to { opacity:1; transform: translateX(0); }
+}
+@keyframes fadeOutToast {
+  from { opacity:1; } to { opacity:0; transform: translateX(20px); }
+}
 
-/* Animations */
-@keyframes slideIn { from { opacity:0; transform:translateX(-20px); } to { opacity:1; transform:translateX(0); } }
-.sub-card-anim { animation: slideIn 0.4s ease both; }
+/* ===== LOADING ===== */
+.loading-spinner {
+  display: inline-block;
+  width: 20px; height: 20px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: var(--white);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
-.progress-bar-container { margin: 20px 0; }
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,31,94,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 28px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  transform: scale(0.95);
+  transition: transform 0.25s;
+}
+.modal-overlay.open .modal { transform: scale(1); }
+.modal-title { font-size: 18px; font-weight: 700; color: var(--indigo); margin-bottom: 12px; }
+.modal-body { font-size: 14px; color: var(--ink-soft); line-height: 1.6; margin-bottom: 24px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .main { padding: 20px 14px 60px; }
+  .card { padding: 20px 16px; }
+  .form-actions { justify-content: stretch; }
+  .form-actions .btn { flex: 1; }
+  .page-title { font-size: 22px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .brand-name { font-size: 15px; }
+}
+
+/* ===== DECORATIVE BORDER ===== */
+.ornament-bar {
+  height: 3px;
+  background: linear-gradient(90deg, var(--saffron), var(--gold), var(--saffron-glow), var(--gold), var(--saffron));
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* ===== CLOTH ICON MAP ===== */
+.cloth-icon { font-size: 18px; }
 </style>
 </head>
 <body>
 
-<!-- Particles -->
-<div id="particles"></div>
+<!-- Ornamental top bar -->
+<div class="ornament-bar"></div>
 
-<div class="container">
-  <header>
-    <div class="header-badge">🎓 Board Exam Special 2025</div>
-    <h1>Result Predictor</h1>
-    <p class="subtitle">Class, Board aur marks range bata — hum bata denge result 😈</p>
-  </header>
-
-  <!-- STEPS -->
-  <div class="steps" id="steps-indicator">
-    <div class="step active" id="step1">
-      <div class="step-circle">1</div>
-      <div class="step-label">Class & Board</div>
+<!-- ===== HEADER ===== -->
+<header class="app-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">🧵</div>
+      <div class="brand-text">
+        <div class="brand-name" id="brandName">Jai Bhawani Tailor</div>
+        <div class="brand-tagline" id="brandTagline">Est. with Pride &amp; Precision</div>
+      </div>
     </div>
-    <div class="step-line" id="line1"></div>
-    <div class="step" id="step2">
-      <div class="step-circle">2</div>
-      <div class="step-label">Subjects</div>
-    </div>
-    <div class="step-line" id="line2"></div>
-    <div class="step" id="step3">
-      <div class="step-circle">3</div>
-      <div class="step-label">Marks Range</div>
-    </div>
-    <div class="step-line" id="line3"></div>
-    <div class="step" id="step4">
-      <div class="step-circle">4</div>
-      <div class="step-label">Result</div>
+    <div class="header-right">
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('hi')" id="btnHi">हिंदी</button>
+        <button class="lang-btn" onclick="setLang('en')" id="btnEn">English</button>
+      </div>
     </div>
   </div>
+</header>
 
-  <div id="form-section">
-    <!-- STEP 1: CLASS + BOARD -->
-    <div id="step-class-board">
-      <div class="section-title">Apni Class Chunno</div>
-      <div class="toggle-group" id="class-group">
-        <button class="toggle-btn" onclick="selectClass('10')">📚 Class 10th</button>
-        <button class="toggle-btn" onclick="selectClass('12')">🎓 Class 12th</button>
+<!-- ===== NAV TABS ===== -->
+<nav class="nav-tabs">
+  <div class="nav-inner">
+    <button class="nav-tab active" onclick="showTab('dashboard')" id="tab-dashboard">
+      <span class="tab-icon">📊</span><span data-key="tab_dashboard">डैशबोर्ड</span>
+    </button>
+    <button class="nav-tab" onclick="showTab('new-order')" id="tab-new-order">
+      <span class="tab-icon">➕</span><span data-key="tab_new_order">नया ऑर्डर</span>
+    </button>
+    <button class="nav-tab" onclick="showTab('search')" id="tab-search">
+      <span class="tab-icon">🔍</span><span data-key="tab_search">खोजें / इतिहास</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main class="main">
+
+  <!-- ===== DASHBOARD TAB ===== -->
+  <div class="tab-panel active" id="panel-dashboard">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title" data-key="dashboard_title">आज का सारांश</h1>
+        <p class="page-subtitle" id="todayDate"></p>
       </div>
-
-      <div class="section-title">Apna Board Chunno</div>
-      <div class="toggle-group" id="board-group">
-        <button class="toggle-btn" onclick="selectBoard('CBSE')">CBSE</button>
-        <button class="toggle-btn" onclick="selectBoard('ICSE')">ICSE</button>
-        <button class="toggle-btn" onclick="selectBoard('UP Board')">UP Board</button>
-        <button class="toggle-btn" onclick="selectBoard('MP Board')">MP Board</button>
-        <button class="toggle-btn" onclick="selectBoard('Bihar Board')">Bihar Board</button>
-        <button class="toggle-btn" onclick="selectBoard('Rajasthan Board')">Rajasthan Board</button>
-        <button class="toggle-btn" onclick="selectBoard('Maharashtra Board')">Maharashtra Board</button>
-        <button class="toggle-btn" onclick="selectBoard('Other State Board')">Other State Board</button>
-      </div>
-
-      <!-- STEP 2: STREAM (only for 12th) -->
-      <div id="stream-section" style="display:none;">
-        <div class="section-title">Stream / Vishay Chunno</div>
-        <div class="toggle-group" id="stream-group">
-          <button class="toggle-btn" onclick="selectStream('Science')">🔬 Science (PCM/PCB)</button>
-          <button class="toggle-btn" onclick="selectStream('Commerce')">💼 Commerce</button>
-          <button class="toggle-btn" onclick="selectStream('Arts')">🎨 Arts / Humanities</button>
-        </div>
-        <div id="science-sub-section" style="display:none; margin-bottom:14px;">
-          <div class="section-title">PCM ya PCB?</div>
-          <div class="toggle-group" id="science-sub-group">
-            <button class="toggle-btn" onclick="selectScienceSub('PCM')">🔢 PCM (Maths)</button>
-            <button class="toggle-btn" onclick="selectScienceSub('PCB')">🧬 PCB (Biology)</button>
-          </div>
-        </div>
-      </div>
-
-      <button class="predict-btn" style="margin-top:20px;" onclick="goToMarks()">
-        ➡️ Marks Bharo!
+      <button class="btn btn-primary" onclick="showTab('new-order')">
+        <span>✂️</span><span data-key="btn_new_order">नया ऑर्डर लें</span>
       </button>
     </div>
 
-    <!-- STEP 3: MARKS -->
-    <div id="step-marks" style="display:none;">
-      <div class="section-title" id="marks-section-label">Har Subject ke Marks Range Dalo</div>
-      <div class="subjects-grid" id="subjects-grid"></div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-label" data-key="stat_total">कुल ऑर्डर</div>
+        <div class="stat-value" id="statTotal">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-label" data-key="stat_pending">बाकी काम</div>
+        <div class="stat-value" id="statPending">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-label" data-key="stat_completed">पूरे हुए</div>
+        <div class="stat-value" id="statCompleted">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label" data-key="stat_balance">बकाया रकम</div>
+        <div class="stat-value" id="statBalance">—</div>
+      </div>
+    </div>
 
-      <div class="error-msg" id="error-msg">⚠️ Sabhi subjects ke marks dalo bhai! Sab bharo!</div>
-
-      <button class="predict-btn" onclick="predictResult()">🔮 Result Predict Karo!</button>
+    <div class="card">
+      <div class="card-title"><span class="icon">⏳</span><span data-key="pending_orders_title">बाकी ऑर्डर</span></div>
+      <div id="dashPendingList"><div class="empty-state"><div class="empty-icon">🔄</div><p data-key="loading">लोड हो रहा है...</p></div></div>
     </div>
   </div>
 
-  <!-- RESULT -->
-  <div id="result-section">
-    <div class="result-hero" id="result-hero">
-      <div class="result-emoji" id="result-emoji"></div>
-      <div class="result-verdict" id="result-verdict"></div>
-      <div class="result-board-info" id="result-board-info"></div>
-      <div class="big-percent" id="big-percent"></div>
-      <div id="grade-badge-wrap"></div>
+  <!-- ===== NEW ORDER TAB ===== -->
+  <div class="tab-panel" id="panel-new-order">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title" data-key="new_order_title">नया ऑर्डर दर्ज करें</h1>
+        <p class="page-subtitle" data-key="new_order_sub">ग्राहक की जानकारी और नाप भरें</p>
+      </div>
     </div>
 
-    <div class="breakdown-title">Subject-wise Breakdown</div>
-    <div class="breakdown-grid" id="breakdown-grid"></div>
+    <div class="card">
+      <div class="card-title"><span class="icon">👤</span><span data-key="section_customer">ग्राहक जानकारी</span></div>
+      <div class="form-grid form-grid-2">
+        <div class="form-group">
+          <label data-key="lbl_name">ग्राहक का नाम</label>
+          <input type="text" id="f_name" placeholder="जैसे: राम कुमार" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label data-key="lbl_mobile">मोबाइल नंबर</label>
+          <input type="tel" id="f_mobile" placeholder="10 अंकों का नंबर" maxlength="10" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label data-key="lbl_cloth_type">कपड़े का प्रकार</label>
+          <select id="f_cloth">
+            <option value="" disabled selected data-key="opt_select">— चुनें —</option>
+            <option value="Shirt">👔 शर्ट (Shirt)</option>
+            <option value="Pant">👖 पैंट (Pant)</option>
+            <option value="Kurta">🧣 कुर्ता (Kurta)</option>
+            <option value="Pajama">🩲 पजामा (Pajama)</option>
+            <option value="Kurta-Pajama">🧣 कुर्ता-पजामा Set</option>
+            <option value="Suit">🤵 सूट (Suit)</option>
+            <option value="Coat">🧥 कोट (Coat)</option>
+            <option value="Blouse">👗 ब्लाउज़ (Blouse)</option>
+            <option value="Salwar">👘 सलवार (Salwar)</option>
+            <option value="Other">📦 अन्य (Other)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label data-key="lbl_delivery">डिलीवरी तारीख</label>
+          <input type="date" id="f_delivery">
+        </div>
+      </div>
+    </div>
 
-    <div class="breakdown-title" style="margin-top:24px;">Performance Bars</div>
-    <div id="bar-chart"></div>
+    <div class="card">
+      <div class="card-title"><span class="icon">📏</span><span data-key="section_measurements">नाप (Measurements)</span></div>
 
-    <div id="roast-card-wrap"></div>
+      <div class="section-divider">
+        <span class="section-divider-label" data-key="meas_upper">ऊपरी नाप</span>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label data-key="lbl_length">लंबाई (Length)</label>
+          <div class="measurement-unit">
+            <input type="number" id="f_length" placeholder="0" step="0.5" min="0">
+            <span class="unit-label">इंच</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label data-key="lbl_chest">सीना (Chest)</label>
+          <div class="measurement-unit">
+            <input type="number" id="f_chest" placeholder="0" step="0.5" min="0">
+            <span class="unit-label">इंच</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label data-key="lbl_waist">कमर (Waist)</label>
+          <div class="measurement-unit">
+            <input type="number" id="f_waist" placeholder="0" step="0.5" min="0">
+            <span class="unit-label">इंच</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label data-key="lbl_shoulder">कंधा (Shoulder)</label>
+          <div class="measurement-unit">
+            <input type="number" id="f_shoulder" placeholder="0" step="0.5" min="0">
+            <span class="unit-label">इंच</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label data-key="lbl_sleeve">बाजू (Sleeve)</label>
+          <div class="measurement-unit">
+            <input type="number" id="f_sleeve" placeholder="0" step="0.5" min="0">
+            <span class="unit-label">इंच</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label data-key="lbl_neck">गला (Neck)</label>
+          <div class="measurement-unit">
+            <input type="number" id="f_neck" placeholder="0" step="0.5" min="0">
+            <span class="unit-label">इंच</span>
+          </div>
+        </div>
+      </div>
 
-    <button class="again-btn" onclick="resetAll()">🔄 Phir Se Try Karo</button>
+      <div class="section-divider">
+        <span class="section-divider-label" data-key="meas_lower">निचला नाप</span>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label data-key="lbl_hip">कूल्हा (Hip)</label>
+          <div class="measurement-unit">
+            <input type="number" id="f_hip" placeholder="0" step="0.5" min="0">
+            <span class="unit-label">इंच</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label data-key="lbl_inseam">टांग (Inseam)</label>
+          <div class="measurement-unit">
+            <input type="number" id="f_inseam" placeholder="0" step="0.5" min="0">
+            <span class="unit-label">इंच</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider">
+        <span class="section-divider-label" data-key="meas_notes">विशेष निर्देश</span>
+      </div>
+      <div class="form-group">
+        <label data-key="lbl_notes">नोट्स / विशेष बातें</label>
+        <textarea id="f_notes" placeholder="जैसे: पॉकेट चाहिए, बटन का रंग, कट का style..."></textarea>
+      </div>
+    </div>
+
+    <div class="payment-card">
+      <div class="card-title" style="color:white; border-color:rgba(255,255,255,0.15); font-family:'Playfair Display',serif;">
+        <span class="icon">💳</span><span data-key="section_payment">भुगतान विवरण</span>
+      </div>
+      <div class="form-grid form-grid-2">
+        <div class="form-group">
+          <label data-key="lbl_total">कुल राशि (₹)</label>
+          <input type="number" id="f_total" placeholder="0" min="0" oninput="calcBalance()">
+        </div>
+        <div class="form-group">
+          <label data-key="lbl_advance">अग्रिम राशि (₹)</label>
+          <input type="number" id="f_advance" placeholder="0" min="0" oninput="calcBalance()">
+        </div>
+        <div class="form-group">
+          <label data-key="lbl_balance">बाकी बचा (₹)</label>
+          <div class="balance-display">
+            <span class="bal-label" data-key="balance_due">बकाया</span>
+            <span class="bal-value" id="balanceDisplay">₹ 0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-secondary" onclick="resetForm()" type="button">
+        <span>🔄</span><span data-key="btn_reset">साफ़ करें</span>
+      </button>
+      <button class="btn btn-primary" onclick="submitOrder()" id="btnSubmit">
+        <span>💾</span><span data-key="btn_save">ऑर्डर सहेजें</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== SEARCH / HISTORY TAB ===== -->
+  <div class="tab-panel" id="panel-search">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title" data-key="search_title">खोजें &amp; इतिहास</h1>
+        <p class="page-subtitle" data-key="search_sub">मोबाइल या नाम से ग्राहक खोजें</p>
+      </div>
+    </div>
+
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" data-key-placeholder="search_placeholder"
+          placeholder="नाम या मोबाइल नंबर लिखें..."
+          oninput="handleSearchInput(this.value)">
+      </div>
+      <button class="btn btn-primary" onclick="doSearch()">
+        <span data-key="btn_search">खोजें</span>
+      </button>
+      <button class="btn btn-secondary" onclick="loadAllOrders()">
+        <span data-key="btn_all">सभी</span>
+      </button>
+    </div>
+
+    <div class="filter-pills">
+      <button class="filter-pill active" onclick="setFilter('all', this)" data-key="filter_all">सभी ऑर्डर</button>
+      <button class="filter-pill" onclick="setFilter('Pending', this)" data-key="filter_pending">⏳ बाकी</button>
+      <button class="filter-pill" onclick="setFilter('Completed', this)" data-key="filter_completed">✅ पूरे हुए</button>
+    </div>
+
+    <div id="searchResultsCount" style="font-size:13px;color:var(--muted);margin-bottom:12px;"></div>
+    <div id="ordersList" class="orders-list">
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3 data-key="search_hint_title">खोज शुरू करें</h3>
+        <p data-key="search_hint_sub">ऊपर नाम या मोबाइल नंबर लिखें, या 'सभी' बटन दबाएं</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ===== CONFIRM MODAL ===== -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">पक्का करें</div>
+    <div class="modal-body" id="modalBody">क्या आप वाकई यह करना चाहते हैं?</div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()"><span data-key="btn_cancel">रद्द करें</span></button>
+      <button class="btn btn-primary" id="modalConfirmBtn"><span data-key="btn_confirm">हाँ, करें</span></button>
+    </div>
   </div>
 </div>
 
+<!-- ===== TOAST CONTAINER ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
 <script>
-// ─── DATA ───────────────────────────────────────────────
-const SUBJECTS = {
-  '10': {
-    'CBSE':             ['Hindi','English','Mathematics','Science','Social Science','Sanskrit/Computer'],
-    'ICSE':             ['English','Second Language','Mathematics','Science','History & Civics','Geography'],
-    'UP Board':         ['Hindi','English','Mathematics','Science','Social Science','Sanskrit'],
-    'MP Board':         ['Hindi','English','Mathematics','Science','Social Science','Sanskrit'],
-    'Bihar Board':      ['Hindi','English','Mathematics','Science','Social Science','Sanskrit'],
-    'Rajasthan Board':  ['Hindi','English','Mathematics','Science','Social Science','Sanskrit'],
-    'Maharashtra Board':['Marathi/Hindi','English','Mathematics','Science','Social Science','Sanskrit/German'],
-    'Other State Board':['Hindi','English','Mathematics','Science','Social Science','Additional Subject'],
+// ================================================================
+// LANGUAGE SYSTEM
+// ================================================================
+var currentLang = 'hi';
+
+var strings = {
+  hi: {
+    tab_dashboard: 'डैशबोर्ड',
+    tab_new_order: 'नया ऑर्डर',
+    tab_search: 'खोजें / इतिहास',
+    dashboard_title: 'आज का सारांश',
+    stat_total: 'कुल ऑर्डर',
+    stat_pending: 'बाकी काम',
+    stat_completed: 'पूरे हुए',
+    stat_balance: 'बकाया रकम',
+    pending_orders_title: 'बाकी ऑर्डर',
+    new_order_title: 'नया ऑर्डर दर्ज करें',
+    new_order_sub: 'ग्राहक की जानकारी और नाप भरें',
+    section_customer: 'ग्राहक जानकारी',
+    section_measurements: 'नाप (Measurements)',
+    section_payment: 'भुगतान विवरण',
+    lbl_name: 'ग्राहक का नाम',
+    lbl_mobile: 'मोबाइल नंबर',
+    lbl_cloth_type: 'कपड़े का प्रकार',
+    lbl_delivery: 'डिलीवरी तारीख',
+    lbl_length: 'लंबाई (Length)',
+    lbl_chest: 'सीना (Chest)',
+    lbl_waist: 'कमर (Waist)',
+    lbl_shoulder: 'कंधा (Shoulder)',
+    lbl_sleeve: 'बाजू (Sleeve)',
+    lbl_neck: 'गला (Neck)',
+    lbl_hip: 'कूल्हा (Hip)',
+    lbl_inseam: 'टांग (Inseam)',
+    lbl_notes: 'नोट्स / विशेष बातें',
+    lbl_total: 'कुल राशि (₹)',
+    lbl_advance: 'अग्रिम राशि (₹)',
+    lbl_balance: 'बाकी बचा (₹)',
+    balance_due: 'बकाया',
+    btn_save: 'ऑर्डर सहेजें',
+    btn_reset: 'साफ़ करें',
+    btn_new_order: 'नया ऑर्डर लें',
+    btn_search: 'खोजें',
+    btn_all: 'सभी',
+    btn_cancel: 'रद्द करें',
+    btn_confirm: 'हाँ, करें',
+    search_title: 'खोजें & इतिहास',
+    search_sub: 'मोबाइल या नाम से ग्राहक खोजें',
+    search_placeholder: 'नाम या मोबाइल नंबर लिखें...',
+    filter_all: 'सभी ऑर्डर',
+    filter_pending: '⏳ बाकी',
+    filter_completed: '✅ पूरे हुए',
+    search_hint_title: 'खोज शुरू करें',
+    search_hint_sub: 'ऊपर नाम या मोबाइल नंबर लिखें, या \'सभी\' बटन दबाएं',
+    meas_upper: 'ऊपरी नाप',
+    meas_lower: 'निचला नाप',
+    meas_notes: 'विशेष निर्देश',
+    loading: 'लोड हो रहा है...',
+    opt_select: '— चुनें —',
+    err_name: 'कृपया ग्राहक का नाम भरें।',
+    err_mobile: 'कृपया सही 10 अंकों का मोबाइल नंबर भरें।',
+    err_cloth: 'कृपया कपड़े का प्रकार चुनें।',
+    toast_saved: 'ऑर्डर सफलतापूर्वक सहेजा गया! ✅',
+    toast_err: 'कुछ गड़बड़ हुई, फिर कोशिश करें।',
+    toast_status: 'स्टेटस बदल गया!',
+    toast_deleted: 'ऑर्डर हटा दिया गया।',
+    no_orders: 'कोई ऑर्डर नहीं मिला।',
+    no_results: 'कोई परिणाम नहीं मिला।',
+    mark_complete: '✅ पूरा हुआ',
+    mark_pending: '⏳ बाकी',
+    btn_delete: '🗑️ हटाएं',
+    confirm_delete_title: 'ऑर्डर हटाएं?',
+    confirm_delete_body: 'क्या आप वाकई यह ऑर्डर हटाना चाहते हैं? यह वापस नहीं आएगा।',
+    results_count: 'ऑर्डर मिले',
+    delivery_label: 'डिलीवरी',
+    notes_label: 'नोट्स',
   },
-  '12': {
-    Science: {
-      PCM: {
-        'CBSE':             ['Physics','Chemistry','Mathematics','English','Physical Education/CS'],
-        'ICSE':             ['Physics','Chemistry','Mathematics','English','Computer Science'],
-        'UP Board':         ['Physics','Chemistry','Mathematics','Hindi','English'],
-        'MP Board':         ['Physics','Chemistry','Mathematics','Hindi','English'],
-        'Bihar Board':      ['Physics','Chemistry','Mathematics','Hindi','English'],
-        'Rajasthan Board':  ['Physics','Chemistry','Mathematics','Hindi','English'],
-        'Maharashtra Board':['Physics','Chemistry','Mathematics','English','Additional Subject'],
-        'Other State Board':['Physics','Chemistry','Mathematics','Hindi','English'],
-      },
-      PCB: {
-        'CBSE':             ['Physics','Chemistry','Biology','English','Physical Education/CS'],
-        'ICSE':             ['Physics','Chemistry','Biology','English','Computer Science'],
-        'UP Board':         ['Physics','Chemistry','Biology','Hindi','English'],
-        'MP Board':         ['Physics','Chemistry','Biology','Hindi','English'],
-        'Bihar Board':      ['Physics','Chemistry','Biology','Hindi','English'],
-        'Rajasthan Board':  ['Physics','Chemistry','Biology','Hindi','English'],
-        'Maharashtra Board':['Physics','Chemistry','Biology','English','Additional Subject'],
-        'Other State Board':['Physics','Chemistry','Biology','Hindi','English'],
-      },
-    },
-    Commerce: {
-      'CBSE':             ['Accountancy','Business Studies','Economics','English','Mathematics/IP'],
-      'ICSE':             ['Accounts','Economics','Business Studies','English','Mathematics'],
-      'UP Board':         ['Accountancy','Business Studies','Economics','Hindi','English'],
-      'MP Board':         ['Accountancy','Business Studies','Economics','Hindi','English'],
-      'Bihar Board':      ['Accountancy','Business Studies','Economics','Hindi','English'],
-      'Rajasthan Board':  ['Accountancy','Business Studies','Economics','Hindi','English'],
-      'Maharashtra Board':['Accountancy','OCM','Economics','English','Mathematics/SP'],
-      'Other State Board':['Accountancy','Business Studies','Economics','Hindi','English'],
-    },
-    Arts: {
-      'CBSE':             ['History','Geography','Political Science','Hindi/English','Economics/Sociology'],
-      'ICSE':             ['History','Geography','Political Science','English','Economics'],
-      'UP Board':         ['History','Geography','Civics','Hindi','English'],
-      'MP Board':         ['History','Geography','Civics','Hindi','English'],
-      'Bihar Board':      ['History','Geography','Civics','Hindi','English'],
-      'Rajasthan Board':  ['History','Geography','Civics','Hindi','English'],
-      'Maharashtra Board':['History','Geography','Civics','English','Additional Subject'],
-      'Other State Board':['History','Geography','Civics','Hindi','English'],
-    },
+  en: {
+    tab_dashboard: 'Dashboard',
+    tab_new_order: 'New Order',
+    tab_search: 'Search / History',
+    dashboard_title: "Today's Summary",
+    stat_total: 'Total Orders',
+    stat_pending: 'Pending',
+    stat_completed: 'Completed',
+    stat_balance: 'Balance Due',
+    pending_orders_title: 'Pending Orders',
+    new_order_title: 'Enter New Order',
+    new_order_sub: 'Fill customer details and measurements',
+    section_customer: 'Customer Information',
+    section_measurements: 'Measurements',
+    section_payment: 'Payment Details',
+    lbl_name: 'Customer Name',
+    lbl_mobile: 'Mobile Number',
+    lbl_cloth_type: 'Cloth Type',
+    lbl_delivery: 'Delivery Date',
+    lbl_length: 'Length',
+    lbl_chest: 'Chest',
+    lbl_waist: 'Waist',
+    lbl_shoulder: 'Shoulder',
+    lbl_sleeve: 'Sleeve',
+    lbl_neck: 'Neck',
+    lbl_hip: 'Hip',
+    lbl_inseam: 'Inseam',
+    lbl_notes: 'Notes / Special Instructions',
+    lbl_total: 'Total Amount (₹)',
+    lbl_advance: 'Advance Paid (₹)',
+    lbl_balance: 'Balance Due (₹)',
+    balance_due: 'Balance',
+    btn_save: 'Save Order',
+    btn_reset: 'Clear Form',
+    btn_new_order: 'New Order',
+    btn_search: 'Search',
+    btn_all: 'All',
+    btn_cancel: 'Cancel',
+    btn_confirm: 'Yes, Proceed',
+    search_title: 'Search & History',
+    search_sub: 'Find customer by mobile or name',
+    search_placeholder: 'Type name or mobile number...',
+    filter_all: 'All Orders',
+    filter_pending: '⏳ Pending',
+    filter_completed: '✅ Completed',
+    search_hint_title: 'Start Searching',
+    search_hint_sub: "Type a name or mobile number above, or press 'All'",
+    meas_upper: 'Upper Body',
+    meas_lower: 'Lower Body',
+    meas_notes: 'Special Instructions',
+    loading: 'Loading...',
+    opt_select: '— Select —',
+    err_name: 'Please enter customer name.',
+    err_mobile: 'Please enter a valid 10-digit mobile number.',
+    err_cloth: 'Please select cloth type.',
+    toast_saved: 'Order saved successfully! ✅',
+    toast_err: 'Something went wrong. Please try again.',
+    toast_status: 'Status updated!',
+    toast_deleted: 'Order deleted.',
+    no_orders: 'No orders found.',
+    no_results: 'No results found.',
+    mark_complete: '✅ Mark Complete',
+    mark_pending: '⏳ Mark Pending',
+    btn_delete: '🗑️ Delete',
+    confirm_delete_title: 'Delete Order?',
+    confirm_delete_body: 'Are you sure you want to delete this order? This cannot be undone.',
+    results_count: 'orders found',
+    delivery_label: 'Delivery',
+    notes_label: 'Notes',
   }
 };
 
-const ICONS = {
-  Hindi:'📖',English:'🇬🇧',Mathematics:'📐',Science:'🔬','Social Science':'🌍',
-  Sanskrit:'🕉️','Sanskrit/Computer':'🕉️','Sanskrit/German':'🕉️',
-  Physics:'⚛️',Chemistry:'⚗️',Biology:'🧬','Computer Science':'💻',
-  'Physical Education/CS':'🏃',Accountancy:'📊','Business Studies':'💼',
-  Economics:'💹',Geography:'🗺️',History:'🏛️','Political Science':'⚖️',
-  Civics:'🏛️',Sociology:'👥',Mathematics:'📐','Mathematics/IP':'📐',
-  'Mathematics/SP':'📐','Marathi/Hindi':'📖','Second Language':'📖',
-  'History & Civics':'🏛️','Hindi/English':'📖',OCM:'💼',
-  'Physical Education':'🏃','Additional Subject':'📚','Other':'📚',
-};
+function t(key) { return (strings[currentLang] && strings[currentLang][key]) || key; }
 
-// State
-let selClass = '', selBoard = '', selStream = '', selSciSub = '';
-let marksData = {}; // { subjectName: {min, max} }
-
-// ─── PARTICLES ────────────────────────────────────────
-(function(){
-  const container = document.getElementById('particles');
-  const colors = ['#f7931e','#ffe44d','#4f9cff','#b47cff','#00e676'];
-  for(let i=0;i<18;i++){
-    const p = document.createElement('div');
-    p.className = 'particle';
-    const size = Math.random()*6+3;
-    p.style.cssText = `
-      width:${size}px; height:${size}px;
-      left:${Math.random()*100}%;
-      background:${colors[Math.floor(Math.random()*colors.length)]};
-      animation-duration:${Math.random()*15+10}s;
-      animation-delay:${Math.random()*10}s;
-    `;
-    container.appendChild(p);
-  }
-})();
-
-// ─── SELECTORS ────────────────────────────────────────
-function selectClass(cls) {
-  selClass = cls; selStream = ''; selSciSub = '';
-  document.querySelectorAll('#class-group .toggle-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('stream-section').style.display = cls === '12' ? 'block' : 'none';
-  document.getElementById('science-sub-section').style.display = 'none';
-  document.querySelectorAll('#stream-group .toggle-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('#science-sub-group .toggle-btn').forEach(b=>b.classList.remove('active'));
-}
-
-function selectBoard(board) {
-  selBoard = board;
-  document.querySelectorAll('#board-group .toggle-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-}
-
-function selectStream(stream) {
-  selStream = stream;
-  document.querySelectorAll('#stream-group .toggle-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('science-sub-section').style.display = stream === 'Science' ? 'block' : 'none';
-  selSciSub = '';
-  document.querySelectorAll('#science-sub-group .toggle-btn').forEach(b=>b.classList.remove('active'));
-}
-
-function selectScienceSub(sub) {
-  selSciSub = sub;
-  document.querySelectorAll('#science-sub-group .toggle-btn').forEach(b=>b.classList.remove('active'));
-  event.target.classList.add('active');
-}
-
-// ─── GET SUBJECTS ─────────────────────────────────────
-function getSubjects() {
-  if (selClass === '10') return SUBJECTS['10'][selBoard] || SUBJECTS['10']['CBSE'];
-  if (selClass === '12') {
-    const streamData = SUBJECTS['12'][selStream];
-    if (!streamData) return [];
-    if (selStream === 'Science') {
-      const subData = streamData[selSciSub];
-      return subData ? (subData[selBoard] || subData['CBSE']) : [];
-    }
-    return streamData[selBoard] || streamData['CBSE'];
-  }
-  return [];
-}
-
-// ─── GO TO MARKS STEP ──────────────────────────────────
-function goToMarks() {
-  if (!selClass) return showError('Pehle class chuno bhai! 10th ya 12th?');
-  if (!selBoard) return showError('Board toh chuno yaar!');
-  if (selClass === '12') {
-    if (!selStream) return showError('Stream bhi chuno bhai — Science/Commerce/Arts?');
-    if (selStream === 'Science' && !selSciSub) return showError('PCM ya PCB? Woh bhi chuno!');
-  }
-  const subs = getSubjects();
-  if (!subs.length) return showError('Subjects nahi mile, kuch galat hua!');
-
-  // Update step UI
-  setStepDone(1); setStepActive(2);
-
-  marksData = {};
-  document.getElementById('step-class-board').style.display = 'none';
-  document.getElementById('step-marks').style.display = 'block';
-  buildSubjectSliders(subs);
-}
-
-function showError(msg) {
-  const err = document.getElementById('error-msg');
-  err.textContent = '⚠️ ' + msg;
-  err.style.display = 'block';
-  setTimeout(() => err.style.display = 'none', 3500);
-}
-
-// ─── BUILD SUBJECT SLIDERS ────────────────────────────
-function buildSubjectSliders(subjects) {
-  const grid = document.getElementById('subjects-grid');
-  grid.innerHTML = '';
-  const maxMarks = selBoard === 'ICSE' ? 100 : 100;
-
-  subjects.forEach((sub, idx) => {
-    const icon = ICONS[sub] || '📚';
-    const card = document.createElement('div');
-    card.className = 'subject-card sub-card-anim';
-    card.style.animationDelay = (idx * 0.07) + 's';
-    card.id = 'card-' + idx;
-
-    card.innerHTML = `
-      <div class="sub-header">
-        <div class="sub-icon">${icon}</div>
-        <div>
-          <div class="sub-name">${sub}</div>
-          <div class="sub-total">Max: ${maxMarks} marks</div>
-        </div>
-      </div>
-      <div class="range-container">
-        <div class="range-labels">
-          <span>0</span><span>Marks Range (Min – Max)</span><span>${maxMarks}</span>
-        </div>
-        <div class="dual-range" id="dr-${idx}">
-          <div class="range-track">
-            <div class="range-fill" id="fill-${idx}"></div>
-          </div>
-          <input type="range" id="min-${idx}" min="0" max="${maxMarks}" value="40" step="1"
-            oninput="updateRange(${idx}, ${maxMarks}, '${sub}')">
-          <input type="range" id="max-${idx}" min="0" max="${maxMarks}" value="65" step="1"
-            oninput="updateRange(${idx}, ${maxMarks}, '${sub}')">
-        </div>
-        <div class="score-display" id="disp-${idx}">
-          40 – 65 <span>/ ${maxMarks}</span>
-        </div>
-      </div>
-    `;
-    grid.appendChild(card);
-    // Init
-    updateRange(idx, maxMarks, sub);
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('btnHi').classList.toggle('active', lang === 'hi');
+  document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+  document.querySelectorAll('[data-key]').forEach(function(el) {
+    el.textContent = t(el.getAttribute('data-key'));
   });
-  setStepActive(3);
+  document.querySelectorAll('[data-key-placeholder]').forEach(function(el) {
+    el.placeholder = t(el.getAttribute('data-key-placeholder'));
+  });
+  // Update select default option
+  document.querySelector('#f_cloth option[disabled]').textContent = t('opt_select');
 }
 
-function updateRange(idx, max, subName) {
-  const minEl = document.getElementById('min-' + idx);
-  const maxEl = document.getElementById('max-' + idx);
-  let minVal = parseInt(minEl.value);
-  let maxVal = parseInt(maxEl.value);
+// ================================================================
+// TAB NAVIGATION
+// ================================================================
+function showTab(tabId) {
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.nav-tab').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('panel-' + tabId).classList.add('active');
+  document.getElementById('tab-' + tabId).classList.add('active');
+  if (tabId === 'dashboard') loadDashboard();
+  if (tabId === 'search') { /* keep current state */ }
+}
 
-  if (minVal > maxVal) {
-    if (document.activeElement === minEl) maxEl.value = minVal;
-    else minEl.value = maxVal;
-    minVal = parseInt(minEl.value);
-    maxVal = parseInt(maxEl.value);
+// ================================================================
+// BALANCE CALCULATOR
+// ================================================================
+function calcBalance() {
+  var total = parseFloat(document.getElementById('f_total').value) || 0;
+  var advance = parseFloat(document.getElementById('f_advance').value) || 0;
+  var balance = total - advance;
+  document.getElementById('balanceDisplay').textContent = '₹ ' + balance.toFixed(0);
+  document.getElementById('balanceDisplay').style.color = balance > 0 ? '#F5C842' : '#7BDA84';
+}
+
+// ================================================================
+// FORM SUBMISSION
+// ================================================================
+function submitOrder() {
+  var name = document.getElementById('f_name').value.trim();
+  var mobile = document.getElementById('f_mobile').value.trim();
+  var cloth = document.getElementById('f_cloth').value;
+
+  if (!name) { showToast(t('err_name'), 'error'); document.getElementById('f_name').focus(); return; }
+  if (!mobile || !/^\d{10}$/.test(mobile)) { showToast(t('err_mobile'), 'error'); document.getElementById('f_mobile').focus(); return; }
+  if (!cloth) { showToast(t('err_cloth'), 'error'); document.getElementById('f_cloth').focus(); return; }
+
+  var btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="loading-spinner"></div>';
+
+  var orderData = {
+    customerName: name,
+    mobile: mobile,
+    clothType: cloth,
+    length: document.getElementById('f_length').value,
+    chest: document.getElementById('f_chest').value,
+    waist: document.getElementById('f_waist').value,
+    shoulder: document.getElementById('f_shoulder').value,
+    sleeve: document.getElementById('f_sleeve').value,
+    neck: document.getElementById('f_neck').value,
+    hip: document.getElementById('f_hip').value,
+    inseam: document.getElementById('f_inseam').value,
+    notes: document.getElementById('f_notes').value.trim(),
+    totalAmount: document.getElementById('f_total').value,
+    advance: document.getElementById('f_advance').value,
+    deliveryDate: document.getElementById('f_delivery').value
+  };
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      btn.disabled = false;
+      btn.innerHTML = '<span>💾</span><span>' + t('btn_save') + '</span>';
+      if (res.success) {
+        showToast(t('toast_saved'), 'success');
+        resetForm();
+        setTimeout(function() { showTab('dashboard'); }, 1200);
+      } else {
+        showToast(res.message || t('toast_err'), 'error');
+      }
+    })
+    .withFailureHandler(function(err) {
+      btn.disabled = false;
+      btn.innerHTML = '<span>💾</span><span>' + t('btn_save') + '</span>';
+      showToast(t('toast_err'), 'error');
+    })
+    .saveOrder(orderData);
+}
+
+function resetForm() {
+  ['f_name','f_mobile','f_length','f_chest','f_waist','f_shoulder',
+   'f_sleeve','f_neck','f_hip','f_inseam','f_notes','f_total','f_advance','f_delivery']
+    .forEach(function(id) { document.getElementById(id).value = ''; });
+  document.getElementById('f_cloth').value = '';
+  document.getElementById('balanceDisplay').textContent = '₹ 0';
+}
+
+// ================================================================
+// DASHBOARD
+// ================================================================
+function loadDashboard() {
+  document.getElementById('dashPendingList').innerHTML =
+    '<div class="empty-state"><div class="empty-icon">🔄</div><p>' + t('loading') + '</p></div>';
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (res.success) {
+        var s = res.stats;
+        document.getElementById('statTotal').textContent = s.total;
+        document.getElementById('statPending').textContent = s.pending;
+        document.getElementById('statCompleted').textContent = s.completed;
+        document.getElementById('statBalance').textContent = '₹' + (s.pendingBalance || 0).toFixed(0);
+      }
+    }).getDashboardStats();
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (!res.success) return;
+      var pending = res.orders.filter(function(o) { return o.status !== 'Completed'; });
+      if (pending.length === 0) {
+        document.getElementById('dashPendingList').innerHTML =
+          '<div class="empty-state"><div class="empty-icon">🎉</div><h3>' +
+          (currentLang === 'hi' ? 'वाह! सभी काम पूरे हो गए!' : 'All caught up!') +
+          '</h3></div>';
+        return;
+      }
+      var html = '<div class="orders-list">';
+      pending.slice(0, 10).forEach(function(o) { html += buildOrderCard(o); });
+      html += '</div>';
+      document.getElementById('dashPendingList').innerHTML = html;
+    }).getAllOrders();
+}
+
+// ================================================================
+// SEARCH
+// ================================================================
+var currentFilter = 'all';
+var currentOrders = [];
+
+function handleSearchInput(val) {
+  if (val.trim() === '') return;
+}
+
+function doSearch() {
+  var q = document.getElementById('searchInput').value.trim();
+  if (!q) { showToast(currentLang === 'hi' ? 'कृपया कुछ लिखें' : 'Please type something', 'info'); return; }
+  document.getElementById('ordersList').innerHTML =
+    '<div class="empty-state"><p>' + t('loading') + '</p></div>';
+  google.script.run
+    .withSuccessHandler(function(res) {
+      currentOrders = res.orders || [];
+      renderOrders();
+    }).searchOrders(q);
+}
+
+function loadAllOrders() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('ordersList').innerHTML =
+    '<div class="empty-state"><p>' + t('loading') + '</p></div>';
+  google.script.run
+    .withSuccessHandler(function(res) {
+      currentOrders = res.orders || [];
+      renderOrders();
+    }).getAllOrders();
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
+  btn.classList.add('active');
+  renderOrders();
+}
+
+function renderOrders() {
+  var filtered = currentOrders;
+  if (currentFilter !== 'all') {
+    filtered = currentOrders.filter(function(o) { return o.status === currentFilter; });
   }
+  var countEl = document.getElementById('searchResultsCount');
+  countEl.textContent = filtered.length + ' ' + t('results_count');
 
-  const pMin = (minVal / max) * 100;
-  const pMax = (maxVal / max) * 100;
-  const fill = document.getElementById('fill-' + idx);
-  fill.style.left = pMin + '%';
-  fill.style.width = (pMax - pMin) + '%';
-
-  document.getElementById('disp-' + idx).innerHTML =
-    `${minVal} – ${maxVal} <span>/ ${max}</span>`;
-
-  marksData[subName] = { min: minVal, max: maxVal };
-  document.getElementById('card-' + idx).classList.add('filled');
-}
-
-// ─── PREDICT ─────────────────────────────────────────
-function predictResult() {
-  const subs = getSubjects();
-  const missing = subs.filter(s => !marksData[s]);
-  if (missing.length) {
-    const err = document.getElementById('error-msg');
-    err.textContent = '⚠️ Sabhi subjects ke marks dalo bhai!';
-    err.style.display = 'block';
+  if (filtered.length === 0) {
+    document.getElementById('ordersList').innerHTML =
+      '<div class="empty-state"><div class="empty-icon">📭</div><h3>' + t('no_results') + '</h3></div>';
     return;
   }
+  var html = '';
+  filtered.forEach(function(o) { html += buildOrderCard(o); });
+  document.getElementById('ordersList').innerHTML = html;
+}
 
-  const results = subs.map(s => {
-    const r = marksData[s];
-    const mid = Math.round((r.min + r.max) / 2);
-    return { name: s, icon: ICONS[s] || '📚', min: r.min, max: r.max, predicted: mid };
-  });
+// ================================================================
+// ORDER CARD BUILDER
+// ================================================================
+function buildOrderCard(o) {
+  var isPending = o.status !== 'Completed';
+  var badgeClass = isPending ? 'badge-pending' : 'badge-completed';
+  var badgeText = isPending
+    ? (currentLang === 'hi' ? '⏳ बाकी' : '⏳ Pending')
+    : (currentLang === 'hi' ? '✅ पूरा' : '✅ Done');
 
-  const total = results.reduce((s, r) => s + r.predicted, 0);
-  const maxTotal = subs.length * 100;
-  const percentage = Math.round((total / maxTotal) * 100);
+  var clothIcons = {
+    'Shirt':'👔','Pant':'👖','Kurta':'🧣','Pajama':'🩲','Kurta-Pajama':'🧣',
+    'Suit':'🤵','Coat':'🧥','Blouse':'👗','Salwar':'👘','Other':'📦'
+  };
+  var clothIcon = clothIcons[o.clothType] || '🧵';
 
-  const passThreshold = selBoard === 'ICSE' ? 40 : 33;
-  const allPass = results.every(r => r.predicted >= passThreshold);
-  const anyVeryLow = results.some(r => r.predicted < passThreshold);
+  var measurements = [];
+  if (o.length)   measurements.push({ k: currentLang==='hi'?'लंबाई':'Length',   v: o.length });
+  if (o.chest)    measurements.push({ k: currentLang==='hi'?'सीना':'Chest',     v: o.chest });
+  if (o.waist)    measurements.push({ k: currentLang==='hi'?'कमर':'Waist',      v: o.waist });
+  if (o.shoulder) measurements.push({ k: currentLang==='hi'?'कंधा':'Shoulder',  v: o.shoulder });
+  if (o.sleeve)   measurements.push({ k: currentLang==='hi'?'बाजू':'Sleeve',    v: o.sleeve });
+  if (o.neck)     measurements.push({ k: currentLang==='hi'?'गला':'Neck',       v: o.neck });
+  if (o.hip)      measurements.push({ k: currentLang==='hi'?'कूल्हा':'Hip',     v: o.hip });
+  if (o.inseam)   measurements.push({ k: currentLang==='hi'?'टांग':'Inseam',    v: o.inseam });
 
-  // Grade
-  let grade, gradeColor;
-  if (percentage >= 91) { grade = 'A1 | Distinction'; gradeColor = '#00e676'; }
-  else if (percentage >= 81) { grade = 'A2 | First Division'; gradeColor = '#4f9cff'; }
-  else if (percentage >= 71) { grade = 'B1 | First Division'; gradeColor = '#4f9cff'; }
-  else if (percentage >= 61) { grade = 'B2 | Second Division'; gradeColor = '#ffe44d'; }
-  else if (percentage >= 51) { grade = 'C1 | Second Division'; gradeColor = '#f7931e'; }
-  else if (percentage >= 41) { grade = 'C2 | Pass'; gradeColor = '#f7931e'; }
-  else if (percentage >= 33) { grade = 'D | Just Pass'; gradeColor = '#ff9800'; }
-  else { grade = 'F | Fail 💀'; gradeColor = '#ff3d5a'; }
-
-  // Build result
-  const hero = document.getElementById('result-hero');
-  hero.className = 'result-hero ' + (allPass ? (percentage >= 55 ? 'pass' : 'close') : 'fail');
-
-  document.getElementById('result-emoji').textContent =
-    percentage >= 90 ? '🏆' : percentage >= 75 ? '🎉' : percentage >= 55 ? '😊' : percentage >= 33 ? '😬' : '💀';
-  document.getElementById('result-verdict').textContent =
-    allPass ? (percentage >= 75 ? 'ZABARDAST PASS! 🎉' : percentage >= 50 ? 'PASS ✅' : 'JUST PASS 😅') : 'FAIL 😭';
-
-  const streamInfo = selClass === '12' ? ` | ${selStream}${selSciSub ? ' ('+selSciSub+')' : ''}` : '';
-  document.getElementById('result-board-info').textContent =
-    `Class ${selClass} | ${selBoard}${streamInfo}`;
-
-  document.getElementById('big-percent').textContent = percentage + '%';
-  document.getElementById('grade-badge-wrap').innerHTML =
-    `<div class="grade-badge" style="background:${gradeColor}22;color:${gradeColor};border:1px solid ${gradeColor}55">${grade}</div>`;
-
-  // Breakdown grid
-  const bdGrid = document.getElementById('breakdown-grid');
-  bdGrid.innerHTML = results.map(r => {
-    const cls = r.predicted >= 70 ? 'high' : r.predicted >= passThreshold ? 'mid' : 'low';
-    return `<div class="breakdown-chip ${cls}">
-      <div class="chip-icon">${r.icon}</div>
-      <div class="chip-name">${r.name}</div>
-      <div class="chip-score">${r.predicted}/100</div>
-      <div class="chip-percent">(${r.min}–${r.max})</div>
-    </div>`;
-  }).join('');
-
-  // Bar chart
-  const barDiv = document.getElementById('bar-chart');
-  barDiv.innerHTML = results.map(r => {
-    const pct = r.predicted;
-    const color = pct >= 70 ? 'var(--green)' : pct >= passThreshold ? 'var(--accent)' : 'var(--red)';
-    return `<div class="bar-row">
-      <div class="bar-sub">${r.icon} ${r.name.length > 10 ? r.name.slice(0,9)+'…' : r.name}</div>
-      <div class="bar-wrap"><div class="bar-fill" style="width:0%;background:${color}" data-target="${pct}"></div></div>
-      <div class="bar-val" style="color:${color}">${pct}%</div>
-    </div>`;
-  }).join('');
-
-  setTimeout(() => {
-    document.querySelectorAll('.bar-fill').forEach(el => {
-      el.style.width = el.dataset.target + '%';
+  var measHTML = '';
+  if (measurements.length > 0) {
+    measHTML = '<div class="measurements-grid">';
+    measurements.forEach(function(m) {
+      measHTML += '<div class="measure-item"><div class="measure-key">' + m.k +
+        '</div><div class="measure-val">' + m.v + '<small style="font-size:10px;color:var(--muted)"> in</small></div></div>';
     });
-  }, 100);
-
-  // Roast
-  buildRoast(percentage, allPass, results, passThreshold);
-
-  setStepDone(2); setStepDone(3); setStepActive(4);
-
-  document.getElementById('form-section').style.display = 'none';
-  document.getElementById('result-section').style.display = 'block';
-  document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
-}
-
-function buildRoast(pct, passed, results, threshold) {
-  const wrap = document.getElementById('roast-card-wrap');
-  const weakSubs = results.filter(r => r.predicted < threshold).map(r => r.name);
-  const strongSubs = results.filter(r => r.predicted >= 75).map(r => r.name);
-
-  let cls, icon, title, body;
-
-  if (pct >= 90) {
-    cls = 'praise'; icon = '🏆'; title = 'Topper Material! Sach mein Kamaal hai tu!';
-    body = `${pct}% bhai?! Tu toh legend hai! 🌟 ${strongSubs.length ? strongSubs.join(', ') + ' mein' : ''} ekdum jhakkas kiya!
-    Maa-Baap ka naam roshan kar diya tune. Teacher bhi teri copy dekhke khush ho jaayegi.
-    Teri zindagi set hai — bas mehnat karte rehna! 🔥 Keep it up champion!`;
-  } else if (pct >= 75) {
-    cls = 'praise'; icon = '🎉'; title = 'First Division! Gazab kar diya!';
-    body = `Wah bhai ${pct}%! First division solidly pakad li tune! 🎊
-    ${strongSubs.length ? strongSubs.join(', ') + ' mein toh zabardast tha!' : ''}
-    Thoda aur push karta toh distinction milti — agli baar pakka! Tu kar sakta hai! 💪`;
-  } else if (pct >= 60) {
-    cls = 'warn'; icon = '😐'; title = 'Theek-Thaak... Par Aur Behtar Ho Sakta Tha';
-    body = `${pct}%... Chalo theek hai, doosri division mili. Par bhai, itna toh hota hi hai phone rakhke padho toh! 😅
-    ${weakSubs.length ? '⚠️ ' + weakSubs.join(', ') + ' mein aur dhyan dena tha yaar!' : ''}
-    Agli baar thoda aur effort kar — tu capable hai, sirf focus nahi tha! 📚`;
-  } else if (pct >= 33 && passed) {
-    cls = 'warn'; icon = '😬'; title = 'Jugaad Pass... Bas Nikal Gaya!';
-    body = `${pct}%?! Bhai seedha bol — raat ko soone se pehle kitne reels dekhe the? 😤
-    ${weakSubs.length ? '🔴 ' + weakSubs.join(' aur ') + ' ne maar diya bilkul!' : ''}
-    Khud ko khush mat kar — paas toh hua, par barely. Agli baar uthke padh warna agli class mein bhi yahi hoga!
-    Teri toh... chalta hai, maar nahi khega abhi — par mehnat kar bhai! 😂`;
-  } else {
-    cls = 'roast'; icon = '💀'; title = 'Bhai... FAIL? Kya kar raha tha poore saal?!';
-    body = `<strong>ARE YOU SERIOUS ${pct}%?!</strong> Itna mushkil tha kya padhna?! 🤬<br><br>
-    ${weakSubs.length ? '<strong>' + weakSubs.join(', ') + '</strong> mein toh ekdum hi haath khade kar diye — ek chapter bhi nahi padha kya?!' : ''}
-    <br><br><strong>Nalayak kahin ka!</strong> Maa-Baap din raat mehnat karte hain aur tu fail ho gaya?!
-    Phone, game, friends — sab tha — sirf ek kaam nahi kiya — <strong>PADHA NAHI!</strong><br><br>
-    <strong>Bewakoof!</strong> Ab ghar mein kya munh lekar ghusega?! Ek baar unka chehra dekh — sharma toh aayegi na?!<br><br>
-    <em>(Yaar seriously — next attempt mein mehnat kar. Tu kar sakta hai bas thoda seriously le! 💪)</em>`;
+    measHTML += '</div>';
   }
 
-  wrap.innerHTML = `
-    <div class="roast-card ${cls}">
-      <div class="roast-header">
-        <div class="roast-icon">${icon}</div>
-        <div class="roast-title">${title}</div>
-      </div>
-      <div class="roast-body">${body}</div>
-    </div>`;
-}
-
-// ─── STEPS UI ────────────────────────────────────────
-function setStepActive(n) {
-  const el = document.getElementById('step'+n);
-  if (el) { el.className = 'step active'; }
-}
-function setStepDone(n) {
-  const el = document.getElementById('step'+n);
-  if (el) {
-    el.className = 'step done';
-    el.querySelector('.step-circle').textContent = '✓';
+  var notesHTML = '';
+  if (o.notes) {
+    notesHTML = '<div class="order-notes">📌 ' + escapeHtml(o.notes) + '</div>';
   }
-  const line = document.getElementById('line'+n);
-  if (line) line.classList.add('done');
+
+  var deliveryHTML = '';
+  if (o.deliveryDate) {
+    deliveryHTML = '<span style="font-size:12px;color:var(--muted);">📅 ' + t('delivery_label') + ': ' + o.deliveryDate + '</span>';
+  }
+
+  var balance = parseFloat(o.balance) || 0;
+  var balClass = balance > 0 ? 'balance-due' : 'balance-paid';
+
+  var statusBtnText = isPending ? t('mark_complete') : t('mark_pending');
+  var newStatus = isPending ? 'Completed' : 'Pending';
+
+  return '<div class="order-card" id="order-' + o.rowIndex + '">' +
+    '<div class="order-card-header" onclick="toggleCard(' + o.rowIndex + ')">' +
+      '<div class="order-id-name">' +
+        '<div>' +
+          '<div class="order-id">' + escapeHtml(String(o.orderId)) + '</div>' +
+          '<div class="order-customer">' + escapeHtml(o.customerName) + ' · 📱 ' + escapeHtml(String(o.mobile)) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="order-meta">' +
+        '<span class="badge badge-cloth">' + clothIcon + ' ' + escapeHtml(o.clothType) + '</span>' +
+        '<span class="badge ' + badgeClass + '">' + badgeText + '</span>' +
+        (o.date ? '<span class="order-date">🗓 ' + escapeHtml(String(o.date)) + '</span>' : '') +
+        '<span class="expand-arrow">▼</span>' +
+      '</div>' +
+    '</div>' +
+    '<div class="order-card-body">' +
+      (measurements.length > 0 ? measHTML : '<p style="color:var(--muted);font-size:13px;padding:8px 0;">' + (currentLang==='hi'?'कोई नाप दर्ज नहीं':'No measurements recorded') + '</p>') +
+      notesHTML +
+      deliveryHTML +
+      '<div class="order-payment-row">' +
+        '<div class="pay-item"><div class="pay-label">' + (currentLang==='hi'?'कुल':'Total') + '</div><div class="pay-val">₹' + (o.totalAmount||0) + '</div></div>' +
+        '<div class="pay-item"><div class="pay-label">' + (currentLang==='hi'?'अग्रिम':'Advance') + '</div><div class="pay-val">₹' + (o.advance||0) + '</div></div>' +
+        '<div class="pay-item"><div class="pay-label">' + (currentLang==='hi'?'बकाया':'Balance') + '</div><div class="pay-val ' + balClass + '">₹' + balance + '</div></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="order-actions">' +
+      '<button class="btn btn-sm btn-' + (isPending ? 'success' : 'secondary') + '" onclick="changeStatus(' + o.rowIndex + ',\'' + newStatus + '\')">' + statusBtnText + '</button>' +
+      '<button class="btn btn-sm btn-ghost" onclick="confirmDelete(' + o.rowIndex + ')">' + t('btn_delete') + '</button>' +
+    '</div>' +
+  '</div>';
 }
 
-// ─── RESET ───────────────────────────────────────────
-function resetAll() {
-  selClass = ''; selBoard = ''; selStream = ''; selSciSub = '';
-  marksData = {};
-  document.getElementById('form-section').style.display = 'block';
-  document.getElementById('step-class-board').style.display = 'block';
-  document.getElementById('step-marks').style.display = 'none';
-  document.getElementById('result-section').style.display = 'none';
-  document.getElementById('stream-section').style.display = 'none';
-  document.getElementById('science-sub-section').style.display = 'none';
-  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.step').forEach((s,i) => {
-    s.className = 'step' + (i===0?' active':'');
-    s.querySelector('.step-circle').textContent = i+1;
-  });
-  document.querySelectorAll('.step-line').forEach(l => l.classList.remove('done'));
-  document.getElementById('error-msg').style.display = 'none';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+function toggleCard(rowIndex) {
+  var el = document.getElementById('order-' + rowIndex);
+  if (el) el.classList.toggle('expanded');
 }
+
+// ================================================================
+// STATUS UPDATE & DELETE
+// ================================================================
+function changeStatus(rowIndex, newStatus) {
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (res.success) {
+        showToast(t('toast_status'), 'success');
+        // Update local data and re-render
+        currentOrders.forEach(function(o) {
+          if (o.rowIndex === rowIndex) o.status = newStatus;
+        });
+        renderOrders();
+        loadDashboard();
+      }
+    }).updateOrderStatus(rowIndex, newStatus);
+}
+
+var pendingDelete = null;
+function confirmDelete(rowIndex) {
+  pendingDelete = rowIndex;
+  document.getElementById('modalTitle').textContent = t('confirm_delete_title');
+  document.getElementById('modalBody').textContent = t('confirm_delete_body');
+  document.getElementById('modalConfirmBtn').onclick = function() {
+    doDelete(pendingDelete);
+    closeModal();
+  };
+  document.getElementById('confirmModal').classList.add('open');
+}
+function closeModal() { document.getElementById('confirmModal').classList.remove('open'); }
+
+function doDelete(rowIndex) {
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (res.success) {
+        showToast(t('toast_deleted'), 'info');
+        currentOrders = currentOrders.filter(function(o) { return o.rowIndex !== rowIndex; });
+        renderOrders();
+        loadDashboard();
+      }
+    }).deleteOrder(rowIndex);
+}
+
+// ================================================================
+// TOAST
+// ================================================================
+function showToast(msg, type) {
+  type = type || 'info';
+  var el = document.createElement('div');
+  el.className = 'toast toast-' + type;
+  el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 3000);
+}
+
+// ================================================================
+// UTILS
+// ================================================================
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ================================================================
+// INIT
+// ================================================================
+window.addEventListener('DOMContentLoaded', function() {
+  // Set today's date
+  var now = new Date();
+  var options = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+  document.getElementById('todayDate').textContent = now.toLocaleDateString(
+    currentLang === 'hi' ? 'hi-IN' : 'en-IN', options);
+  loadDashboard();
+});
+
 </script>
 </body>
 </html>
