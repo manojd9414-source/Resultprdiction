@@ -4,21 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PDF Quiz — 75 Questions | Gemini AI</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-
   <style>
     :root {
-      --bg:      #080b14;
-      --surface: rgba(255,255,255,0.04);
-      --border:  rgba(255,255,255,0.08);
-      --text:    #e8eaf0;
-      --muted:   rgba(255,255,255,0.38);
-      --accent1: #1a73e8;
-      --accent2: #34a853;
-      --green:   #2cb67d;
-      --red:     #e85d75;
-      --yellow:  #f5a623;
+      --bg: #080b14; --surface: rgba(255,255,255,0.04); --border: rgba(255,255,255,0.08);
+      --text: #e8eaf0; --muted: rgba(255,255,255,0.38);
+      --accent1: #1a73e8; --accent2: #34a853;
+      --green: #2cb67d; --red: #e85d75; --yellow: #f5a623;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -26,392 +18,216 @@
       background-image:
         radial-gradient(ellipse 80% 60% at 20% 10%, rgba(26,115,232,0.18) 0%, transparent 60%),
         radial-gradient(ellipse 60% 50% at 80% 80%, rgba(52,168,83,0.12) 0%, transparent 60%);
-      min-height: 100vh;
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text);
-      padding-bottom: 60px;
+      min-height: 100vh; font-family: 'DM Sans', sans-serif; color: var(--text); padding-bottom: 60px;
     }
 
     .header { text-align: center; padding: 44px 20px 28px; }
     .badge {
-      display: inline-block;
-      background: rgba(26,115,232,0.14);
-      border: 1px solid rgba(26,115,232,0.35);
-      color: #82b4ff;
-      font-size: 10px;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      padding: 5px 16px;
-      border-radius: 999px;
-      margin-bottom: 16px;
+      display: inline-block; background: rgba(26,115,232,0.14); border: 1px solid rgba(26,115,232,0.35);
+      color: #82b4ff; font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+      padding: 5px 16px; border-radius: 999px; margin-bottom: 16px;
     }
     .header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.8rem, 5vw, 3rem);
-      font-weight: 800;
-      color: #fff;
-      letter-spacing: -.02em;
-      margin-bottom: 10px;
-      line-height: 1.15;
+      font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,5vw,3rem); font-weight: 800;
+      color: #fff; letter-spacing: -.02em; margin-bottom: 10px; line-height: 1.15;
     }
-    .header h1 span {
-      background: linear-gradient(90deg, #1a73e8, #34a853);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+    .header h1 span { background: linear-gradient(90deg,#1a73e8,#34a853); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .header p { color: var(--muted); font-size: 14px; }
 
     .card {
-      background: var(--surface);
-      backdrop-filter: blur(24px);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      padding: 32px 28px;
-      max-width: 680px;
-      margin: 0 auto 24px;
+      background: var(--surface); backdrop-filter: blur(24px); border: 1px solid var(--border);
+      border-radius: 22px; padding: 28px 24px; max-width: 680px; margin: 0 auto 24px;
     }
-    @media(max-width:600px){ .card{ padding:20px 14px; margin:0 10px 18px; } }
+    @media(max-width:600px){ .card{ padding:18px 14px; margin:0 10px 18px; } }
 
-    .section-label {
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-      display: block;
-    }
+    .section-label { font-size: 11px; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px; display: block; }
 
     input[type=password], select {
-      width: 100%;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 13px 16px;
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      outline: none;
-      transition: border-color .2s;
-      margin-bottom: 12px;
+      width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--border);
+      border-radius: 12px; padding: 13px 16px; color: var(--text); font-family: 'DM Sans',sans-serif;
+      font-size: 14px; outline: none; transition: border-color .2s; margin-bottom: 10px;
     }
     input[type=password]:focus, select:focus { border-color: var(--accent1); }
-    input[type=password]::placeholder { color: rgba(255,255,255,0.2); }
+    input::placeholder { color: rgba(255,255,255,0.2); }
     select {
-      -webkit-appearance: none;
-      appearance: none;
+      -webkit-appearance: none; appearance: none; cursor: pointer;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      background-color: rgba(255,255,255,0.06);
-      padding-right: 36px;
-      cursor: pointer;
+      background-repeat: no-repeat; background-position: right 14px center;
+      background-color: rgba(255,255,255,0.06); padding-right: 36px;
     }
-    select option { background: #1a1f2e; color: var(--text); }
+    select option { background: #1a1f2e; }
 
-    .key-help { font-size: 11px; color: var(--muted); margin-top: -6px; margin-bottom: 14px; }
+    .key-help { font-size: 11px; color: var(--muted); margin-bottom: 14px; }
     .key-help a { color: #82b4ff; text-decoration: none; }
 
     .info-box {
-      background: rgba(26,115,232,0.08);
-      border: 1px solid rgba(26,115,232,0.2);
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 12px;
-      color: #82b4ff;
-      line-height: 1.6;
-      margin-bottom: 14px;
+      background: rgba(26,115,232,0.08); border: 1px solid rgba(26,115,232,0.2);
+      border-radius: 12px; padding: 12px 16px; font-size: 12px; color: #82b4ff;
+      line-height: 1.6; margin-bottom: 14px;
     }
     .info-box strong { color: #a8caff; }
 
-    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+    /* Quantity selector */
+    .qty-row { display: flex; gap: 8px; margin-bottom: 14px; }
+    .qty-btn {
+      flex: 1; padding: 10px 6px; border-radius: 10px; border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04); color: var(--muted); font-family: 'DM Sans',sans-serif;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; text-align: center;
+    }
+    .qty-btn.active { border-color: var(--accent1); background: rgba(26,115,232,0.12); color: #82b4ff; }
+
+    .divider { height: 1px; background: var(--border); margin: 18px 0; }
 
     .dropzone {
-      border: 2px dashed rgba(255,255,255,0.15);
-      border-radius: 16px;
-      padding: 40px 24px;
-      text-align: center;
-      cursor: pointer;
-      transition: all .22s;
-      position: relative;
+      border: 2px dashed rgba(255,255,255,0.15); border-radius: 16px; padding: 36px 20px;
+      text-align: center; cursor: pointer; transition: all .22s; position: relative;
     }
     .dropzone:hover, .dropzone.drag { border-color: var(--accent1); background: rgba(26,115,232,0.06); }
     .dropzone.has-file { border-color: var(--green); background: rgba(44,182,125,0.05); }
     .dropzone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-    .dz-icon { font-size: 34px; margin-bottom: 8px; }
-    .dz-title { color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 4px; }
-    .dz-sub { color: rgba(255,255,255,0.28); font-size: 12px; }
-    .dz-file { color: var(--green); font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    .dz-icon { font-size: 30px; margin-bottom: 8px; }
+    .dz-title { color: rgba(255,255,255,0.6); font-size: 13px; margin-bottom: 4px; }
+    .dz-sub { color: rgba(255,255,255,0.28); font-size: 11px; }
+    .dz-file { color: var(--green); font-weight: 600; font-size: 13px; margin-bottom: 3px; word-break: break-all; }
 
     .btn-primary {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 16px;
-      margin-top: 16px;
-      border: none;
-      border-radius: 14px;
-      background: linear-gradient(135deg, var(--accent1), var(--accent2));
-      color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity .2s, transform .1s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 16px; margin-top: 16px; border: none; border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2)); color: #fff;
+      font-family: 'DM Sans',sans-serif; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: opacity .2s, transform .1s;
     }
     .btn-primary:hover:not(:disabled) { opacity: .9; transform: translateY(-1px); }
-    .btn-primary:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+    .btn-primary:disabled { opacity: .35; cursor: not-allowed; }
 
     .error-box {
-      margin-top: 14px;
-      padding: 12px 16px;
-      border-radius: 12px;
-      background: rgba(232,93,117,0.1);
-      border: 1px solid rgba(232,93,117,0.3);
-      color: #ffb3be;
-      font-size: 13px;
-      line-height: 1.5;
+      margin-top: 12px; padding: 12px 16px; border-radius: 12px;
+      background: rgba(232,93,117,0.1); border: 1px solid rgba(232,93,117,0.3);
+      color: #ffb3be; font-size: 13px; line-height: 1.6;
     }
 
     /* LOADING */
-    .loader { text-align: center; padding: 30px 0 10px; }
+    .loader { text-align: center; padding: 20px 0 16px; }
     .spinner {
-      width: 48px; height: 48px;
-      border: 3px solid rgba(255,255,255,0.08);
-      border-top-color: var(--accent1);
-      border-radius: 50%;
-      animation: spin .8s linear infinite;
-      margin: 0 auto 18px;
+      width: 44px; height: 44px; border: 3px solid rgba(255,255,255,0.08);
+      border-top-color: var(--accent1); border-radius: 50%;
+      animation: spin .8s linear infinite; margin: 0 auto 14px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loader-title { color: #fff; font-size: 16px; font-weight: 600; margin-bottom: 6px; }
-    .loader-sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+    .loader-title { color: #fff; font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .loader-sub { color: var(--muted); font-size: 12px; margin-bottom: 18px; }
 
-    /* Batch progress */
-    .batch-progress {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    .batch-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
+    .batch-wrap { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+    .batch-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
     .batch-row:last-child { margin-bottom: 0; }
-    .batch-num {
-      width: 28px; height: 28px;
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 700;
-      flex-shrink: 0;
-    }
-    .batch-num.waiting { background: rgba(255,255,255,0.06); color: var(--muted); }
-    .batch-num.active  { background: rgba(26,115,232,0.3); color: #82b4ff; animation: pulse 1s infinite; }
-    .batch-num.done    { background: rgba(44,182,125,0.2); color: var(--green); }
-    .batch-num.error   { background: rgba(232,93,117,0.2); color: var(--red); }
+    .bnum { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+    .bnum.wait  { background: rgba(255,255,255,0.06); color: var(--muted); }
+    .bnum.active{ background: rgba(26,115,232,0.3); color: #82b4ff; animation: pulse 1s infinite; }
+    .bnum.done  { background: rgba(44,182,125,0.2); color: var(--green); }
+    .bnum.err   { background: rgba(232,93,117,0.2); color: var(--red); }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
-    .batch-info { flex: 1; }
-    .batch-label { font-size: 13px; color: var(--text); }
-    .batch-status { font-size: 11px; color: var(--muted); margin-top: 2px; }
-    .batch-count { font-size: 12px; font-weight: 700; color: var(--green); }
+    .blabel { font-size: 13px; color: var(--text); flex: 1; }
+    .bstatus { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .bcount { font-size: 12px; font-weight: 700; color: var(--green); }
 
-    .total-prog-wrap { margin-top: 14px; }
-    .total-prog-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-    .prog-bar { height: 6px; background: rgba(255,255,255,0.07); border-radius: 999px; overflow: hidden; }
-    .prog-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent1), var(--accent2));
-      border-radius: 999px;
-      transition: width .5s ease;
-    }
+    .prog-wrap { margin-top: 12px; }
+    .prog-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .prog-bar { height: 5px; background: rgba(255,255,255,0.07); border-radius: 999px; overflow: hidden; }
+    .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent1), var(--accent2)); border-radius: 999px; transition: width .5s ease; }
 
     /* QUIZ */
-    .quiz-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 8px; }
-    .q-counter { color: var(--muted); font-size: 12px; letter-spacing: .08em; }
-    .q-score-live { font-size: 12px; color: var(--green); font-weight: 600; }
-    .q-text {
-      color: #fff;
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(14px, 2.8vw, 18px);
-      font-weight: 700;
-      line-height: 1.55;
-      margin-bottom: 20px;
-    }
+    .qprog-wrap { height: 4px; background: rgba(255,255,255,0.07); border-radius: 999px; overflow: hidden; margin-bottom: 16px; }
+    .qprog-fill { height: 100%; background: linear-gradient(90deg, var(--accent1), var(--accent2)); border-radius: 999px; transition: width .4s ease; }
+    .quiz-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .q-counter { color: var(--muted); font-size: 12px; }
+    .q-score { font-size: 12px; color: var(--green); font-weight: 600; }
+    .q-text { color: #fff; font-family: 'Playfair Display',serif; font-size: clamp(14px,2.8vw,18px); font-weight: 700; line-height: 1.55; margin-bottom: 16px; }
 
-    .quiz-prog-wrap { height: 4px; background: rgba(255,255,255,0.07); border-radius: 999px; overflow: hidden; margin-bottom: 20px; }
-    .quiz-prog-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent1), var(--accent2));
-      border-radius: 999px;
-      transition: width .4s ease;
+    .opt-btn {
+      width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.025); color: #d4d8e5;
+      font-family: 'DM Sans',sans-serif; font-size: 13px; cursor: pointer;
+      display: flex; align-items: center; gap: 12px; transition: all .15s;
     }
+    .opt-btn:hover:not(.locked) { border-color: var(--accent1); background: rgba(26,115,232,0.08); }
+    .opt-btn.correct { border-color: var(--green); background: rgba(44,182,125,0.1); color: #7fe8be; }
+    .opt-btn.wrong   { border-color: var(--red);   background: rgba(232,93,117,0.1); color: #ffb3be; }
+    .opt-btn.locked  { cursor: default; }
+    .opt-lbl {
+      width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center;
+      justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;
+      background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); transition: all .15s;
+    }
+    .opt-btn.correct .opt-lbl { background: var(--green); color: #fff; }
+    .opt-btn.wrong   .opt-lbl { background: var(--red); color: #fff; }
 
-    .option-btn {
-      width: 100%;
-      text-align: left;
-      padding: 12px 14px;
-      margin-bottom: 8px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.025);
-      color: #d4d8e5;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: all .15s;
-    }
-    .option-btn:hover:not(.locked) { border-color: var(--accent1); background: rgba(26,115,232,0.08); }
-    .option-btn.correct { border-color: var(--green); background: rgba(44,182,125,0.1); color: #7fe8be; }
-    .option-btn.wrong   { border-color: var(--red);   background: rgba(232,93,117,0.1); color: #ffb3be; }
-    .option-btn.locked  { cursor: default; }
-    .opt-label {
-      width: 26px; height: 26px;
-      border-radius: 7px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 700;
-      flex-shrink: 0;
-      background: rgba(255,255,255,0.08);
-      color: rgba(255,255,255,0.5);
-      transition: all .15s;
-    }
-    .option-btn.correct .opt-label { background: var(--green); color: #fff; }
-    .option-btn.wrong   .opt-label { background: var(--red);   color: #fff; }
-
-    .explanation {
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: 11px;
-      background: rgba(26,115,232,0.08);
-      border: 1px solid rgba(26,115,232,0.22);
-      color: #82b4ff;
-      font-size: 12px;
-      line-height: 1.65;
-      animation: fadeUp .3s ease;
+    .expl {
+      margin-top: 12px; padding: 12px 14px; border-radius: 11px;
+      background: rgba(26,115,232,0.08); border: 1px solid rgba(26,115,232,0.22);
+      color: #82b4ff; font-size: 12px; line-height: 1.65; animation: fadeUp .3s ease;
     }
     @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
 
-    .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; gap: 10px; }
+    .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; gap: 10px; }
     .btn-next {
-      padding: 11px 24px;
-      border: none;
-      border-radius: 11px;
-      background: linear-gradient(135deg, var(--accent1), var(--accent2));
-      color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity .2s, transform .1s;
+      padding: 11px 24px; border: none; border-radius: 11px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2)); color: #fff;
+      font-family: 'DM Sans',sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity .2s;
     }
-    .btn-next:hover { opacity:.9; transform:translateY(-1px); }
+    .btn-next:hover { opacity:.9; }
     .btn-skip {
-      padding: 11px 20px;
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      background: transparent;
-      color: var(--muted);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all .15s;
+      padding: 11px 16px; border: 1px solid var(--border); border-radius: 11px;
+      background: transparent; color: var(--muted); font-family: 'DM Sans',sans-serif;
+      font-size: 12px; cursor: pointer; transition: all .15s;
     }
     .btn-skip:hover { border-color: var(--accent1); color: var(--text); }
 
     /* RESULTS */
-    .results-header { text-align: center; padding-bottom: 24px; }
-    .trophy { font-size: 48px; margin-bottom: 6px; }
-    .results-header h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 800; color: #fff; }
+    .res-hdr { text-align: center; padding-bottom: 20px; }
+    .trophy { font-size: 44px; margin-bottom: 6px; }
+    .res-hdr h2 { font-family: 'Playfair Display',serif; font-size: 22px; font-weight: 800; color: #fff; }
 
-    .score-ring-wrap { margin: 0 auto 24px; width: fit-content; }
-    .score-ring {
-      width: 120px; height: 120px;
-      border-radius: 50%;
-      border: 7px solid var(--green);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
+    .ring-wrap { margin: 0 auto 20px; width: fit-content; }
+    .ring {
+      width: 110px; height: 110px; border-radius: 50%; border: 7px solid var(--green);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
-    .score-ring.mid { border-color: var(--yellow); }
-    .score-ring.low { border-color: var(--red); }
-    .score-pct { color: #fff; font-family: 'Playfair Display',serif; font-size: 28px; font-weight: 800; line-height: 1; }
-    .score-frac { color: var(--muted); font-size: 12px; margin-top: 3px; }
+    .ring.mid { border-color: var(--yellow); } .ring.low { border-color: var(--red); }
+    .ring-pct { color: #fff; font-family: 'Playfair Display',serif; font-size: 26px; font-weight: 800; line-height: 1; }
+    .ring-frac { color: var(--muted); font-size: 11px; margin-top: 3px; }
 
-    .stat-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 28px; flex-wrap: wrap; }
-    .stat-pill {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px 18px;
-      text-align: center;
-      min-width: 75px;
-    }
-    .stat-val { font-family: 'Playfair Display',serif; font-size: 22px; font-weight: 800; }
-    .stat-lbl { color: var(--muted); font-size: 11px; margin-top: 2px; }
+    .stat-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 22px; flex-wrap: wrap; }
+    .stat-pill { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; text-align: center; min-width: 65px; }
+    .stat-val { font-family: 'Playfair Display',serif; font-size: 20px; font-weight: 800; }
+    .stat-lbl { color: var(--muted); font-size: 10px; margin-top: 2px; }
 
-    /* Review with search/filter */
-    .review-controls {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
+    .filter-row { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+    .fbtn {
+      padding: 5px 12px; border-radius: 999px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); font-size: 11px; cursor: pointer;
+      transition: all .15s; font-family: 'DM Sans',sans-serif;
     }
-    .filter-btn {
-      padding: 6px 14px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      font-size: 12px;
-      cursor: pointer;
-      transition: all .15s;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .filter-btn.active { border-color: var(--accent1); color: #82b4ff; background: rgba(26,115,232,0.1); }
+    .fbtn.active { border-color: var(--accent1); color: #82b4ff; background: rgba(26,115,232,0.1); }
 
-    .review-list { margin-bottom: 28px; max-height: 480px; overflow-y: auto; padding-right: 4px; }
-    .review-list::-webkit-scrollbar { width: 4px; }
-    .review-list::-webkit-scrollbar-track { background: transparent; }
+    .review-list { margin-bottom: 22px; max-height: 450px; overflow-y: auto; padding-right: 4px; }
+    .review-list::-webkit-scrollbar { width: 3px; }
     .review-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-
-    .review-item {
-      padding: 12px 14px;
-      border-radius: 12px;
-      margin-bottom: 8px;
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-    }
-    .review-item.ok  { background: rgba(44,182,125,0.06); border:1px solid rgba(44,182,125,0.2); }
-    .review-item.bad { background: rgba(232,93,117,0.06); border:1px solid rgba(232,93,117,0.2); }
-    .review-item.skipped { background: rgba(245,166,35,0.06); border:1px solid rgba(245,166,35,0.2); }
-    .ri-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+    .ri { padding: 11px 13px; border-radius: 11px; margin-bottom: 7px; display: flex; gap: 9px; align-items: flex-start; }
+    .ri.ok  { background: rgba(44,182,125,0.06); border:1px solid rgba(44,182,125,0.2); }
+    .ri.bad { background: rgba(232,93,117,0.06); border:1px solid rgba(232,93,117,0.2); }
+    .ri.skip{ background: rgba(245,166,35,0.06); border:1px solid rgba(245,166,35,0.2); }
     .ri-q { color: var(--text); font-size: 12px; font-weight: 500; margin-bottom: 3px; line-height: 1.4; }
-    .ri-ans { font-size: 11px; color: var(--muted); }
-    .ri-ans .wrong-a { color: #ffb3be; }
-    .ri-ans .right-a { color: #7fe8be; }
+    .ri-a { font-size: 11px; color: var(--muted); }
+    .ri-a .wa { color: #ffb3be; } .ri-a .ca { color: #7fe8be; }
 
     .btn-retry {
-      display: block; margin: 0 auto;
-      padding: 14px 36px;
-      border: none; border-radius: 14px;
-      background: linear-gradient(135deg, var(--accent1), var(--accent2));
-      color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px; font-weight: 600;
-      cursor: pointer;
-      transition: opacity .2s, transform .1s;
+      display: block; margin: 0 auto; padding: 13px 30px; border: none; border-radius: 13px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2)); color: #fff;
+      font-family: 'DM Sans',sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity .2s;
     }
-    .btn-retry:hover { opacity:.9; transform:translateY(-1px); }
+    .btn-retry:hover { opacity:.9; }
 
-    .footer { text-align: center; color: rgba(255,255,255,0.12); font-size: 11px; margin-top: 14px; }
-
+    .footer { text-align: center; color: rgba(255,255,255,0.1); font-size: 11px; margin-top: 14px; }
     .screen { display: none; }
     .screen.active { display: block; }
   </style>
@@ -419,33 +235,35 @@
 <body>
 
 <header class="header">
-  <div class="badge">Gemini AI &middot; 75 MCQ &middot; PDF Quiz</div>
-  <h1>PDF se banao<br/><span>75 Questions Quiz</span></h1>
-  <p>PDF upload karo → Gemini AI 75 MCQ banayega → Score dekho</p>
+  <div class="badge">Gemini Native PDF · Quiz Generator</div>
+  <h1>PDF se banao<br/><span>Smart MCQ Quiz</span></h1>
+  <p>PDF directly Gemini ko bhejo → AI khud padhega → Quiz banayega</p>
 </header>
 
-<!-- ══ UPLOAD SCREEN ══ -->
+<!-- UPLOAD -->
 <div id="screen-upload" class="screen active">
   <div class="card">
-
     <span class="section-label">🔑 Google Gemini API Key</span>
     <input type="password" id="apiKey" placeholder="AIzaSy..." autocomplete="off" />
-    <p class="key-help">
-      Free API key milegi yahan &rarr;
-      <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a>
-    </p>
+    <p class="key-help">Free key → <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a></p>
 
     <span class="section-label">🤖 Gemini Model</span>
     <select id="modelSelect">
-      <option value="gemini-2.0-flash">gemini-2.0-flash ⚡ (Recommended — Fast)</option>
+      <option value="gemini-2.0-flash">gemini-2.0-flash ⚡ (Best for free tier)</option>
       <option value="gemini-1.5-flash">gemini-1.5-flash (Stable)</option>
-      <option value="gemini-2.0-flash-lite">gemini-2.0-flash-lite (Fastest, lite)</option>
+      <option value="gemini-1.5-pro">gemini-1.5-pro (Most capable)</option>
     </select>
 
+    <span class="section-label">📊 Kitne Questions?</span>
+    <div class="qty-row">
+      <button class="qty-btn" onclick="setQty(this,25)">25 Q</button>
+      <button class="qty-btn" onclick="setQty(this,50)">50 Q</button>
+      <button class="qty-btn active" onclick="setQty(this,75)">75 Q</button>
+    </div>
+
     <div class="info-box">
-      ℹ️ <strong>75 Questions kaise banega?</strong><br/>
-      Free API ki limit ke andar rehne ke liye, AI <strong>3 batches</strong> mein 25-25 questions banayega.
-      Har batch ke beech thodi si delay hogi taaki rate limit na aaye. Total ~60-90 seconds lagenge.
+      ✅ <strong>Ab PDF directly Gemini ko bheja jaata hai!</strong><br/>
+      PDF.js text extraction ki zaroorat nahi — Gemini khud PDF padhta hai. JEE, NEET, math equations sab kaam karega!
     </div>
 
     <div class="divider"></div>
@@ -455,153 +273,108 @@
       <div id="dz-default">
         <div class="dz-icon">📄</div>
         <div class="dz-title">PDF yahan drop karo ya click karo</div>
-        <div class="dz-sub">Text-based PDF · Max ~20 MB</div>
+        <div class="dz-sub">Any PDF — JEE, NEET, notes, textbook · Max 20MB</div>
       </div>
       <div id="dz-selected" style="display:none">
         <div class="dz-icon">✅</div>
         <div class="dz-file" id="dz-filename"></div>
-        <div class="dz-sub">Change karne ke liye click karo</div>
+        <div class="dz-sub">Change ke liye click karo</div>
       </div>
     </div>
 
     <div id="upload-error" class="error-box" style="display:none"></div>
-
-    <button class="btn-primary" id="btnGenerate" disabled>
-      ✨ 75 Questions Generate Karo
-    </button>
+    <button class="btn-primary" id="btnGenerate" disabled>✨ Quiz Generate Karo</button>
   </div>
 </div>
 
-<!-- ══ LOADING SCREEN ══ -->
+<!-- LOADING -->
 <div id="screen-loading" class="screen">
   <div class="card">
     <div class="loader">
       <div class="spinner"></div>
-      <div class="loader-title" id="loader-title">Generating Questions...</div>
-      <div class="loader-sub" id="loader-sub">Thoda wait karo, AI kaam kar raha hai</div>
+      <div class="loader-title" id="loaderTitle">PDF Gemini ko bhej raha hoon...</div>
+      <div class="loader-sub" id="loaderSub">Please wait</div>
     </div>
-
-    <div class="batch-progress">
-      <div class="batch-row" id="batch-row-0">
-        <div class="batch-num waiting" id="batch-icon-0">1</div>
-        <div class="batch-info">
-          <div class="batch-label">Batch 1 — Q 1 to 25</div>
-          <div class="batch-status" id="batch-status-0">Waiting...</div>
-        </div>
-        <div class="batch-count" id="batch-count-0"></div>
-      </div>
-      <div class="batch-row" id="batch-row-1">
-        <div class="batch-num waiting" id="batch-icon-1">2</div>
-        <div class="batch-info">
-          <div class="batch-label">Batch 2 — Q 26 to 50</div>
-          <div class="batch-status" id="batch-status-1">Waiting...</div>
-        </div>
-        <div class="batch-count" id="batch-count-1"></div>
-      </div>
-      <div class="batch-row" id="batch-row-2">
-        <div class="batch-num waiting" id="batch-icon-2">3</div>
-        <div class="batch-info">
-          <div class="batch-label">Batch 3 — Q 51 to 75</div>
-          <div class="batch-status" id="batch-status-2">Waiting...</div>
-        </div>
-        <div class="batch-count" id="batch-count-2"></div>
-      </div>
-    </div>
-
-    <div class="total-prog-wrap">
-      <div class="total-prog-label">
-        <span>Total Progress</span>
-        <span id="progLabel">0 / 75 questions</span>
-      </div>
-      <div class="prog-bar">
-        <div class="prog-fill" id="totalProgFill" style="width:0%"></div>
-      </div>
+    <div class="batch-wrap" id="batchWrap"></div>
+    <div class="prog-wrap">
+      <div class="prog-label"><span>Progress</span><span id="progLabel">0 questions</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
     </div>
   </div>
 </div>
 
-<!-- ══ QUIZ SCREEN ══ -->
+<!-- QUIZ -->
 <div id="screen-quiz" class="screen">
   <div class="card">
-    <div class="quiz-prog-wrap">
-      <div class="quiz-prog-fill" id="quizProgFill" style="width:0%"></div>
-    </div>
-    <div class="quiz-header">
+    <div class="qprog-wrap"><div class="qprog-fill" id="qprogFill" style="width:0%"></div></div>
+    <div class="quiz-hdr">
       <div class="q-counter" id="qCounter">Q 1 / 75</div>
-      <div class="q-score-live" id="scoreLive">✅ 0 correct</div>
+      <div class="q-score" id="qScore">✅ 0</div>
     </div>
     <div class="q-text" id="qText"></div>
-    <div id="optionsWrap"></div>
-    <div id="explanation" class="explanation" style="display:none"></div>
+    <div id="optWrap"></div>
+    <div id="expl" class="expl" style="display:none"></div>
     <div class="nav-row">
-      <button class="btn-skip" id="btnSkip">Skip →</button>
+      <button class="btn-skip" id="btnSkip">Skip ⏭</button>
       <button class="btn-next" id="btnNext" style="display:none">Next →</button>
     </div>
   </div>
 </div>
 
-<!-- ══ RESULTS SCREEN ══ -->
+<!-- RESULTS -->
 <div id="screen-results" class="screen">
   <div class="card">
-    <div class="results-header">
-      <div class="trophy" id="trophyEmoji">🏆</div>
-      <h2 id="gradeText">Excellent!</h2>
-      <p style="color:var(--muted);font-size:13px;margin-top:4px">75 Questions Quiz Complete!</p>
+    <div class="res-hdr">
+      <div class="trophy" id="trophy">🏆</div>
+      <h2 id="grade">Excellent!</h2>
+      <p style="color:var(--muted);font-size:12px;margin-top:4px">Quiz Complete!</p>
     </div>
-
-    <div class="score-ring-wrap">
-      <div class="score-ring" id="scoreRing">
-        <div class="score-pct" id="scorePct">0%</div>
-        <div class="score-frac" id="scoreFrac">0/75</div>
+    <div class="ring-wrap">
+      <div class="ring" id="ring">
+        <div class="ring-pct" id="ringPct">0%</div>
+        <div class="ring-frac" id="ringFrac">0/75</div>
       </div>
     </div>
-
     <div class="stat-row">
-      <div class="stat-pill"><div class="stat-val" style="color:var(--green)" id="statCorrect">0</div><div class="stat-lbl">Correct</div></div>
-      <div class="stat-pill"><div class="stat-val" style="color:var(--red)"   id="statWrong">0</div><div class="stat-lbl">Wrong</div></div>
-      <div class="stat-pill"><div class="stat-val" style="color:var(--yellow)" id="statSkipped">0</div><div class="stat-lbl">Skipped</div></div>
-      <div class="stat-pill"><div class="stat-val" style="color:#82b4ff"      id="statTotal">75</div><div class="stat-lbl">Total</div></div>
+      <div class="stat-pill"><div class="stat-val" style="color:var(--green)"  id="sC">0</div><div class="stat-lbl">Correct</div></div>
+      <div class="stat-pill"><div class="stat-val" style="color:var(--red)"    id="sW">0</div><div class="stat-lbl">Wrong</div></div>
+      <div class="stat-pill"><div class="stat-val" style="color:var(--yellow)" id="sS">0</div><div class="stat-lbl">Skipped</div></div>
+      <div class="stat-pill"><div class="stat-val" style="color:#82b4ff"       id="sT">0</div><div class="stat-lbl">Total</div></div>
     </div>
-
-    <div class="review-controls">
-      <button class="filter-btn active" data-filter="all"     onclick="setFilter(this,'all')">All (75)</button>
-      <button class="filter-btn"        data-filter="wrong"   onclick="setFilter(this,'wrong')">❌ Wrong</button>
-      <button class="filter-btn"        data-filter="correct" onclick="setFilter(this,'correct')">✅ Correct</button>
-      <button class="filter-btn"        data-filter="skipped" onclick="setFilter(this,'skipped')">⏭ Skipped</button>
+    <div class="filter-row">
+      <button class="fbtn active" onclick="setFilter(this,'all')">All</button>
+      <button class="fbtn" onclick="setFilter(this,'bad')">❌ Wrong</button>
+      <button class="fbtn" onclick="setFilter(this,'ok')">✅ Correct</button>
+      <button class="fbtn" onclick="setFilter(this,'skip')">⏭ Skipped</button>
     </div>
-
-    <div class="review-list" id="reviewItems"></div>
-
+    <div class="review-list" id="reviewList"></div>
     <button class="btn-retry" id="btnRetry">↑ Naya PDF Try Karo</button>
   </div>
 </div>
 
-<div class="footer">Powered by Google Gemini AI &middot; PDF.js &middot; 75 MCQ Quiz</div>
+<div class="footer">Powered by Google Gemini Native PDF API · No text extraction needed</div>
 
 <script>
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
   // ── State ──────────────────────────────────────────────────────────────
-  let currentFile = null;
-  let questions   = [];   // all 75
-  let currentQ    = 0;
-  let userAnswers = {};   // { index: 'A'|'B'|'C'|'D'|'SKIP' }
-  let revealed    = false;
-  let correctCount = 0;
-  let currentFilter = 'all';
+  let currentFile = null, questions = [], currentQ = 0;
+  let userAnswers = {}, correctCount = 0, totalQty = 75;
 
   const $ = id => document.getElementById(id);
-  const show = id => {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    $(id).classList.add('active');
-  };
+  const show = id => { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); };
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-  // ── File ───────────────────────────────────────────────────────────────
+  // ── Qty selector ───────────────────────────────────────────────────────
+  function setQty(btn, n) {
+    document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    totalQty = n;
+  }
+
+  // ── File ──────────────────────────────────────────────────────────────
   $('pdfInput').addEventListener('change', e => { if(e.target.files[0]) setFile(e.target.files[0]); });
   const dz = $('dropzone');
-  dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag'); });
-  dz.addEventListener('dragleave', ()  => dz.classList.remove('drag'));
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
   dz.addEventListener('drop', e => {
     e.preventDefault(); dz.classList.remove('drag');
     const f = e.dataTransfer.files[0];
@@ -610,354 +383,334 @@
 
   function setFile(f) {
     currentFile = f;
-    $('dz-default').style.display = 'none';
+    $('dz-default').style.display  = 'none';
     $('dz-selected').style.display = 'block';
-    $('dz-filename').textContent = '📄 ' + f.name + ' (' + (f.size/1024).toFixed(0) + ' KB)';
+    $('dz-filename').textContent   = '📄 ' + f.name + ' (' + (f.size/1024).toFixed(0) + ' KB)';
     dz.classList.add('has-file');
     checkReady();
   }
   $('apiKey').addEventListener('input', checkReady);
-  function checkReady() {
-    $('btnGenerate').disabled = !($('apiKey').value.trim().length > 10 && currentFile);
+  function checkReady() { $('btnGenerate').disabled = !($('apiKey').value.trim().length > 10 && currentFile); }
+
+  // ── PDF → Base64 ──────────────────────────────────────────────────────
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = () => resolve(reader.result.split(',')[1]); // strip data:...;base64,
+      reader.onerror = () => reject(new Error('File read failed'));
+      reader.readAsDataURL(file);
+    });
   }
 
-  // ── Generate ───────────────────────────────────────────────────────────
+  // ── Build batch UI ────────────────────────────────────────────────────
+  function buildBatchUI(batches) {
+    const wrap = $('batchWrap');
+    wrap.innerHTML = '';
+    batches.forEach((b, i) => {
+      wrap.innerHTML += `
+        <div class="batch-row">
+          <div class="bnum wait" id="bi${i}">${i+1}</div>
+          <div style="flex:1">
+            <div class="blabel">Batch ${i+1} — Q ${b.start} to ${b.start+b.n-1}</div>
+            <div class="bstatus" id="bs${i}">Waiting...</div>
+          </div>
+          <div class="bcount" id="bc${i}"></div>
+        </div>`;
+    });
+  }
+
+  function setBatch(i, state, status, count) {
+    const bi = $('bi'+i); if(!bi) return;
+    bi.className = 'bnum ' + state;
+    $('bs'+i).textContent = status;
+    if (count != null) $('bc'+i).textContent = count > 0 ? '+'+count+' ✓' : '';
+  }
+
+  function setProgress(got, total) {
+    $('progFill').style.width = Math.min(got/total*100, 100) + '%';
+    $('progLabel').textContent = got + ' / ' + total + ' questions';
+  }
+
+  // ── Generate ──────────────────────────────────────────────────────────
   $('btnGenerate').addEventListener('click', async () => {
     const apiKey = $('apiKey').value.trim();
     const model  = $('modelSelect').value;
+    const qty    = totalQty;
     $('upload-error').style.display = 'none';
     show('screen-loading');
 
     try {
-      $('loader-title').textContent = '📖 PDF se text extract ho raha hai...';
-      $('loader-sub').textContent   = 'Ek second...';
-      const text = await extractTextFromPDF(currentFile);
-      if (text.length < 100) throw new Error('PDF mein zyada text nahi mila. Scanned image PDFs support nahi hote.');
+      $('loaderTitle').textContent = '📄 PDF ko base64 mein convert kar raha hoon...';
+      $('loaderSub').textContent   = 'Ek second...';
 
-      $('loader-title').textContent = '🤖 Gemini 75 Questions bana raha hai...';
-      $('loader-sub').textContent   = '3 batches mein generate hoga — thoda wait karo';
+      const base64 = await fileToBase64(currentFile);
 
-      questions = await generateAll75(apiKey, model, text);
-      if (questions.length < 10) throw new Error(`Sirf ${questions.length} questions generate hue. Dobara try karo.`);
+      // Decide batches
+      const batchSize = 25;
+      const numBatches = Math.ceil(qty / batchSize);
+      const batches = [];
+      for (let i = 0; i < numBatches; i++) {
+        const start = i * batchSize + 1;
+        const n     = Math.min(batchSize, qty - i * batchSize);
+        batches.push({ i, start, n });
+      }
 
-      currentQ     = 0;
+      buildBatchUI(batches);
+      $('loaderTitle').textContent = `🤖 Gemini ${qty} questions bana raha hai...`;
+      $('loaderSub').textContent   = `${numBatches} batches mein — PDF directly Gemini ko bhej raha hoon`;
+
+      questions    = [];
       userAnswers  = {};
       correctCount = 0;
+      currentQ     = 0;
+
+      for (const b of batches) {
+        setBatch(b.i, 'active', 'PDF bhej raha hoon...', null);
+
+        try {
+          const qs = await fetchBatch(apiKey, model, base64, b, qty);
+          questions.push(...qs);
+          setBatch(b.i, 'done', `Done! ${qs.length} questions`, qs.length);
+          setProgress(questions.length, qty);
+        } catch(e) {
+          setBatch(b.i, 'err', 'Error: ' + e.message, 0);
+          console.error('Batch', b.i, 'failed:', e);
+        }
+
+        // Delay between batches (not after last)
+        if (b.i < batches.length - 1) {
+          for (let t = 10; t >= 1; t--) {
+            $('bs'+b.i).textContent = `Done ✓ — Next in ${t}s...`;
+            await sleep(1000);
+          }
+        }
+      }
+
+      if (questions.length === 0) throw new Error('Koi bhi question nahi bana. API key check karo ya dusra model try karo.');
+
       startQuiz();
 
     } catch(err) {
       show('screen-upload');
       $('upload-error').style.display = 'block';
-      $('upload-error').textContent = '⚠️ ' + err.message;
+      $('upload-error').textContent   = '⚠️ ' + err.message;
     }
   });
 
-  // ── PDF Extract ────────────────────────────────────────────────────────
-  async function extractTextFromPDF(file) {
-    const buf = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-    let text = '';
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      text += content.items.map(x => x.str).join(' ') + '\n';
-    }
-    return text.trim();
-  }
-
-  // ── Gemini API ─────────────────────────────────────────────────────────
-  async function callGemini(apiKey, model, prompt, retries = 3) {
+  // ── Single batch: PDF → Gemini ────────────────────────────────────────
+  async function fetchBatch(apiKey, model, base64, batch, totalQty, attempt = 1) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-              temperature: 0.5,
-              maxOutputTokens: 8192,
-              responseMimeType: 'application/json'
-            }
-          })
-        });
 
-        if (res.status === 429) {
-          // Rate limit — wait and retry
-          const wait = attempt * 20000; // 20s, 40s, 60s
-          updateBatchStatus(currentBatch, `Rate limit! ${wait/1000}s wait kar raha hai... (try ${attempt}/${retries})`);
-          await sleep(wait);
-          continue;
-        }
+    const prompt = `You are an expert MCQ quiz maker for competitive exams like JEE, NEET, UPSC.
 
-        if (!res.ok) {
-          const err = await res.json().catch(()=>({}));
-          throw new Error(err?.error?.message || `API error ${res.status}`);
-        }
+This is a PDF document. Read it carefully and create exactly ${batch.n} multiple choice questions.
 
-        const data = await res.json();
-        const raw  = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        const clean = raw.trim().replace(/^```[a-z]*\n?/,'').replace(/\n?```$/,'');
-        return JSON.parse(clean);
+BATCH INFO:
+- This is batch ${batch.i + 1}
+- Question IDs: ${batch.start} to ${batch.start + batch.n - 1}
+- Total quiz will have ${totalQty} questions across all batches
+- Cover DIFFERENT topics/sections than earlier batches — avoid repetition
 
-      } catch(e) {
-        if (attempt === retries) throw e;
-        await sleep(10000);
-      }
-    }
-  }
+STRICT OUTPUT RULES:
+- Return ONLY a valid JSON object
+- No markdown, no backticks, no explanation before or after
+- Start your response with { and end with }
 
-  let currentBatch = 0;
-
-  function setBatchState(idx, state, statusText, count) {
-    const icon   = $(`batch-icon-${idx}`);
-    const status = $(`batch-status-${idx}`);
-    const cnt    = $(`batch-count-${idx}`);
-    icon.className   = `batch-num ${state}`;
-    status.textContent = statusText;
-    if (count !== undefined) cnt.textContent = count > 0 ? `+${count} ✓` : '';
-  }
-
-  function updateBatchStatus(idx, text) {
-    $(`batch-status-${idx}`).textContent = text;
-  }
-
-  function updateTotalProg(got) {
-    const pct = Math.min((got / 75) * 100, 100);
-    $('totalProgFill').style.width = pct + '%';
-    $('progLabel').textContent = `${got} / 75 questions`;
-  }
-
-  async function generateAll75(apiKey, model, fullText) {
-    const allQuestions = [];
-    // Split text into 3 chunks for variety
-    const chunkSize = Math.floor(fullText.length / 3);
-    const chunks = [
-      fullText.slice(0, chunkSize + 1000),
-      fullText.slice(Math.max(0, chunkSize - 500), 2 * chunkSize + 1000),
-      fullText.slice(Math.max(0, 2 * chunkSize - 500))
-    ];
-
-    const batchDefs = [
-      { idx: 0, startId: 1,  count: 25, label: 'Batch 1 (Q 1-25)'  },
-      { idx: 1, startId: 26, count: 25, label: 'Batch 2 (Q 26-50)' },
-      { idx: 2, startId: 51, count: 25, label: 'Batch 3 (Q 51-75)' },
-    ];
-
-    for (const batch of batchDefs) {
-      currentBatch = batch.idx;
-      setBatchState(batch.idx, 'active', 'Generating...', 0);
-
-      const textChunk = chunks[batch.idx].slice(0, 6000); // safe limit per call
-
-      const prompt = `You are an expert quiz maker. Based on the document content below, create exactly ${batch.count} unique multiple-choice questions.
-
-DOCUMENT CONTENT:
-"""
-${textChunk}
-"""
-
-IMPORTANT:
-- Start question IDs from ${batch.startId} to ${batch.startId + batch.count - 1}
-- Do NOT repeat questions already covered in earlier batches
-- Focus on different aspects, facts, and concepts each batch
-- Make distractors plausible but clearly wrong
-
-Return ONLY a valid JSON object with this exact schema:
+JSON SCHEMA:
 {
   "questions": [
     {
-      "id": ${batch.startId},
-      "question": "question text here",
-      "options": { "A": "option", "B": "option", "C": "option", "D": "option" },
+      "id": ${batch.start},
+      "question": "full question text",
+      "options": {
+        "A": "option text",
+        "B": "option text",
+        "C": "option text",
+        "D": "option text"
+      },
       "correct_answer": "A",
-      "explanation": "brief 1-2 sentence explanation"
+      "explanation": "why this answer is correct"
     }
   ]
 }
 
-Return ONLY the JSON. No markdown, no code fences, no extra text.`;
+Generate all ${batch.n} questions now. Start IDs from ${batch.start}.`;
 
-      try {
-        const parsed = await callGemini(apiKey, model, prompt);
-        const qs = parsed?.questions || [];
-        allQuestions.push(...qs);
-        setBatchState(batch.idx, 'done', `Done! ${qs.length} questions ready`, qs.length);
-        updateTotalProg(allQuestions.length);
-      } catch(err) {
-        setBatchState(batch.idx, 'error', `Error: ${err.message}`, 0);
-        // Continue with other batches
+    const body = {
+      contents: [{
+        parts: [
+          {
+            inline_data: {
+              mime_type: "application/pdf",
+              data: base64
+            }
+          },
+          { text: prompt }
+        ]
+      }],
+      generationConfig: {
+        temperature: 0.4,
+        maxOutputTokens: 8192
       }
+    };
 
-      // Delay between batches to respect rate limits (except last)
-      if (batch.idx < 2) {
-        for (let t = 8; t >= 1; t--) {
-          updateBatchStatus(batch.idx, `Done ✓ — Next batch in ${t}s...`);
-          await sleep(1000);
-        }
-      }
+    let res;
+    try {
+      res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+    } catch(netErr) {
+      throw new Error('Network error — internet check karo: ' + netErr.message);
     }
 
-    return allQuestions;
+    // Rate limit retry
+    if (res.status === 429) {
+      if (attempt >= 4) throw new Error('Rate limit — thodi der baad try karo');
+      const wait = attempt * 20000;
+      setBatch(batch.i, 'active', `Rate limit! ${wait/1000}s wait... (${attempt}/4)`, null);
+      await sleep(wait);
+      return fetchBatch(apiKey, model, base64, batch, totalQty, attempt + 1);
+    }
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      const msg = errData?.error?.message || `HTTP ${res.status}`;
+      // Common errors with helpful messages
+      if (res.status === 400) throw new Error(`API Error 400: ${msg} — Model PDF support nahi karta? gemini-1.5-flash try karo.`);
+      if (res.status === 403) throw new Error('API key invalid hai ya quota khatam ho gaya.');
+      throw new Error(msg);
+    }
+
+    const data = await res.json();
+    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    if (!rawText) {
+      const reason = data?.candidates?.[0]?.finishReason || 'unknown';
+      throw new Error(`Gemini ne empty response diya (reason: ${reason})`);
+    }
+
+    const parsed = robustParse(rawText);
+    if (!parsed || !Array.isArray(parsed.questions) || parsed.questions.length === 0) {
+      throw new Error(`JSON parse fail. Response: ${rawText.slice(0, 200)}`);
+    }
+
+    return parsed.questions;
   }
 
-  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-  // ── Quiz ───────────────────────────────────────────────────────────────
-  function startQuiz() {
-    show('screen-quiz');
-    renderQuestion();
+  // ── Robust JSON parser ─────────────────────────────────────────────────
+  function robustParse(raw) {
+    const strategies = [
+      // 1. Direct
+      s => JSON.parse(s.trim()),
+      // 2. Strip fences
+      s => JSON.parse(s.trim().replace(/^```json\s*/i,'').replace(/\s*```$/,'')),
+      // 3. Extract {}
+      s => { const a=s.indexOf('{'), b=s.lastIndexOf('}'); if(a<0||b<0) throw 0; return JSON.parse(s.slice(a,b+1)); },
+      // 4. Fix trailing commas
+      s => { let f=s.replace(/,(\s*[}\]])/g,'$1'); const a=f.indexOf('{'), b=f.lastIndexOf('}'); return JSON.parse(f.slice(a,b+1)); }
+    ];
+    for (const fn of strategies) {
+      try { const r = fn(raw); if(r) return r; } catch(e) {}
+    }
+    return null;
   }
 
-  function renderQuestion() {
-    const q     = questions[currentQ];
-    const total = questions.length;
-    const pct   = (currentQ / total) * 100;
+  // ── Quiz ──────────────────────────────────────────────────────────────
+  function startQuiz() { show('screen-quiz'); renderQ(); }
 
-    $('quizProgFill').style.width = pct + '%';
-    $('qCounter').textContent     = `Q ${currentQ + 1} / ${total}`;
-    $('scoreLive').textContent    = `✅ ${correctCount} correct`;
-    $('qText').textContent        = q.question;
-    $('explanation').style.display = 'none';
-    $('btnNext').style.display     = 'none';
-    $('btnSkip').style.display     = 'inline-block';
-    revealed = false;
+  function renderQ() {
+    const q = questions[currentQ], tot = questions.length;
+    $('qprogFill').style.width  = (currentQ/tot*100) + '%';
+    $('qCounter').textContent   = `Q ${currentQ+1} / ${tot}`;
+    $('qScore').textContent     = `✅ ${correctCount}`;
+    $('qText').textContent      = q.question;
+    $('expl').style.display     = 'none';
+    $('btnNext').style.display  = 'none';
+    $('btnSkip').style.display  = 'inline-block';
 
-    const wrap = $('optionsWrap');
-    wrap.innerHTML = '';
+    const wrap = $('optWrap'); wrap.innerHTML = '';
     ['A','B','C','D'].forEach(l => {
       const btn = document.createElement('button');
-      btn.className = 'option-btn';
-      btn.innerHTML = `<span class="opt-label">${l}</span><span>${q.options[l]}</span>`;
-      btn.addEventListener('click', () => pickAnswer(l));
+      btn.className = 'opt-btn';
+      btn.innerHTML = `<span class="opt-lbl">${l}</span><span>${q.options[l] || '—'}</span>`;
+      btn.addEventListener('click', () => pick(l));
       wrap.appendChild(btn);
     });
   }
 
-  function pickAnswer(letter) {
-    if (revealed) return;
-    revealed = true;
+  function pick(letter) {
     const q = questions[currentQ];
     userAnswers[currentQ] = letter;
     if (letter === q.correct_answer) correctCount++;
-    $('scoreLive').textContent = `✅ ${correctCount} correct`;
+    $('qScore').textContent = `✅ ${correctCount}`;
 
-    const btns = $('optionsWrap').querySelectorAll('.option-btn');
-    ['A','B','C','D'].forEach((l, i) => {
-      btns[i].classList.add('locked');
-      if (l === q.correct_answer) btns[i].classList.add('correct');
-      else if (l === letter)      btns[i].classList.add('wrong');
+    $('optWrap').querySelectorAll('.opt-btn').forEach((btn, i) => {
+      const l = ['A','B','C','D'][i];
+      btn.classList.add('locked');
+      if (l === q.correct_answer) btn.classList.add('correct');
+      else if (l === letter)      btn.classList.add('wrong');
     });
 
-    $('explanation').textContent   = '💡 ' + q.explanation;
-    $('explanation').style.display = 'block';
-    $('btnNext').style.display     = 'block';
-    $('btnSkip').style.display     = 'none';
-    $('btnNext').textContent = (currentQ + 1 < questions.length) ? 'Next →' : '🏁 Results Dekho';
+    $('expl').textContent    = '💡 ' + (q.explanation || 'No explanation.');
+    $('expl').style.display  = 'block';
+    $('btnNext').style.display = 'block';
+    $('btnSkip').style.display = 'none';
+    $('btnNext').textContent = currentQ+1 < questions.length ? 'Next →' : '🏁 Results Dekho';
   }
 
-  $('btnSkip').addEventListener('click', () => {
-    userAnswers[currentQ] = 'SKIP';
-    nextQuestion();
-  });
+  $('btnSkip').addEventListener('click', () => { userAnswers[currentQ]='SKIP'; nextQ(); });
+  $('btnNext').addEventListener('click', nextQ);
+  function nextQ() { currentQ++; if(currentQ < questions.length) renderQ(); else showResults(); }
 
-  $('btnNext').addEventListener('click', nextQuestion);
-
-  function nextQuestion() {
-    currentQ++;
-    if (currentQ < questions.length) renderQuestion();
-    else showResults();
-  }
-
-  // ── Results ────────────────────────────────────────────────────────────
+  // ── Results ───────────────────────────────────────────────────────────
   function showResults() {
-    const total   = questions.length;
-    const correct = questions.filter((q,i) => userAnswers[i] === q.correct_answer).length;
-    const skipped = Object.values(userAnswers).filter(v => v === 'SKIP').length;
-    const wrong   = total - correct - skipped;
-    const pct     = Math.round((correct / total) * 100);
+    const tot     = questions.length;
+    const correct = questions.filter((q,i)=>userAnswers[i]===q.correct_answer).length;
+    const skipped = Object.values(userAnswers).filter(v=>v==='SKIP').length;
+    const wrong   = tot - correct - skipped;
+    const pct     = Math.round(correct/tot*100);
 
-    const grade = pct >= 80 ? ['🏆','Zabardast! Outstanding!']
-                : pct >= 65 ? ['🎯','Bahut Badiya! Great Job!']
-                : pct >= 50 ? ['💪','Theek Hai! Keep Going!']
-                : pct >= 35 ? ['📖','Aur Padhna Padega!']
-                :             ['😅','Mehnat Karo Yaar!'];
-
-    $('trophyEmoji').textContent = grade[0];
-    $('gradeText').textContent   = grade[1];
-    $('scorePct').textContent    = pct + '%';
-    $('scoreFrac').textContent   = correct + '/' + total;
-    $('statCorrect').textContent = correct;
-    $('statWrong').textContent   = wrong;
-    $('statSkipped').textContent = skipped;
-    $('statTotal').textContent   = total;
-
-    const ring = $('scoreRing');
-    ring.className = 'score-ring' + (pct >= 65 ? '' : pct >= 40 ? ' mid' : ' low');
-
-    // Update filter buttons
-    document.querySelector('[data-filter="all"]').textContent    = `All (${total})`;
-    document.querySelector('[data-filter="wrong"]').textContent   = `❌ Wrong (${wrong})`;
-    document.querySelector('[data-filter="correct"]').textContent = `✅ Correct (${correct})`;
-    document.querySelector('[data-filter="skipped"]').textContent = `⏭ Skipped (${skipped})`;
-
+    const g = pct>=80?['🏆','Zabardast! Outstanding!']:pct>=65?['🎯','Bahut Badiya!']:pct>=50?['💪','Keep Going!']:pct>=35?['📖','Aur Padhna Padega!']:['😅','Mehnat Karo!'];
+    $('trophy').textContent   = g[0]; $('grade').textContent = g[1];
+    $('ringPct').textContent  = pct+'%'; $('ringFrac').textContent = correct+'/'+tot;
+    $('sC').textContent=correct; $('sW').textContent=wrong; $('sS').textContent=skipped; $('sT').textContent=tot;
+    $('ring').className = 'ring'+(pct>=65?'':pct>=40?' mid':' low');
     buildReview('all');
     show('screen-results');
   }
 
   function buildReview(filter) {
-    const wrap = $('reviewItems');
-    wrap.innerHTML = '';
-    questions.forEach((q, i) => {
-      const ans     = userAnswers[i];
-      const skipped = ans === 'SKIP' || ans === undefined;
-      const ok      = ans === q.correct_answer;
-      const type    = skipped ? 'skipped' : ok ? 'ok' : 'bad';
-
-      if (filter !== 'all' && filter !== type && !(filter === 'wrong' && type === 'bad') && !(filter === 'correct' && type === 'ok') && !(filter === 'skipped' && type === 'skipped')) return;
-
-      const div = document.createElement('div');
-      div.className = 'review-item ' + type;
-      const icon = skipped ? '⏭' : ok ? '✅' : '❌';
-      div.innerHTML = `
-        <span class="ri-icon">${icon}</span>
-        <div>
-          <div class="ri-q">${i+1}. ${q.question}</div>
-          ${!ok && !skipped ? `<div class="ri-ans">
-            Tumhara: <span class="wrong-a">${ans}. ${q.options[ans]}</span>
-            &nbsp;·&nbsp; Sahi: <span class="right-a">${q.correct_answer}. ${q.options[q.correct_answer]}</span>
-          </div>` : ''}
-          ${skipped ? `<div class="ri-ans">Sahi: <span class="right-a">${q.correct_answer}. ${q.options[q.correct_answer]}</span></div>` : ''}
+    const wrap = $('reviewList'); wrap.innerHTML = '';
+    questions.forEach((q,i)=>{
+      const ans=userAnswers[i], skip=!ans||ans==='SKIP', ok=ans===q.correct_answer;
+      const type=skip?'skip':ok?'ok':'bad';
+      if(filter!=='all'&&filter!==type) return;
+      const div=document.createElement('div'); div.className='ri '+type;
+      div.innerHTML=`<span style="font-size:14px;flex-shrink:0;margin-top:1px">${skip?'⏭':ok?'✅':'❌'}</span>
+        <div><div class="ri-q">${i+1}. ${q.question}</div>
+        ${!ok&&!skip?`<div class="ri-a">Tumhara: <span class="wa">${ans}. ${q.options[ans]||'?'}</span> · Sahi: <span class="ca">${q.correct_answer}. ${q.options[q.correct_answer]}</span></div>`:''}
+        ${skip?`<div class="ri-a">Sahi: <span class="ca">${q.correct_answer}. ${q.options[q.correct_answer]}</span></div>`:''}
         </div>`;
       wrap.appendChild(div);
     });
-    if (wrap.children.length === 0) {
-      wrap.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">Koi item nahi is category mein</div>';
-    }
+    if(!wrap.children.length) wrap.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px">Koi item nahi</div>';
   }
 
-  function setFilter(btn, filter) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentFilter = filter;
-    buildReview(filter);
+  function setFilter(btn, f) {
+    document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); buildReview(f);
   }
 
-  // ── Retry ──────────────────────────────────────────────────────────────
-  $('btnRetry').addEventListener('click', () => {
-    currentFile  = null; questions = []; currentQ = 0;
-    userAnswers  = {}; correctCount = 0; currentFilter = 'all';
-    $('pdfInput').value = '';
-    $('dz-default').style.display  = 'block';
-    $('dz-selected').style.display = 'none';
+  // ── Retry ─────────────────────────────────────────────────────────────
+  $('btnRetry').addEventListener('click', ()=>{
+    currentFile=null; questions=[]; currentQ=0; userAnswers={}; correctCount=0;
+    $('pdfInput').value='';
+    $('dz-default').style.display='block'; $('dz-selected').style.display='none';
     dz.classList.remove('has-file','drag');
-    $('upload-error').style.display = 'none';
-    $('btnGenerate').disabled = true;
-    // Reset batch UI
-    [0,1,2].forEach(i => setBatchState(i, 'waiting', 'Waiting...', 0));
-    $('totalProgFill').style.width = '0%';
-    $('progLabel').textContent = '0 / 75 questions';
+    $('upload-error').style.display='none';
+    $('btnGenerate').disabled=true;
     show('screen-upload');
   });
 </script>
