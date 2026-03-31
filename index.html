@@ -77,7 +77,6 @@
       background: rgba(232,93,117,0.1); border: 1px solid rgba(232,93,117,0.3);
       color: #ffb3be; font-size: 13px; line-height: 1.6;
     }
-    /* LOADING */
     .loader { text-align: center; padding: 20px 0 16px; }
     .spinner {
       width: 44px; height: 44px; border: 3px solid rgba(255,255,255,0.08);
@@ -103,7 +102,6 @@
     .prog-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
     .prog-bar { height: 5px; background: rgba(255,255,255,0.07); border-radius: 999px; overflow: hidden; }
     .prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent1), var(--accent2)); border-radius: 999px; transition: width .5s ease; }
-    /* QUIZ */
     .qprog-wrap { height: 4px; background: rgba(255,255,255,0.07); border-radius: 999px; overflow: hidden; margin-bottom: 16px; }
     .qprog-fill { height: 100%; background: linear-gradient(90deg, var(--accent1), var(--accent2)); border-radius: 999px; transition: width .4s ease; }
     .quiz-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
@@ -146,7 +144,6 @@
       font-size: 12px; cursor: pointer; transition: all .15s;
     }
     .btn-skip:hover { border-color: var(--accent1); color: var(--text); }
-    /* RESULTS */
     .res-hdr { text-align: center; padding-bottom: 20px; }
     .trophy { font-size: 44px; margin-bottom: 6px; }
     .res-hdr h2 { font-family: 'Playfair Display',serif; font-size: 22px; font-weight: 800; color: #fff; }
@@ -188,6 +185,12 @@
     .footer { text-align: center; color: rgba(255,255,255,0.1); font-size: 11px; margin-top: 14px; }
     .screen { display: none; }
     .screen.active { display: block; }
+    .debug-box {
+      margin-top: 10px; padding: 10px 14px; border-radius: 10px;
+      background: rgba(245,166,35,0.08); border: 1px solid rgba(245,166,35,0.25);
+      color: #fcd34d; font-size: 11px; font-family: monospace; line-height: 1.6;
+      max-height: 120px; overflow-y: auto; display: none;
+    }
   </style>
 </head>
 <body>
@@ -202,15 +205,16 @@
 <div id="screen-upload" class="screen active">
   <div class="card">
     <div class="info-box">
-      ✅ <strong>Ab Claude AI directly PDF padhta hai!</strong><br/>
-      Koi API key ki zaroorat nahi — Claude natively PDF samajhta hai. JEE, NEET, math equations sab kaam karega!
+      ✅ <strong>Claude AI directly PDF padhta hai!</strong><br/>
+      JEE, NEET, math equations, notes — sab kaam karega. Text-based PDF best results deta hai.
     </div>
 
     <span class="section-label">📊 Kitne Questions?</span>
     <div class="qty-row">
-      <button class="qty-btn" onclick="setQty(this,10)">10 Q</button>
-      <button class="qty-btn active" onclick="setQty(this,25)">25 Q</button>
-      <button class="qty-btn" onclick="setQty(this,50)">50 Q</button>
+      <button class="qty-btn" onclick="setQty(this,5)">5 Q</button>
+      <button class="qty-btn active" onclick="setQty(this,10)">10 Q</button>
+      <button class="qty-btn" onclick="setQty(this,20)">20 Q</button>
+      <button class="qty-btn" onclick="setQty(this,30)">30 Q</button>
     </div>
 
     <div class="divider"></div>
@@ -230,6 +234,7 @@
     </div>
 
     <div id="upload-error" class="error-box" style="display:none"></div>
+    <div id="debug-log" class="debug-box"></div>
     <button class="btn-primary" id="btnGenerate" disabled>✨ Quiz Generate Karo</button>
   </div>
 </div>
@@ -255,7 +260,7 @@
   <div class="card">
     <div class="qprog-wrap"><div class="qprog-fill" id="qprogFill" style="width:0%"></div></div>
     <div class="quiz-hdr">
-      <div class="q-counter" id="qCounter">Q 1 / 25</div>
+      <div class="q-counter" id="qCounter">Q 1 / 10</div>
       <div class="q-score" id="qScore">✅ 0</div>
     </div>
     <div class="q-text" id="qText"></div>
@@ -279,7 +284,7 @@
     <div class="ring-wrap">
       <div class="ring" id="ring">
         <div class="ring-pct" id="ringPct">0%</div>
-        <div class="ring-frac" id="ringFrac">0/25</div>
+        <div class="ring-frac" id="ringFrac">0/10</div>
       </div>
     </div>
     <div class="stat-row">
@@ -299,15 +304,23 @@
   </div>
 </div>
 
-<div class="footer">Powered by Claude AI · No API key needed</div>
+<div class="footer">Powered by Claude AI</div>
 
 <script>
   let currentFile = null, questions = [], currentQ = 0;
-  let userAnswers = {}, correctCount = 0, totalQty = 25;
+  let userAnswers = {}, correctCount = 0, totalQty = 10;
 
   const $ = id => document.getElementById(id);
   const show = id => { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $(id).classList.add('active'); };
   const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  function debugLog(msg) {
+    const box = $('debug-log');
+    box.style.display = 'block';
+    box.innerHTML += msg + '<br/>';
+    box.scrollTop = box.scrollHeight;
+    console.log('[QuizDebug]', msg);
+  }
 
   function setQty(btn, n) {
     document.querySelectorAll('.qty-btn').forEach(b => b.classList.remove('active'));
@@ -332,10 +345,8 @@
     $('dz-selected').style.display = 'block';
     $('dz-filename').textContent   = '📄 ' + f.name + ' (' + (f.size/1024).toFixed(0) + ' KB)';
     dz.classList.add('has-file');
-    checkReady();
+    $('btnGenerate').disabled = false;
   }
-
-  function checkReady() { $('btnGenerate').disabled = !currentFile; }
 
   function fileToBase64(file) {
     return new Promise((resolve, reject) => {
@@ -375,6 +386,8 @@
 
   $('btnGenerate').addEventListener('click', async () => {
     $('upload-error').style.display = 'none';
+    $('debug-log').style.display = 'none';
+    $('debug-log').innerHTML = '';
     show('screen-loading');
 
     try {
@@ -384,8 +397,8 @@
       const base64 = await fileToBase64(currentFile);
       const qty = totalQty;
 
-      // Split into batches of max 15 questions (Claude handles better in smaller batches)
-      const batchSize = 15;
+      // Use single batch for small quantities, else split into batches of 10
+      const batchSize = qty <= 15 ? qty : 10;
       const numBatches = Math.ceil(qty / batchSize);
       const batches = [];
       for (let i = 0; i < numBatches; i++) {
@@ -396,7 +409,7 @@
 
       buildBatchUI(batches);
       $('loaderTitle').textContent = `🤖 Claude ${qty} questions bana raha hai...`;
-      $('loaderSub').textContent   = `${numBatches} batches mein`;
+      $('loaderSub').textContent   = numBatches > 1 ? `${numBatches} batches mein` : 'Ek hi baar mein';
 
       questions = []; userAnswers = {}; correctCount = 0; currentQ = 0;
 
@@ -408,13 +421,13 @@
           setBatch(b.i, 'done', `Done! ${qs.length} questions`, qs.length);
           setProgress(questions.length, qty);
         } catch(e) {
-          setBatch(b.i, 'err', 'Error: ' + e.message.slice(0,60), 0);
+          setBatch(b.i, 'err', 'Error: ' + e.message.slice(0,80), 0);
           console.error('Batch', b.i, 'failed:', e);
         }
-        if (b.i < batches.length - 1) await sleep(1500);
+        if (b.i < batches.length - 1) await sleep(1200);
       }
 
-      if (questions.length === 0) throw new Error('Koi question nahi bana. PDF check karo — text-based hona chahiye.');
+      if (questions.length === 0) throw new Error('Koi question nahi bana. PDF text-based hona chahiye (scanned image PDF kaam nahi karega).');
 
       startQuiz();
     } catch(err) {
@@ -427,73 +440,83 @@
   async function fetchBatchClaude(base64, batch, totalQty) {
     const prompt = `You are an expert MCQ quiz maker for competitive exams like JEE, NEET, UPSC.
 
-Read the PDF carefully and create EXACTLY ${batch.n} multiple choice questions.
+Read the attached PDF carefully and create EXACTLY ${batch.n} multiple choice questions based on its content.
 
-BATCH INFO:
-- Question IDs: ${batch.start} to ${batch.start + batch.n - 1}
-- Total quiz has ${totalQty} questions — cover DIFFERENT topics than other batches
+STRICT OUTPUT RULES:
+- Return ONLY raw JSON — no markdown, no backticks, no explanation, no preamble
+- The response must start with { and end with }
+- Every question must have exactly 4 options: A, B, C, D
 
-STRICT RULES:
-- Return ONLY valid JSON — no markdown, no backticks, no preamble
-- Start with { and end with }
-- Every question must have exactly 4 options (A, B, C, D)
-
-JSON SCHEMA:
+Required JSON format:
 {
   "questions": [
     {
       "id": ${batch.start},
-      "question": "full question text here",
+      "question": "Question text here?",
       "options": {
-        "A": "option A text",
-        "B": "option B text",
-        "C": "option C text",
-        "D": "option D text"
+        "A": "First option",
+        "B": "Second option",
+        "C": "Third option",
+        "D": "Fourth option"
       },
       "correct_answer": "A",
-      "explanation": "brief explanation why this is correct"
+      "explanation": "Brief explanation of why this answer is correct."
     }
   ]
 }
 
-Generate all ${batch.n} questions now starting from ID ${batch.start}.`;
+Generate exactly ${batch.n} questions, starting at id ${batch.start}. Only output the JSON object.`;
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 4000,
-        messages: [{
-          role: "user",
-          content: [
-            {
-              type: "document",
-              source: {
-                type: "base64",
-                media_type: "application/pdf",
-                data: base64
-              }
-            },
-            { type: "text", text: prompt }
-          ]
-        }]
-      })
-    });
+    const requestBody = {
+      model: "claude-sonnet-4-6",
+      max_tokens: 4000,
+      messages: [{
+        role: "user",
+        content: [
+          {
+            type: "document",
+            source: {
+              type: "base64",
+              media_type: "application/pdf",
+              data: base64
+            }
+          },
+          { type: "text", text: prompt }
+        ]
+      }]
+    };
+
+    let response;
+    try {
+      response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody)
+      });
+    } catch(networkErr) {
+      throw new Error('Network error: ' + networkErr.message);
+    }
 
     if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
-      throw new Error(errData?.error?.message || `HTTP ${response.status}`);
+      let errMsg = `HTTP ${response.status}`;
+      try {
+        const errData = await response.json();
+        errMsg = errData?.error?.message || errMsg;
+      } catch(e) {}
+      throw new Error(errMsg);
     }
 
     const data = await response.json();
-    const rawText = data?.content?.find(c => c.type === 'text')?.text || '';
 
-    if (!rawText) throw new Error('Claude ne empty response diya');
+    // Handle error in response body
+    if (data.error) throw new Error(data.error.message || 'API error');
+
+    const rawText = (data?.content || []).find(c => c.type === 'text')?.text || '';
+    if (!rawText.trim()) throw new Error('Claude ne empty response diya. Dobara try karo.');
 
     const parsed = robustParse(rawText);
     if (!parsed || !Array.isArray(parsed.questions) || parsed.questions.length === 0) {
-      throw new Error('JSON parse fail. Response: ' + rawText.slice(0, 150));
+      throw new Error('JSON parse fail hua. Response: ' + rawText.slice(0, 200));
     }
 
     return parsed.questions;
@@ -503,8 +526,8 @@ Generate all ${batch.n} questions now starting from ID ${batch.start}.`;
     const strategies = [
       s => JSON.parse(s.trim()),
       s => JSON.parse(s.trim().replace(/^```json\s*/i,'').replace(/\s*```$/,'')),
-      s => { const a=s.indexOf('{'), b=s.lastIndexOf('}'); if(a<0||b<0) throw 0; return JSON.parse(s.slice(a,b+1)); },
-      s => { let f=s.replace(/,(\s*[}\]])/g,'$1'); const a=f.indexOf('{'), b=f.lastIndexOf('}'); return JSON.parse(f.slice(a,b+1)); }
+      s => { const a=s.indexOf('{'), b=s.lastIndexOf('}'); if(a<0||b<0) throw new Error('no braces'); return JSON.parse(s.slice(a,b+1)); },
+      s => { let f=s.replace(/,(\s*[}\]])/g,'$1'); const a=f.indexOf('{'), b=f.lastIndexOf('}'); if(a<0||b<0) throw new Error('no braces'); return JSON.parse(f.slice(a,b+1)); }
     ];
     for (const fn of strategies) {
       try { const r = fn(raw); if(r) return r; } catch(e) {}
@@ -545,7 +568,7 @@ Generate all ${batch.n} questions now starting from ID ${batch.start}.`;
       if (l === q.correct_answer) btn.classList.add('correct');
       else if (l === letter)      btn.classList.add('wrong');
     });
-    $('expl').textContent    = '💡 ' + (q.explanation || 'No explanation.');
+    $('expl').textContent    = '💡 ' + (q.explanation || 'No explanation provided.');
     $('expl').style.display  = 'block';
     $('btnNext').style.display = 'block';
     $('btnSkip').style.display = 'none';
@@ -599,6 +622,8 @@ Generate all ${batch.n} questions now starting from ID ${batch.start}.`;
     $('dz-default').style.display='block'; $('dz-selected').style.display='none';
     dz.classList.remove('has-file','drag');
     $('upload-error').style.display='none';
+    $('debug-log').style.display='none';
+    $('debug-log').innerHTML='';
     $('btnGenerate').disabled=true;
     show('screen-upload');
   });
