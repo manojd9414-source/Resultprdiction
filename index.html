@@ -1,1457 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prayas JEE 2027 — Lecture & Test Planner</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<style>
-:root {
-  --bg: #0a0a0f;
-  --surface: #111118;
-  --card: #16161f;
-  --border: #2a2a3a;
-  --accent: #ff6b00;
-  --accent2: #ffa040;
-  --text: #e8e8f0;
-  --muted: #888898;
-  --green: #22c55e;
-  --blue: #3b82f6;
-  --purple: #a855f7;
-  --pink: #ec4899;
-}
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Syne', sans-serif;
-  min-height: 100vh;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Prayas JEE 2.0 — Study Tracker</title>
 
-/* HEADER */
-header {
-  background: linear-gradient(135deg, #0f0f1a 0%, #1a0a00 100%);
-  border-bottom: 1px solid var(--border);
-  padding: 20px 24px 16px;
-  position: sticky; top: 0; z-index: 100;
-  backdrop-filter: blur(12px);
-}
-.header-inner {
-  max-width: 1400px; margin: 0 auto;
-  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-}
-.logo {
-  display: flex; align-items: center; gap: 10px;
-}
-.logo-icon {
-  width: 36px; height: 36px; background: var(--accent);
-  border-radius: 8px; display: flex; align-items: center; justify-content: center;
-  font-size: 18px; font-weight: 800; color: #fff;
-}
-.logo-text h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
-.logo-text h1 span { color: var(--accent); }
-.logo-text p { font-size: 11px; color: var(--muted); font-weight: 400; }
-.badge {
-  background: var(--accent); color: #fff;
-  font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
-  letter-spacing: 0.5px;
-}
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
 
-/* SEARCH */
-.search-wrap {
-  max-width: 1400px; margin: 0 auto;
-  padding: 16px 24px 0;
-}
-.search-box {
-  display: flex; gap: 10px; align-items: center;
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 10px; padding: 10px 14px;
-  max-width: 400px;
-}
-.search-box input {
-  background: none; border: none; outline: none;
-  color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px;
-  width: 100%;
-}
-.search-box input::placeholder { color: var(--muted); }
-.search-icon { color: var(--muted); font-size: 16px; }
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-/* TABS */
-.tabs-wrap {
-  max-width: 1400px; margin: 0 auto;
-  padding: 16px 24px 0;
-}
-.tabs {
-  display: flex; gap: 4px; overflow-x: auto;
-  padding-bottom: 2px;
-  scrollbar-width: none;
-}
-.tabs::-webkit-scrollbar { display: none; }
-.tab {
-  background: var(--card); border: 1px solid var(--border);
-  color: var(--muted); padding: 8px 16px; border-radius: 8px;
-  cursor: pointer; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600;
-  white-space: nowrap; transition: all 0.2s;
-  display: flex; align-items: center; gap: 6px;
-}
-.tab:hover { color: var(--text); border-color: #444; }
-.tab.active {
-  background: var(--accent); border-color: var(--accent);
-  color: #fff;
-}
-.tab-dot { width: 7px; height: 7px; border-radius: 50%; }
-
-/* CONTENT */
-.content {
-  max-width: 1400px; margin: 0 auto;
-  padding: 20px 24px 40px;
-}
-.section { display: none; }
-.section.active { display: block; }
-
-/* STATS ROW */
-.stats-row {
-  display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
-}
-.stat-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 10px; padding: 14px 18px;
-  display: flex; align-items: center; gap: 10px;
-}
-.stat-icon { font-size: 20px; }
-.stat-num { font-size: 22px; font-weight: 800; line-height: 1; }
-.stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-/* TABLE */
-.table-wrap {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; overflow: hidden;
-}
-.table-header-bar {
-  padding: 14px 18px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.table-title { font-size: 14px; font-weight: 700; }
-.row-count { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
-.table-scroll { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-thead tr { background: #1d1d2a; }
-th {
-  padding: 10px 14px; text-align: left; font-weight: 700;
-  color: var(--muted); font-size: 11px; letter-spacing: 0.5px;
-  text-transform: uppercase; white-space: nowrap;
-  border-bottom: 1px solid var(--border);
-}
-td {
-  padding: 10px 14px; border-bottom: 1px solid #1e1e2a;
-  vertical-align: top; line-height: 1.5;
-}
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: #1a1a26; }
-.sno {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px; color: var(--muted); width: 40px;
-}
-.chapter-col { color: var(--accent2); font-weight: 600; max-width: 200px; }
-.topic-col { max-width: 260px; color: var(--text); }
-.lec-num {
-  font-family: 'JetBrains Mono', monospace;
-  background: var(--border); border-radius: 4px;
-  padding: 2px 7px; font-size: 12px; font-weight: 500;
-  white-space: nowrap;
-}
-.date-col {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px; color: var(--green); white-space: nowrap;
-}
-.faculty-col { font-size: 12px; color: var(--muted); white-space: nowrap; }
-.check-col { width: 36px; text-align: center; }
-.check-col input[type="checkbox"] {
-  width: 16px; height: 16px; cursor: pointer;
-  accent-color: var(--accent);
-  border-radius: 3px;
-}
-tr.done td { opacity: 0.45; text-decoration: line-through; }
-tr.done .check-col { opacity: 1; text-decoration: none; }
-.progress-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; margin-top: 8px; }
-.progress-bar { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s; }
-.progress-label { font-size: 11px; color: var(--muted); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
-
-/* TEST PLANNER */
-.test-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 16px; margin-bottom: 12px;
-  transition: border-color 0.2s;
-}
-.test-card:hover { border-color: var(--accent); }
-.test-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
-.test-name { font-size: 16px; font-weight: 800; }
-.test-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 4px; }
-.chip {
-  font-size: 11px; font-weight: 600; padding: 3px 9px;
-  border-radius: 20px; display: inline-block;
-}
-.chip-date { background: #1a2a1a; color: var(--green); }
-.chip-type { background: #1a1a2a; color: var(--blue); }
-.chip-pattern { background: #2a1a1a; color: var(--accent); }
-.test-subjects { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
-.subject-block {
-  background: var(--surface); border-radius: 8px; padding: 10px 12px;
-  border-left: 3px solid var(--border);
-}
-.subject-block.phy { border-left-color: var(--blue); }
-.subject-block.chem { border-left-color: var(--green); }
-.subject-block.math { border-left-color: var(--purple); }
-.subject-block-title {
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.5px; margin-bottom: 6px;
-}
-.subject-block.phy .subject-block-title { color: var(--blue); }
-.subject-block.chem .subject-block-title { color: var(--green); }
-.subject-block.math .subject-block-title { color: var(--purple); }
-.subject-block ul { list-style: none; }
-.subject-block ul li {
-  font-size: 12px; color: var(--muted); padding: 2px 0;
-  border-bottom: 1px solid #1e1e2a;
-  line-height: 1.4;
-}
-.subject-block ul li:last-child { border-bottom: none; }
-.test-card.done {
-  opacity: 0.45;
-  border-color: var(--green) !important;
-  position: relative;
-}
-.test-card.done .test-name { text-decoration: line-through; }
-.test-card.done::after {
-  content: '✅ COMPLETED';
-  position: absolute; top: 10px; right: 14px;
-  font-size: 10px; font-weight: 800; color: var(--green);
-  letter-spacing: 1px; background: #0a1f0a;
-  padding: 3px 8px; border-radius: 20px;
-}
-.test-checkbox-wrap {
-  display: flex; align-items: center; gap: 8px;
-  margin-top: 8px;
-}
-.test-checkbox-wrap input[type="checkbox"] {
-  width: 18px; height: 18px; cursor: pointer;
-  accent-color: var(--green); flex-shrink: 0;
-}
-.test-checkbox-wrap label {
-  font-size: 12px; color: var(--muted); cursor: pointer; user-select: none;
-}
-#tests-divider {
-  text-align: center; font-size: 11px; color: var(--muted);
-  letter-spacing: 1px; padding: 8px 0; margin: 4px 0;
-  border-top: 1px dashed var(--border);
-  display: none;
-}
-#tests-progress-wrap { padding: 0 2px 12px; }
-.test-card { transition: opacity 0.3s, border-color 0.3s; }
-
-/* HIDDEN */
-.hidden { display: none; }
-/* LOADING OVERLAY */
-#loading-overlay {
-  position: fixed; inset: 0; z-index: 9999;
-  background: var(--bg); display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 14px;
-}
-.loading-spinner {
-  width: 40px; height: 40px; border: 3px solid var(--border);
-  border-top-color: var(--accent); border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-text { font-size: 14px; color: var(--muted); }
-#firebase-config-notice {
-  position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
-  background: #2a1010; border: 1px solid #ff4444; border-radius: 10px;
-  padding: 12px 18px; font-size: 12px; color: #ff8888; z-index: 9998;
-  max-width: 420px; text-align: center; display: none;
-}
-
-/* MOBILE */
-@media (max-width: 600px) {
-  header { padding: 14px 14px 12px; }
-  .search-wrap, .tabs-wrap, .content { padding-left: 14px; padding-right: 14px; }
-  th, td { padding: 8px 10px; }
-}
-</style>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-<!-- Loading overlay -->
-<div id="loading-overlay">
-  <div class="loading-spinner"></div>
-  <div class="loading-text">Connecting to Firestore…</div>
-</div>
-<div id="firebase-config-notice">
-  ⚠️ Firebase config nahi mila! <code>firebaseConfig</code> mein apna project config daalo.
-</div>
 
-<header>
-  <div class="header-inner">
-    <div class="logo">
-      <div class="logo-icon">PW</div>
-      <div class="logo-text">
-        <h1>Prayas JEE <span>2027</span></h1>
-        <p>Lecture &amp; Test Planner — Updated Schedule</p>
+<body class="light-mode">
+
+  <!-- ============================================================
+       HEADER
+  ============================================================ -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-mark">⚡</div>
+      <div class="brand-text">
+        <h1 class="app-title">Prayas JEE 2.0</h1>
+        <p class="app-subtitle">Study Tracker</p>
       </div>
     </div>
-    <span class="badge">Years Shifted: 2025→2026 · 2026→2027</span>
-  </div>
-</header>
 
-<div class="search-wrap">
-  <div class="search-box">
-    <span class="search-icon">🔍</span>
-    <input type="text" id="globalSearch" placeholder="Search chapters, topics, dates..." oninput="filterAll()">
-  </div>
-</div>
-
-<div class="tabs-wrap">
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('physics',this)">
-      <span class="tab-dot" style="background:#3b82f6"></span>Physics
-    </button>
-    <button class="tab" onclick="switchTab('math',this)">
-      <span class="tab-dot" style="background:#a855f7"></span>Mathematics
-    </button>
-    <button class="tab" onclick="switchTab('phychem',this)">
-      <span class="tab-dot" style="background:#22c55e"></span>Physical Chem
-    </button>
-    <button class="tab" onclick="switchTab('orgchem',this)">
-      <span class="tab-dot" style="background:#f59e0b"></span>Organic Chem
-    </button>
-    <button class="tab" onclick="switchTab('inochem',this)">
-      <span class="tab-dot" style="background:#ec4899"></span>Inorganic Chem
-    </button>
-    <button class="tab" onclick="switchTab('tests',this)">
-      <span class="tab-dot" style="background:#ff6b00"></span>Test Planner
-    </button>
-  </div>
-</div>
-
-<div class="content">
-
-<!-- PHYSICS -->
-<div class="section active" id="sec-physics">
-  <div class="stats-row">
-    <div class="stat-card"><span class="stat-icon">📐</span><div><div class="stat-num" id="phy-count">—</div><div class="stat-label">Total Lectures</div></div></div>
-    <div class="stat-card"><span class="stat-icon">📅</span><div><div class="stat-num">Apr '26</div><div class="stat-label">Batch Start</div></div></div>
-    <div class="stat-card"><span class="stat-icon">👨‍🏫</span><div><div class="stat-num">RJ</div><div class="stat-label">Rajwant Sir</div></div></div>
-  </div>
-  <div id="phy-progress-wrap" style="padding:0 2px 12px">
-    <div class="progress-bar-wrap"><div class="progress-bar" id="phy-progress-bar" style="width:0%"></div></div>
-    <div class="progress-label" id="phy-progress-label">0 / 0 done</div>
-  </div>
-  <div class="table-wrap">
-    <div class="table-header-bar">
-      <span class="table-title">Physics Lectures</span>
-      <span class="row-count" id="phy-shown">— rows</span>
-    </div>
-    <div class="table-scroll">
-      <table id="tbl-physics">
-        <thead><tr><th class="check-col">✓</th><th>#</th><th>Chapter</th><th>Topic</th><th>Lec</th><th>Date</th><th>Faculty</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- MATH -->
-<div class="section" id="sec-math">
-  <div class="stats-row">
-    <div class="stat-card"><span class="stat-icon">∑</span><div><div class="stat-num" id="math-count">—</div><div class="stat-label">Total Lectures</div></div></div>
-    <div class="stat-card"><span class="stat-icon">📅</span><div><div class="stat-num">Apr '26</div><div class="stat-label">Batch Start</div></div></div>
-    <div class="stat-card"><span class="stat-icon">👨‍🏫</span><div><div class="stat-num">TS</div><div class="stat-label">Tarun Sir</div></div></div>
-  </div>
-  <div id="math-progress-wrap" style="padding:0 2px 12px">
-    <div class="progress-bar-wrap"><div class="progress-bar" id="math-progress-bar" style="width:0%"></div></div>
-    <div class="progress-label" id="math-progress-label">0 / 0 done</div>
-  </div>
-  <div class="table-wrap">
-    <div class="table-header-bar">
-      <span class="table-title">Mathematics Lectures</span>
-      <span class="row-count" id="math-shown">— rows</span>
-    </div>
-    <div class="table-scroll">
-      <table id="tbl-math">
-        <thead><tr><th class="check-col">✓</th><th>#</th><th>Chapter</th><th>Topic</th><th>Lec</th><th>Date</th><th>Faculty</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- PHYSICAL CHEM -->
-<div class="section" id="sec-phychem">
-  <div class="stats-row">
-    <div class="stat-card"><span class="stat-icon">⚗️</span><div><div class="stat-num" id="phychem-count">—</div><div class="stat-label">Total Lectures</div></div></div>
-    <div class="stat-card"><span class="stat-icon">📅</span><div><div class="stat-num">Apr '26</div><div class="stat-label">Batch Start</div></div></div>
-    <div class="stat-card"><span class="stat-icon">👨‍🏫</span><div><div class="stat-num">RD</div><div class="stat-label">Rahul Dudi Sir</div></div></div>
-  </div>
-  <div id="phychem-progress-wrap" style="padding:0 2px 12px">
-    <div class="progress-bar-wrap"><div class="progress-bar" id="phychem-progress-bar" style="width:0%"></div></div>
-    <div class="progress-label" id="phychem-progress-label">0 / 0 done</div>
-  </div>
-  <div class="table-wrap">
-    <div class="table-header-bar">
-      <span class="table-title">Physical Chemistry Lectures</span>
-      <span class="row-count" id="phychem-shown">— rows</span>
-    </div>
-    <div class="table-scroll">
-      <table id="tbl-phychem">
-        <thead><tr><th class="check-col">✓</th><th>#</th><th>Chapter</th><th>Topic</th><th>Lec</th><th>Date</th><th>Faculty</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ORGANIC CHEM -->
-<div class="section" id="sec-orgchem">
-  <div class="stats-row">
-    <div class="stat-card"><span class="stat-icon">🧪</span><div><div class="stat-num" id="orgchem-count">—</div><div class="stat-label">Total Lectures</div></div></div>
-    <div class="stat-card"><span class="stat-icon">📅</span><div><div class="stat-num">Aug '26</div><div class="stat-label">Batch Start</div></div></div>
-    <div class="stat-card"><span class="stat-icon">👨‍🏫</span><div><div class="stat-num">RS</div><div class="stat-label">Rohit Sir</div></div></div>
-  </div>
-  <div id="orgchem-progress-wrap" style="padding:0 2px 12px">
-    <div class="progress-bar-wrap"><div class="progress-bar" id="orgchem-progress-bar" style="width:0%"></div></div>
-    <div class="progress-label" id="orgchem-progress-label">0 / 0 done</div>
-  </div>
-  <div class="table-wrap">
-    <div class="table-header-bar">
-      <span class="table-title">Organic Chemistry Lectures</span>
-      <span class="row-count" id="orgchem-shown">— rows</span>
-    </div>
-    <div class="table-scroll">
-      <table id="tbl-orgchem">
-        <thead><tr><th class="check-col">✓</th><th>#</th><th>Chapter</th><th>Topic</th><th>Lec</th><th>Date</th><th>Faculty</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- INORGANIC CHEM -->
-<div class="section" id="sec-inochem">
-  <div class="stats-row">
-    <div class="stat-card"><span class="stat-icon">🔬</span><div><div class="stat-num" id="inochem-count">—</div><div class="stat-label">Total Lectures</div></div></div>
-    <div class="stat-card"><span class="stat-icon">📅</span><div><div class="stat-num">Jul '26</div><div class="stat-label">Batch Start</div></div></div>
-    <div class="stat-card"><span class="stat-icon">👨‍🏫</span><div><div class="stat-num">RD/AS</div><div class="stat-label">Rahul Dudi Sir / Amitabh Sir</div></div></div>
-  </div>
-  <div id="inochem-progress-wrap" style="padding:0 2px 12px">
-    <div class="progress-bar-wrap"><div class="progress-bar" id="inochem-progress-bar" style="width:0%"></div></div>
-    <div class="progress-label" id="inochem-progress-label">0 / 0 done</div>
-  </div>
-  <div class="table-wrap">
-    <div class="table-header-bar">
-      <span class="table-title">Inorganic Chemistry Lectures</span>
-      <span class="row-count" id="inochem-shown">— rows</span>
-    </div>
-    <div class="table-scroll">
-      <table id="tbl-inochem">
-        <thead><tr><th class="check-col">✓</th><th>#</th><th>Chapter</th><th>Topic</th><th>Lec</th><th>Date</th><th>Faculty</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- TESTS -->
-<div class="section" id="sec-tests">
-  <div class="stats-row">
-    <div class="stat-card"><span class="stat-icon">📝</span><div><div class="stat-num">26</div><div class="stat-label">Total Tests</div></div></div>
-    <div class="stat-card"><span class="stat-icon">🎯</span><div><div class="stat-num">May '26</div><div class="stat-label">First Test</div></div></div>
-    <div class="stat-card"><span class="stat-icon">🏆</span><div><div class="stat-num">May '27</div><div class="stat-label">Last Test</div></div></div>
-  </div>
-  <div id="tests-progress-wrap">
-    <div class="progress-bar-wrap"><div class="progress-bar" id="tests-progress-bar" style="width:0%;background:var(--green)"></div></div>
-    <div class="progress-label" id="tests-progress-label">0 / 26 done</div>
-  </div>
-  <div id="tests-container"></div>
-  <div id="tests-divider">─── COMPLETED TESTS ───</div>
-  <div id="tests-done-container"></div>
-</div>
-
-</div><!-- /content -->
-
-<script>
-// ─── YEAR SHIFT UTIL ───────────────────────────────────────────────────────
-function shiftYear(str) {
-  return str.replace(/202[56]/g, y => y === '2025' ? '2026' : '2027');
-}
-
-// ─── DATA ─────────────────────────────────────────────────────────────────
-// Format: [sno, chapter, topic, lecNum, date, faculty]
-
-const PHYSICS = [
-[1,"Mathematical Tools","Basic Maths",1,"Monday, April 21, 2025","Rajwant Sir"],
-[2,"Mathematical Tools","Basic Maths",2,"Tuesday, April 22, 2025","Rajwant Sir"],
-[3,"Mathematical Tools","Scalars and Vectors",3,"Wednesday, April 23, 2025","Rajwant Sir"],
-[4,"Mathematical Tools","Subtraction of Vectors, Resolution of Vectors",4,"Thursday, April 24, 2025","Rajwant Sir"],
-[5,"Mathematical Tools","Subtraction of Vectors, Resolution of Vectors",5,"Friday, April 25, 2025","Rajwant Sir"],
-[6,"Mathematical Tools","Dimensions",6,"Saturday, April 26, 2025","Rajwant Sir"],
-[7,"Motion in a Straight Line","Introduction",1,"Monday, April 28, 2025","Rajwant Sir"],
-[8,"Motion in a Straight Line","Concept of position, path length, displacement",2,"Tuesday, April 29, 2025","Rajwant Sir"],
-[9,"Motion in a Straight Line","Speed",3,"Wednesday, April 30, 2025","Rajwant Sir"],
-[10,"Motion in a Straight Line","Velocity",4,"Friday, May 2, 2025","Rajwant Sir"],
-[11,"Motion in a Straight Line","Acceleration",5,"Saturday, May 3, 2025","Rajwant Sir"],
-[12,"Motion in a Straight Line","Graphs",6,"Monday, May 5, 2025","Rajwant Sir"],
-[13,"Motion in a Straight Line","Motion with constant acceleration",7,"Tuesday, May 6, 2025","Rajwant Sir"],
-[14,"Motion in a Plane","Introduction",1,"Wednesday, May 7, 2025","Rajwant Sir"],
-[15,"Motion in a Plane","Motion in a plane",2,"Thursday, May 8, 2025","Rajwant Sir"],
-[16,"Motion in a Plane","Projectile Motion",3,"Friday, May 9, 2025","Rajwant Sir"],
-[17,"Relative Motion","Relative Velocity & Circular motion",1,"Saturday, May 10, 2025","Rajwant Sir"],
-[18,"Relative Motion","Relative Velocity & Circular motion",2,"Monday, May 12, 2025","Rajwant Sir"],
-[19,"Relative Motion","Relative Velocity & Circular motion",3,"Tuesday, May 13, 2025","Rajwant Sir"],
-[20,"Laws of Motion","Newton's Laws of motion",1,"Wednesday, May 14, 2025","Rajwant Sir"],
-[21,"Laws of Motion","Newton's Laws of motion",2,"Thursday, May 15, 2025","Rajwant Sir"],
-[22,"Laws of Motion","Spring",3,"Friday, May 16, 2025","Rajwant Sir"],
-[23,"Laws of Motion","Pseudo Force",4,"Saturday, May 17, 2025","Rajwant Sir"],
-[24,"Laws of Motion","Friction",5,"Monday, May 19, 2025","Rajwant Sir"],
-[25,"Laws of Motion","Friction",6,"Tuesday, May 20, 2025","Rajwant Sir"],
-[26,"Laws of Motion","Friction",7,"Wednesday, May 21, 2025","Rajwant Sir"],
-[27,"Laws of Motion","Friction",8,"Thursday, May 22, 2025","Rajwant Sir"],
-[28,"Laws of Motion","Friction",9,"Friday, May 23, 2025","Rajwant Sir"],
-[29,"Work, Energy and Power","Introduction of Work",1,"Saturday, May 24, 2025","Rajwant Sir"],
-[30,"Work, Energy and Power","Work done by constant & variable force",2,"Monday, May 26, 2025","Rajwant Sir"],
-[31,"Work, Energy and Power","Graphical Interpretation",3,"Tuesday, May 27, 2025","Rajwant Sir"],
-[32,"Work, Energy and Power","Kinetic energy, Conservative & Non-conservative force",4,"Wednesday, May 28, 2025","Rajwant Sir"],
-[33,"Work, Energy and Power","Potential energy, Work Kinetic energy theorem",5,"Thursday, May 29, 2025","Rajwant Sir"],
-[34,"Work, Energy and Power","Types of equilibrium",6,"Friday, May 30, 2025","Rajwant Sir"],
-[35,"Work, Energy and Power","Stable Equilibrium",7,"Saturday, May 31, 2025","Rajwant Sir"],
-[36,"Work, Energy and Power","Unstable Equilibrium",8,"Monday, June 2, 2025","Rajwant Sir"],
-[37,"Work, Energy and Power","Neutral Equilibrium & Power",9,"Tuesday, June 3, 2025","Rajwant Sir"],
-[38,"Circular Motion","Circular Motion",1,"Wednesday, June 4, 2025","Rajwant Sir"],
-[39,"Circular Motion","Circular Motion",2,"Thursday, June 5, 2025","Rajwant Sir"],
-[40,"Circular Motion","Circular Motion",3,"Saturday, June 7, 2025","Rajwant Sir"],
-[41,"Circular Motion","Circular Motion",4,"Monday, June 9, 2025","Rajwant Sir"],
-[42,"Circular Motion","Circular Motion",5,"Tuesday, June 10, 2025","Rajwant Sir"],
-[43,"Centre of Mass & System of Particles","Introduction and Definition",1,"Wednesday, June 11, 2025","Rajwant Sir"],
-[44,"Centre of Mass & System of Particles","Calculation of COM — Discrete & Continuous systems",2,"Thursday, June 12, 2025","Rajwant Sir"],
-[45,"Centre of Mass & System of Particles","Shifting of COM, Velocity & Acceleration of COM",3,"Friday, June 13, 2025","Rajwant Sir"],
-[46,"Centre of Mass & System of Particles","Conservation of linear momentum",4,"Saturday, June 14, 2025","Rajwant Sir"],
-[47,"Centre of Mass & System of Particles","Jumping from cart, Recoil of Gun, Explosion",5,"Monday, June 16, 2025","Rajwant Sir"],
-[48,"Centre of Mass & System of Particles","C-Frame",6,"Tuesday, June 17, 2025","Rajwant Sir"],
-[49,"Centre of Mass & System of Particles","Introduction and Definition",7,"Wednesday, June 18, 2025","Rajwant Sir"],
-[50,"Centre of Mass & System of Particles","Coefficient of restitution",8,"Thursday, June 19, 2025","Rajwant Sir"],
-[51,"Centre of Mass & System of Particles","Concept of Impulse",9,"Friday, June 20, 2025","Rajwant Sir"],
-[52,"Centre of Mass & System of Particles","Impulsive and non-impulsive forces",10,"Saturday, June 21, 2025","Rajwant Sir"],
-[53,"Rotational Motion","Definition of Rigid body",1,"Monday, June 23, 2025","Rajwant Sir"],
-[54,"Rotational Motion","Moment of inertia of a single particle",2,"Tuesday, June 24, 2025","Rajwant Sir"],
-[55,"Rotational Motion","Moment of inertia of a system of particles",3,"Wednesday, June 25, 2025","Rajwant Sir"],
-[56,"Rotational Motion","Moment of inertia of rigid bodies",4,"Thursday, June 26, 2025","Rajwant Sir"],
-[57,"Rotational Motion","Parallel Axis Theorem & Perpendicular Axis Theorem",5,"Friday, June 27, 2025","Rajwant Sir"],
-[58,"Rotational Motion","Radius of gyration, MOI of compound objects",6,"Saturday, June 28, 2025","Rajwant Sir"],
-[59,"Rotational Motion","Torque, Rotational equilibrium",7,"Monday, June 30, 2025","Rajwant Sir"],
-[60,"Rotational Motion","Kinetic energy of rigid body rotating about fixed axis",8,"Tuesday, July 1, 2025","Rajwant Sir"],
-[61,"Rotational Motion","Rotation about a fixed axis",9,"Wednesday, July 2, 2025","Rajwant Sir"],
-[62,"Rotational Motion","Angular momentum, conservation of angular momentum",10,"Thursday, July 3, 2025","Rajwant Sir"],
-[63,"Rotational Motion","Angular momentum, conservation of angular momentum",11,"Friday, July 4, 2025","Rajwant Sir"],
-[64,"Rotational Motion","Rotation about a fixed axis",12,"Saturday, July 5, 2025","Rajwant Sir"],
-[65,"Rotational Motion","Combined translational and rotational motion",13,"Monday, July 7, 2025","Rajwant Sir"],
-[66,"Rotational Motion","Combined translational and rotational motion",14,"Tuesday, July 8, 2025","Rajwant Sir"],
-[67,"Rotational Motion","Impulsive force and impulsive torque",15,"Wednesday, July 9, 2025","Rajwant Sir"],
-[68,"Oscillations","Linear SHM",1,"Thursday, July 10, 2025","Rajwant Sir"],
-[69,"Oscillations","Linear SHM",2,"Friday, July 11, 2025","Rajwant Sir"],
-[70,"Oscillations","Energy in SHM",3,"Saturday, July 12, 2025","Rajwant Sir"],
-[71,"Oscillations","Series and Parallel Combination of Springs",4,"Monday, July 14, 2025","Rajwant Sir"],
-[72,"Oscillations","Angular SHM",5,"Tuesday, July 15, 2025","Rajwant Sir"],
-[73,"Oscillations","Some special cases of SHM",6,"Wednesday, July 16, 2025","Rajwant Sir"],
-[74,"Oscillations","Some special cases of SHM",7,"Thursday, July 17, 2025","Rajwant Sir"],
-[75,"Ray Optics","Plane mirrors",1,"Friday, July 18, 2025","Rajwant Sir"],
-[76,"Ray Optics","Reflection From a Curved Surface",2,"Saturday, July 19, 2025","Rajwant Sir"],
-[77,"Ray Optics","Refraction of Light",3,"Monday, July 21, 2025","Rajwant Sir"],
-[78,"Ray Optics","Prism",4,"Tuesday, July 22, 2025","Rajwant Sir"],
-[79,"Ray Optics","TIR",5,"Wednesday, July 23, 2025","Rajwant Sir"],
-[80,"Ray Optics","Refraction from Spherical surface",6,"Thursday, July 24, 2025","Rajwant Sir"],
-[81,"Ray Optics","Thin Lens",7,"Friday, July 25, 2025","Rajwant Sir"],
-[82,"Ray Optics","Optical Instruments",8,"Saturday, July 26, 2025","Rajwant Sir"],
-[83,"Ray Optics","Optical Instruments",9,"Monday, July 28, 2025","Rajwant Sir"],
-[84,"Ray Optics","Optical Instruments",10,"Tuesday, July 29, 2025","Rajwant Sir"],
-[85,"Ray Optics","Optical Instruments",11,"Wednesday, July 30, 2025","Rajwant Sir"],
-[86,"Ray Optics","Thin Lens",12,"Thursday, July 31, 2025","Rajwant Sir"],
-[87,"Ray Optics","Thin Lens",13,"Friday, August 1, 2025","Rajwant Sir"],
-[88,"Ray Optics","Thin Lens",14,"Saturday, August 2, 2025","Rajwant Sir"],
-[89,"Ray Optics","Thin Lens",15,"Monday, August 4, 2025","Rajwant Sir"],
-[90,"Dual Nature","Dual nature of matter and waves",1,"Tuesday, August 5, 2025","Rajwant Sir"],
-[91,"Dual Nature","Photoelectric effect",2,"Wednesday, August 6, 2025","Rajwant Sir"],
-[92,"Dual Nature","Quantum Theory of Light",3,"Thursday, August 7, 2025","Rajwant Sir"],
-[93,"Atoms","Atomic Models",1,"Saturday, August 9, 2025","Rajwant Sir"],
-[94,"Atoms","Bohr's Model",2,"Monday, August 11, 2025","Rajwant Sir"],
-[95,"Atoms","Atomic Spectrum, Hydrogen Spectra, X-Rays",3,"Tuesday, August 12, 2025","Rajwant Sir"],
-[96,"Nuclei","Introduction to Nucleus",1,"Wednesday, August 13, 2025","Rajwant Sir"],
-[97,"Nuclei","Radioactive Decay, Parallel and Series Decay",2,"Thursday, August 14, 2025","Rajwant Sir"],
-[98,"Nuclei","Radioactive Decay, Parallel and Series Decay",3,"Saturday, August 16, 2025","Rajwant Sir"],
-[99,"Thermal Properties of Matter","Thermal Expansion",1,"Monday, August 18, 2025","Rajwant Sir"],
-[100,"Thermal Properties of Matter","Calorimetry",2,"Tuesday, August 19, 2025","Rajwant Sir"],
-[101,"Thermal Properties of Matter","Calorimetry",3,"Wednesday, August 20, 2025","Rajwant Sir"],
-[102,"Thermal Properties of Matter","Conduction",4,"Thursday, August 21, 2025","Rajwant Sir"],
-[103,"Thermal Properties of Matter","Conduction",5,"Friday, August 22, 2025","Rajwant Sir"],
-[104,"Thermal Properties of Matter","Conduction",6,"Saturday, August 23, 2025","Rajwant Sir"],
-[105,"Thermal Properties of Matter","Radiation",7,"Monday, August 25, 2025","Rajwant Sir"],
-[106,"Thermal Properties of Matter","Radiation",8,"Tuesday, August 26, 2025","Rajwant Sir"],
-[107,"Kinetic Theory","Gas Laws",1,"Thursday, August 28, 2025","Rajwant Sir"],
-[108,"Kinetic Theory","Relation between Pressure and Kinetic Energy",2,"Friday, August 29, 2025","Rajwant Sir"],
-[109,"Kinetic Theory","Relation between Pressure and Kinetic Energy",3,"Saturday, August 30, 2025","Rajwant Sir"],
-[110,"Thermodynamics","Thermodynamics",1,"Monday, September 1, 2025","Rajwant Sir"],
-[111,"Thermodynamics","Gas Laws",2,"Tuesday, September 2, 2025","Rajwant Sir"],
-[112,"Thermodynamics","Relation between Pressure and Kinetic Energy",3,"Wednesday, September 3, 2025","Rajwant Sir"],
-[113,"Thermodynamics","Relation between Pressure and Kinetic Energy",4,"Thursday, September 4, 2025","Rajwant Sir"],
-[114,"Thermodynamics","Different Processes in Ideal Gas",5,"Friday, September 5, 2025","Rajwant Sir"],
-[115,"Thermodynamics","Thermodynamic System, Heat, Reversible & Irreversible Process",6,"Saturday, September 6, 2025","Rajwant Sir"],
-[116,"Thermodynamics","First & Second Law of Thermodynamics",7,"Monday, September 8, 2025","Rajwant Sir"],
-[117,"Mechanical Properties of Solids (Rec.)","Elasticity & Energy",1,"Monday, September 8, 2025","Rajwant Sir"],
-[118,"Mechanical Properties of Solids (Rec.)","Elasticity & Energy",2,"Tuesday, September 9, 2025","Rajwant Sir"],
-[119,"Mechanical Properties of Fluids","Fluid Statics",1,"Tuesday, September 9, 2025","Rajwant Sir"],
-[120,"Mechanical Properties of Fluids","Fluid Statics",2,"Wednesday, September 10, 2025","Rajwant Sir"],
-[121,"Mechanical Properties of Fluids","Fluid Statics",3,"Thursday, September 11, 2025","Rajwant Sir"],
-[122,"Mechanical Properties of Fluids","Fluid Dynamics",4,"Friday, September 12, 2025","Rajwant Sir"],
-[123,"Mechanical Properties of Fluids","Fluid Dynamics",5,"Saturday, September 13, 2025","Rajwant Sir"],
-[124,"Mechanical Properties of Fluids","Surface Tension",6,"Monday, September 15, 2025","Rajwant Sir"],
-[125,"Mechanical Properties of Fluids","Surface Tension",7,"Tuesday, September 16, 2025","Rajwant Sir"],
-[126,"Mechanical Properties of Fluids","Viscosity",8,"Wednesday, September 17, 2025","Rajwant Sir"],
-[127,"Electric Charges and Fields & Potential","Introduction & Charge",1,"Thursday, September 18, 2025","Rajwant Sir"],
-[128,"Electric Charges and Fields & Potential","Coulomb's Law",2,"Friday, September 19, 2025","Rajwant Sir"],
-[129,"Electric Charges and Fields & Potential","Electric Field, Conductors and Insulators",3,"Saturday, September 20, 2025","Rajwant Sir"],
-[130,"Electric Charges and Fields & Potential","Electric Field of a Continuous Charge Distribution",4,"Monday, September 22, 2025","Rajwant Sir"],
-[131,"Electric Charges and Fields & Potential","Electric Field of a Continuous Charge Distribution",5,"Tuesday, September 23, 2025","Rajwant Sir"],
-[132,"Electric Charges and Fields & Potential","Motion of Charged Particle in Uniform Electric Field",6,"Wednesday, September 24, 2025","Rajwant Sir"],
-[133,"Electric Charges and Fields & Potential","Motion of Charged Particle in Uniform Electric Field",7,"Thursday, September 25, 2025","Rajwant Sir"],
-[134,"Electric Charges and Fields & Potential","Electric Flux, Gauss Law & Applications",8,"Friday, September 26, 2025","Rajwant Sir"],
-[135,"Electric Charges and Fields & Potential","Electrostatic Potential, Relation between E & V",9,"Saturday, September 27, 2025","Rajwant Sir"],
-[136,"Electric Charges and Fields & Potential","Equipotential Surface",10,"Monday, September 29, 2025","Rajwant Sir"],
-[137,"Electric Charges and Fields & Potential","Electrostatic potential energy, Electric potential due to dipole",11,"Tuesday, September 30, 2025","Rajwant Sir"],
-[138,"Electric Charges and Fields & Potential","Electrostatics of Conductor",12,"Wednesday, October 1, 2025","Rajwant Sir"],
-[139,"Electric Charges and Fields & Potential","Conductor & its capacitance",13,"Friday, October 3, 2025","Rajwant Sir"],
-[140,"Electric Charges and Fields & Potential","Charging of a capacitor",14,"Saturday, October 4, 2025","Rajwant Sir"],
-[141,"Electric Charges and Fields & Potential","Combination of capacitors",15,"Monday, October 6, 2025","Rajwant Sir"],
-[142,"Gravitation","Newton's Law of Gravitation",1,"Tuesday, October 7, 2025","Rajwant Sir"],
-[143,"Gravitation","Kepler's Law",2,"Wednesday, October 8, 2025","Rajwant Sir"],
-[144,"Current Electricity","Electric Current",1,"Thursday, October 9, 2025","Rajwant Sir"],
-[145,"Current Electricity","Current in Conductors",2,"Friday, October 10, 2025","Rajwant Sir"],
-[146,"Current Electricity","Kirchhoff's Laws and Combination of Resistances",3,"Saturday, October 11, 2025","Rajwant Sir"],
-[147,"Current Electricity","Wheatstone Bridge and Symmetric Circuits",4,"Monday, October 13, 2025","Rajwant Sir"],
-[148,"Current Electricity","Heating Effect of Current, Cells and Combination of Cells",5,"Tuesday, October 14, 2025","Rajwant Sir"],
-[149,"Current Electricity","Electrical Measuring Instruments, RC Circuit",6,"Wednesday, October 15, 2025","Rajwant Sir"],
-[150,"Current Electricity","Electrical Measuring Instruments, RC Circuit",7,"Thursday, October 16, 2025","Rajwant Sir"],
-[151,"Current Electricity","Electrical Measuring Instruments, RC Circuit",8,"Friday, October 17, 2025","Rajwant Sir"],
-[152,"Electrostatic Potential and Capacitance","Dielectric in capacitor — variable changes",1,"Friday, October 24, 2025","Rajwant Sir"],
-[153,"Electrostatic Potential and Capacitance","Dielectric in capacitor — variable changes",2,"Saturday, October 25, 2025","Rajwant Sir"],
-[154,"Electrostatic Potential and Capacitance","Dielectric in capacitor — variable changes",3,"Wednesday, October 29, 2025","Rajwant Sir"],
-[155,"Electrostatic Potential and Capacitance","Dielectric in capacitor — variable changes",4,"Thursday, October 30, 2025","Rajwant Sir"],
-[156,"Electrostatic Potential and Capacitance","Dielectric in capacitor — variable changes",5,"Friday, October 31, 2025","Rajwant Sir"],
-[157,"Electrostatic Potential and Capacitance","Dielectric in capacitor — variable changes",6,"Saturday, November 1, 2025","Rajwant Sir"],
-[158,"Electrostatic Potential and Capacitance","Dielectric in capacitor — variable changes",7,"Monday, November 3, 2025","Rajwant Sir"],
-[159,"Moving Charges and Magnetism","Oersted's Experiment and Biot-Savart's Law",1,"Tuesday, November 4, 2025","Rajwant Sir"],
-[160,"Moving Charges and Magnetism","B-field due to current carrying Ring and Rod combinations",2,"Wednesday, November 5, 2025","Rajwant Sir"],
-[161,"Moving Charges and Magnetism","Ampere's Law and Its applications",3,"Thursday, November 6, 2025","Rajwant Sir"],
-[162,"Moving Charges and Magnetism","Force on a moving charge in a Magnetic Field",4,"Friday, November 7, 2025","Rajwant Sir"],
-[163,"Moving Charges and Magnetism","Lorentz force, Motion of charged particle in E & B field",5,"Saturday, November 8, 2025","Rajwant Sir"],
-[164,"Moving Charges and Magnetism","Magnetic force on a Current Carrying Conductor",6,"Monday, November 10, 2025","Rajwant Sir"],
-[165,"Moving Charges and Magnetism","Gyromagnetic Ratio, Torque on a Current carrying Loop",7,"Tuesday, November 11, 2025","Rajwant Sir"],
-[166,"Moving Charges and Magnetism","Magnetic Dipole",8,"Wednesday, November 12, 2025","Rajwant Sir"],
-[167,"Moving Charges and Magnetism","Magnetic Dipole",9,"Thursday, November 13, 2025","Rajwant Sir"],
-[168,"Moving Charges and Magnetism","Magnetic Dipole",10,"Friday, November 14, 2025","Rajwant Sir"],
-[169,"Moving Charges and Magnetism","Magnetic Dipole",11,"Saturday, November 15, 2025","Rajwant Sir"],
-[170,"Magnetism and Matter","Bar Magnet, Oscillation Magnetometer, Classification of Magnetic Materials, Ferromagnetism",1,"Monday, November 17, 2025","Rajwant Sir"],
-[171,"Magnetism and Matter","Bar Magnet, Oscillation Magnetometer, Classification of Magnetic Materials, Ferromagnetism",2,"Tuesday, November 18, 2025","Rajwant Sir"],
-[172,"Electromagnetic Induction","Magnetic Flux and Lenz's Law",1,"Wednesday, November 19, 2025","Rajwant Sir"],
-[173,"Electromagnetic Induction","Faraday's Law",2,"Thursday, November 20, 2025","Rajwant Sir"],
-[174,"Electromagnetic Induction","Calculation of Induced EMF",3,"Friday, November 21, 2025","Rajwant Sir"],
-[175,"Electromagnetic Induction","Self Inductance",4,"Saturday, November 22, 2025","Rajwant Sir"],
-[176,"Electromagnetic Induction","Mutual Inductance",5,"Monday, November 24, 2025","Rajwant Sir"],
-[177,"Electromagnetic Induction","Inductor in Electrical Circuits, Induced Electric Field",6,"Tuesday, November 25, 2025","Rajwant Sir"],
-[178,"Electromagnetic Induction","Inductor in Electrical Circuits, Induced Electric Field",7,"Wednesday, November 26, 2025","Rajwant Sir"],
-[179,"Electromagnetic Induction","Inductor in Electrical Circuits, Induced Electric Field",8,"Thursday, November 27, 2025","Rajwant Sir"],
-[180,"Alternating Current","Introduction to Alternating Current",1,"Friday, November 28, 2025","Rajwant Sir"],
-[181,"Alternating Current","Average and RMS Values",2,"Saturday, November 29, 2025","Rajwant Sir"],
-[182,"Alternating Current","Types of AC Circuits, Power & Power Factor",3,"Monday, December 1, 2025","Rajwant Sir"],
-[183,"Waves","Travelling Waves",1,"Tuesday, December 2, 2025","Rajwant Sir"],
-[184,"Waves","Wave function",2,"Wednesday, December 3, 2025","Rajwant Sir"],
-[185,"Waves","Superposition and interference",3,"Thursday, December 4, 2025","Rajwant Sir"],
-[186,"Waves","Superposition & Reflection",4,"Friday, December 5, 2025","Rajwant Sir"],
-[187,"Waves","Standing Waves",5,"Saturday, December 6, 2025","Rajwant Sir"],
-[188,"Waves","Doppler Effect",6,"Monday, December 8, 2025","Rajwant Sir"],
-[189,"Waves","Huygens' Wave Theory",7,"Tuesday, December 9, 2025","Rajwant Sir"],
-[190,"Electromagnetic Waves","Characteristics of Electromagnetic Waves",1,"Wednesday, December 10, 2025","Rajwant Sir"],
-[191,"Electromagnetic Waves","Characteristics of Electromagnetic Waves",2,"Thursday, December 11, 2025","Rajwant Sir"],
-[192,"Electromagnetic Waves","Characteristics of Electromagnetic Waves",3,"Friday, December 12, 2025","Rajwant Sir"],
-[193,"Wave Optics","Huygens' Wave Theory",1,"Saturday, December 13, 2025","Rajwant Sir"],
-[194,"Wave Optics","Interference of light, YDSE & Fringe Visibility",2,"Monday, December 15, 2025","Rajwant Sir"],
-[195,"Wave Optics","Bichromatic light, Fresnel Biprism, Thin film interference",3,"Tuesday, December 16, 2025","Rajwant Sir"],
-[196,"Wave Optics","Diffraction, Power of Resolution, Polarization, Brewster's Law",4,"Wednesday, December 17, 2025","Rajwant Sir"],
-[197,"Wave Optics","Scattering and Doppler Effect of Light",5,"Thursday, December 18, 2025","Rajwant Sir"],
-[198,"Wave Optics","Scattering and Doppler Effect of Light",6,"Friday, December 19, 2025","Rajwant Sir"],
-[199,"Semiconductor Electronics","Introduction to Semiconductors, Intrinsic and Extrinsic",1,"Saturday, December 20, 2025","Rajwant Sir"],
-[200,"Semiconductor Electronics","PN Junction Diode",2,"Monday, December 22, 2025","Rajwant Sir"],
-[201,"Semiconductor Electronics","Application of P-N Junction Diode, transistor and logic gate",3,"Tuesday, December 23, 2025","Rajwant Sir"],
-[202,"Units and Measurements","Dimensions",1,"Wednesday, December 24, 2025","Rajwant Sir"],
-[203,"Units and Measurements","Error, significant figures",2,"Friday, December 26, 2025","Rajwant Sir"],
-];
-
-const MATH = [
-[1,"Basic Mathematics","Number system",1,"Monday, April 21, 2025","Tarun Sir"],
-[2,"Basic Mathematics","Number system",2,"Tuesday, April 22, 2025","Tarun Sir"],
-[3,"Basic Mathematics","Number system",3,"Wednesday, April 23, 2025","Tarun Sir"],
-[4,"Basic Mathematics","Number system",4,"Thursday, April 24, 2025","Tarun Sir"],
-[5,"Basic Mathematics","Wavy Curve Method",5,"Friday, April 25, 2025","Tarun Sir"],
-[6,"Basic Mathematics","Wavy Curve Method",6,"Saturday, April 26, 2025","Tarun Sir"],
-[7,"Basic Mathematics","Wavy Curve Method",7,"Monday, April 28, 2025","Tarun Sir"],
-[8,"Basic Mathematics","Wavy Curve Method",8,"Tuesday, April 29, 2025","Tarun Sir"],
-[9,"Basic Mathematics","Wavy Curve Method",9,"Wednesday, April 30, 2025","Tarun Sir"],
-[10,"Basic Mathematics","Logarithm",10,"Friday, May 2, 2025","Tarun Sir"],
-[11,"Basic Mathematics","Logarithm",11,"Saturday, May 3, 2025","Tarun Sir"],
-[12,"Basic Mathematics","Logarithm",12,"Monday, May 5, 2025","Tarun Sir"],
-[13,"Basic Mathematics","Modulus",13,"Tuesday, May 6, 2025","Tarun Sir"],
-[14,"Basic Mathematics","Modulus",14,"Wednesday, May 7, 2025","Tarun Sir"],
-[15,"Basic Mathematics","Modulus",15,"Thursday, May 8, 2025","Tarun Sir"],
-[16,"Basic Mathematics","Modulus",16,"Friday, May 9, 2025","Tarun Sir"],
-[17,"Basic Mathematics","Modulus",17,"Saturday, May 10, 2025","Tarun Sir"],
-[18,"Quadratic Equations","Introduction",1,"Monday, May 12, 2025","Tarun Sir"],
-[19,"Quadratic Equations","Common roots",2,"Tuesday, May 13, 2025","Tarun Sir"],
-[20,"Quadratic Equations","Theory of equation",3,"Wednesday, May 14, 2025","Tarun Sir"],
-[21,"Quadratic Equations","Graph of ax²+bx+c",4,"Thursday, May 15, 2025","Tarun Sir"],
-[22,"Quadratic Equations","Sign of ax²+bx+c",5,"Friday, May 16, 2025","Tarun Sir"],
-[23,"Quadratic Equations","Location of roots",6,"Saturday, May 17, 2025","Tarun Sir"],
-[24,"Quadratic Equations","Some results",7,"Monday, May 19, 2025","Tarun Sir"],
-[25,"Quadratic Equations","Descarte's rule of signs",8,"Tuesday, May 20, 2025","Tarun Sir"],
-[26,"Quadratic Equations","Descarte's rule of signs",9,"Wednesday, May 21, 2025","Tarun Sir"],
-[27,"Sequence and Series","Introduction",1,"Thursday, May 22, 2025","Tarun Sir"],
-[28,"Sequence and Series","Arithmetic Progression (AP)",2,"Friday, May 23, 2025","Tarun Sir"],
-[29,"Sequence and Series","Geometric Progression (GP)",3,"Saturday, May 24, 2025","Tarun Sir"],
-[30,"Sequence and Series","Harmonical Progression (HP)",4,"Monday, May 26, 2025","Tarun Sir"],
-[31,"Sequence and Series","Insertion of mean's between Two numbers",5,"Tuesday, May 27, 2025","Tarun Sir"],
-[32,"Sequence and Series","Properties of Means, AGS",6,"Wednesday, May 28, 2025","Tarun Sir"],
-[33,"Sequence and Series","Summation, Method of difference",7,"Thursday, May 29, 2025","Tarun Sir"],
-[34,"Sequence and Series","Telescopic series",8,"Friday, May 30, 2025","Tarun Sir"],
-[35,"Trigonometric Functions","Introduction",1,"Saturday, May 31, 2025","Tarun Sir"],
-[36,"Trigonometric Functions","Trigonometrical Ratios for Acute Angle",2,"Monday, June 2, 2025","Tarun Sir"],
-[37,"Trigonometric Functions","Basic identities, Sign Convention",3,"Tuesday, June 3, 2025","Tarun Sir"],
-[38,"Trigonometric Functions","Domain/Range of Trigonometrical Functions",4,"Wednesday, June 4, 2025","Tarun Sir"],
-[39,"Trigonometric Functions","Allied Angles, Sum/Difference Formulae, Multiple Angles",5,"Thursday, June 5, 2025","Tarun Sir"],
-[40,"Trigonometric Functions","Transformation Formulae, Identities",6,"Saturday, June 7, 2025","Tarun Sir"],
-[41,"Trigonometric Functions","Maximum/Minimum Value",7,"Monday, June 9, 2025","Tarun Sir"],
-[42,"Trigonometric Functions","Some Series, Telescopic series",8,"Tuesday, June 10, 2025","Tarun Sir"],
-[43,"Trigonometric Equation","Introduction",1,"Wednesday, June 11, 2025","Tarun Sir"],
-[44,"Trigonometric Equation","Solution",2,"Thursday, June 12, 2025","Tarun Sir"],
-[45,"Trigonometric Equation","Types of Trigonometrical Equation",3,"Friday, June 13, 2025","Tarun Sir"],
-[46,"Trigonometric Equation","Types of Trigonometrical Equation",4,"Saturday, June 14, 2025","Tarun Sir"],
-[47,"Permutations and Combinations","Introduction, Counting, Permutation",1,"Monday, June 16, 2025","Tarun Sir"],
-[48,"Permutations and Combinations","Circular Permutation, Combination",2,"Tuesday, June 17, 2025","Tarun Sir"],
-[49,"Permutations and Combinations","Divisors",3,"Wednesday, June 18, 2025","Tarun Sir"],
-[50,"Permutations and Combinations","Exponent",4,"Thursday, June 19, 2025","Tarun Sir"],
-[51,"Permutations and Combinations","Division and distribution",5,"Friday, June 20, 2025","Tarun Sir"],
-[52,"Permutations and Combinations","Division and distribution",6,"Saturday, June 21, 2025","Tarun Sir"],
-[53,"Permutations and Combinations","Derangement",7,"Monday, June 23, 2025","Tarun Sir"],
-[54,"Permutations and Combinations","Some rules",8,"Tuesday, June 24, 2025","Tarun Sir"],
-[55,"Binomial Theorem","Introduction, Expansion of (x+a)ⁿ",1,"Wednesday, June 25, 2025","Tarun Sir"],
-[56,"Binomial Theorem","General terms, Middle terms",2,"Thursday, June 26, 2025","Tarun Sir"],
-[57,"Binomial Theorem","Numerically greatest term, Form (A+B)ⁿ",3,"Friday, June 27, 2025","Tarun Sir"],
-[58,"Binomial Theorem","Sum of coefficients, Summation of series",4,"Saturday, June 28, 2025","Tarun Sir"],
-[59,"Binomial Theorem","Multinomial theorem",5,"Monday, June 30, 2025","Tarun Sir"],
-[60,"Binomial Theorem","Binomial theorem for any index",6,"Tuesday, July 1, 2025","Tarun Sir"],
-[61,"Straight Lines","Introduction, Section formula",1,"Wednesday, July 2, 2025","Tarun Sir"],
-[62,"Straight Lines","Different Centre of Triangle",2,"Thursday, July 3, 2025","Tarun Sir"],
-[63,"Straight Lines","Area, Locus",3,"Friday, July 4, 2025","Tarun Sir"],
-[64,"Straight Lines","Straight line, Slope",4,"Saturday, July 5, 2025","Tarun Sir"],
-[65,"Straight Lines","Standard form, Position of point w.r.t straight line",5,"Monday, July 7, 2025","Tarun Sir"],
-[66,"Straight Lines","Angle between two straight lines",6,"Tuesday, July 8, 2025","Tarun Sir"],
-[67,"Straight Lines","Perpendicular distance, Concurrent lines, Family of lines, Angle bisector",7,"Wednesday, July 9, 2025","Tarun Sir"],
-[68,"Straight Lines","Transformation of Axis, Pair of straight lines",8,"Thursday, July 10, 2025","Tarun Sir"],
-[69,"Circles","Introduction, General equation",1,"Friday, July 11, 2025","Tarun Sir"],
-[70,"Circles","Diameter form, Parametric form",2,"Saturday, July 12, 2025","Tarun Sir"],
-[71,"Circles","Intercept on axis, Position of point/line w.r.t circle",3,"Monday, July 14, 2025","Tarun Sir"],
-[72,"Circles","Tangent, Normal, Director circle, Chord of contact",4,"Tuesday, July 15, 2025","Tarun Sir"],
-[73,"Circles","Pair of tangent, Radical axis",5,"Wednesday, July 16, 2025","Tarun Sir"],
-[74,"Circles","Family of circles, Position of two Circles, Common tangent",6,"Thursday, July 17, 2025","Tarun Sir"],
-[75,"Circles","Angle of intersection, Orthogonality of two circles",7,"Friday, July 18, 2025","Tarun Sir"],
-[76,"Circles","Circle circumscribing a triangle/quadrilateral",8,"Saturday, July 19, 2025","Tarun Sir"],
-[77,"Conic Sections: Parabola","Introduction, Standard form, Parametric form",1,"Monday, July 21, 2025","Tarun Sir"],
-[78,"Conic Sections: Parabola","Types of parabola, General equation, Focal distance",2,"Tuesday, July 22, 2025","Tarun Sir"],
-[79,"Conic Sections: Parabola","Some result, Position of point/line w.r.t parabola",3,"Wednesday, July 23, 2025","Tarun Sir"],
-[80,"Conic Sections: Parabola","Tangent, Normal",4,"Thursday, July 24, 2025","Tarun Sir"],
-[81,"Conic Sections: Parabola","Properties of Tangent & Normal, Focal chord",5,"Friday, July 25, 2025","Tarun Sir"],
-[82,"Conic Sections: Parabola","Chord of contact, Chord in mid points form",6,"Saturday, July 26, 2025","Tarun Sir"],
-[83,"Conic Sections: Parabola","Pair of tangents, Director circle, Properties",7,"Monday, July 28, 2025","Tarun Sir"],
-[84,"Conic Sections: Ellipse","Introduction, Standard form, Auxiliary circle",1,"Tuesday, July 29, 2025","Tarun Sir"],
-[85,"Conic Sections: Ellipse","General equation, Another definition",2,"Wednesday, July 30, 2025","Tarun Sir"],
-[86,"Conic Sections: Ellipse","Focal distance, Position of point w.r.t ellipse",3,"Thursday, July 31, 2025","Tarun Sir"],
-[87,"Conic Sections: Ellipse","Position of straight line w.r.t ellipse, Tangent",4,"Friday, August 1, 2025","Tarun Sir"],
-[88,"Conic Sections: Ellipse","Normal, Equation of chord joining P(a) and Q(b)",5,"Saturday, August 2, 2025","Tarun Sir"],
-[89,"Conic Sections: Ellipse","Director circle, Properties",6,"Monday, August 4, 2025","Tarun Sir"],
-[90,"Conic Sections: Hyperbola","Introduction, Standard form",1,"Tuesday, August 5, 2025","Tarun Sir"],
-[91,"Conic Sections: Hyperbola","General equation, Another definition, Auxiliary circle",2,"Wednesday, August 6, 2025","Tarun Sir"],
-[92,"Conic Sections: Hyperbola","Focal distance, Position of point/line w.r.t hyperbola",3,"Thursday, August 7, 2025","Tarun Sir"],
-[93,"Conic Sections: Hyperbola","Tangent, Normal, Chord of contact, Chord in mid point form",4,"Saturday, August 9, 2025","Tarun Sir"],
-[94,"Conic Sections: Hyperbola","Pair of tangents, Director circle, Asymptotes",5,"Monday, August 11, 2025","Tarun Sir"],
-[95,"Conic Sections: Hyperbola","Rectangular hyperbola, Properties",6,"Tuesday, August 12, 2025","Tarun Sir"],
-[96,"Determinants","Introduction, Minor and cofactor",1,"Wednesday, August 13, 2025","Tarun Sir"],
-[97,"Determinants","General Properties",2,"Thursday, August 14, 2025","Tarun Sir"],
-[98,"Determinants","Addition/Summation, Product, Differentiation",3,"Saturday, August 16, 2025","Tarun Sir"],
-[99,"Determinants","Solution of Equation",4,"Monday, August 18, 2025","Tarun Sir"],
-[100,"Matrices","Introduction, Types, Equality",1,"Tuesday, August 19, 2025","Tarun Sir"],
-[101,"Matrices","Trace, Determinants, Operations on Matrices",2,"Wednesday, August 20, 2025","Tarun Sir"],
-[102,"Matrices","Matrix Polynomial, Transpose",3,"Thursday, August 21, 2025","Tarun Sir"],
-[103,"Matrices","Transposed Conjugate, Symmetric and Skew Symmetric",4,"Friday, August 22, 2025","Tarun Sir"],
-[104,"Matrices","Orthogonal matrix, Adjoint, Invertible Matrix, Elementary Operations",5,"Saturday, August 23, 2025","Tarun Sir"],
-[105,"Matrices","Inverse of a matrix",6,"Monday, August 25, 2025","Tarun Sir"],
-[106,"Matrices","Characteristic equation, Equation solving by matrix method",7,"Tuesday, August 26, 2025","Tarun Sir"],
-[107,"Sets","Introduction, Sets and their Representation",1,"Thursday, August 28, 2025","Tarun Sir"],
-[108,"Sets","Types of Sets, Operations on Sets",2,"Friday, August 29, 2025","Tarun Sir"],
-[109,"Sets","Algebra of sets, Geometrical Problems on Union & Intersection",3,"Saturday, August 30, 2025","Tarun Sir"],
-[110,"Relations and Functions","Relation, Type of Relations",4,"Monday, September 1, 2025","Tarun Sir"],
-[111,"Relations and Functions","Functions, Domain and Range",5,"Tuesday, September 2, 2025","Tarun Sir"],
-[112,"Relations and Functions","Type of Functions, Equal Function",6,"Wednesday, September 3, 2025","Tarun Sir"],
-[113,"Relations and Functions","Classification of Function",7,"Thursday, September 4, 2025","Tarun Sir"],
-[114,"Relations and Functions","Composite Function",8,"Friday, September 5, 2025","Tarun Sir"],
-[115,"Relations and Functions","Odd/Even Function",9,"Saturday, September 6, 2025","Tarun Sir"],
-[116,"Relations and Functions","Period of Function",10,"Monday, September 8, 2025","Tarun Sir"],
-[117,"Relations and Functions","Inverse of Function",11,"Tuesday, September 9, 2025","Tarun Sir"],
-[118,"Relations and Functions","Some Graph and its transformation",12,"Wednesday, September 10, 2025","Tarun Sir"],
-[119,"Relations and Functions","Functional Equation",13,"Thursday, September 11, 2025","Tarun Sir"],
-[120,"Inverse Trigonometric Functions","Introduction",1,"Friday, September 12, 2025","Tarun Sir"],
-[121,"Inverse Trigonometric Functions","Domain/Range of ITF, Graph",2,"Saturday, September 13, 2025","Tarun Sir"],
-[122,"Inverse Trigonometric Functions","Properties of Inverse Circular Functions",3,"Monday, September 15, 2025","Tarun Sir"],
-[123,"Inverse Trigonometric Functions","Some Graphs",4,"Tuesday, September 16, 2025","Tarun Sir"],
-[124,"Limit, Continuity and Differentiability","Limit",1,"Wednesday, September 17, 2025","Tarun Sir"],
-[125,"Limit, Continuity and Differentiability","Limit",2,"Thursday, September 18, 2025","Tarun Sir"],
-[126,"Limit, Continuity and Differentiability","Method finding limit",3,"Friday, September 19, 2025","Tarun Sir"],
-[127,"Limit, Continuity and Differentiability","Method finding limit, Sandwitch Theorem, Newton Leibnitz Theorem",4,"Saturday, September 20, 2025","Tarun Sir"],
-[128,"Limit, Continuity and Differentiability","Continuity",5,"Monday, September 22, 2025","Tarun Sir"],
-[129,"Limit, Continuity and Differentiability","Continuity",6,"Tuesday, September 23, 2025","Tarun Sir"],
-[130,"Limit, Continuity and Differentiability","Intermediate mean value theorem",7,"Wednesday, September 24, 2025","Tarun Sir"],
-[131,"Limit, Continuity and Differentiability","Differentiability",8,"Thursday, September 25, 2025","Tarun Sir"],
-[132,"Limit, Continuity and Differentiability","Differentiability",9,"Friday, September 26, 2025","Tarun Sir"],
-[133,"Method of Differentiation","Differentiation",1,"Saturday, September 27, 2025","Tarun Sir"],
-[134,"Method of Differentiation","Differentiation",2,"Monday, September 29, 2025","Tarun Sir"],
-[135,"Method of Differentiation","Differentiation",3,"Tuesday, September 30, 2025","Tarun Sir"],
-[136,"Method of Differentiation","Differentiation",4,"Wednesday, October 1, 2025","Tarun Sir"],
-[137,"Method of Differentiation","Differentiation",5,"Friday, October 3, 2025","Tarun Sir"],
-[138,"Application of Derivatives","Rate of change, Tangent and normal, Angle between two curves",1,"Saturday, October 4, 2025","Tarun Sir"],
-[139,"Application of Derivatives","Shortest distance between two curves, Approximation and error",2,"Monday, October 6, 2025","Tarun Sir"],
-[140,"Application of Derivatives","Monotonicity, Stationary points, Critical Points",3,"Tuesday, October 7, 2025","Tarun Sir"],
-[141,"Application of Derivatives","Maxima and Minima, Global maxima/minima",4,"Wednesday, October 8, 2025","Tarun Sir"],
-[142,"Application of Derivatives","Concavity, Rolle's theorem",5,"Thursday, October 9, 2025","Tarun Sir"],
-[143,"Application of Derivatives","LMVT, Curve Sketching",6,"Friday, October 10, 2025","Tarun Sir"],
-[144,"Indefinite Integration","Introduction, Algebra of integration",1,"Saturday, October 11, 2025","Tarun Sir"],
-[145,"Indefinite Integration","Integration by substitution, Trigonometric identities",2,"Monday, October 13, 2025","Tarun Sir"],
-[146,"Indefinite Integration","Integration by parts, Use of partial fraction",3,"Tuesday, October 14, 2025","Tarun Sir"],
-[147,"Indefinite Integration","Algebraic function",4,"Wednesday, October 15, 2025","Tarun Sir"],
-[148,"Indefinite Integration","Trigonometric form, Some special type",5,"Thursday, October 16, 2025","Tarun Sir"],
-[149,"Indefinite Integration","Irrational form",6,"Friday, October 17, 2025","Tarun Sir"],
-[150,"Indefinite Integration","Reduction form",7,"Friday, October 24, 2025","Tarun Sir"],
-[151,"Definite Integration","Introduction",1,"Saturday, October 25, 2025","Tarun Sir"],
-[152,"Definite Integration","Properties",2,"Wednesday, October 29, 2025","Tarun Sir"],
-[153,"Definite Integration","Properties",3,"Thursday, October 30, 2025","Tarun Sir"],
-[154,"Definite Integration","Newton Leibniz Theorem",4,"Friday, October 31, 2025","Tarun Sir"],
-[155,"Definite Integration","Definite integration with limit as a sum",5,"Saturday, November 1, 2025","Tarun Sir"],
-[156,"Definite Integration","Wall's Formula/Gamma function, Estimation",6,"Monday, November 3, 2025","Tarun Sir"],
-[157,"Application of Integrals","Area between two curves",1,"Tuesday, November 4, 2025","Tarun Sir"],
-[158,"Application of Integrals","Curve Sketching",2,"Wednesday, November 5, 2025","Tarun Sir"],
-[159,"Application of Integrals","Curve Sketching",3,"Thursday, November 6, 2025","Tarun Sir"],
-[160,"Differential Equation","Introduction, Formation of differential Equation",1,"Friday, November 7, 2025","Tarun Sir"],
-[161,"Differential Equation","Solution of differential Equation",2,"Saturday, November 8, 2025","Tarun Sir"],
-[162,"Differential Equation","Orthogonal trajectory",3,"Monday, November 10, 2025","Tarun Sir"],
-[163,"Differential Equation","Clairaut's equation",4,"Tuesday, November 11, 2025","Tarun Sir"],
-[164,"Differential Equation","Application of differential equation",5,"Wednesday, November 12, 2025","Tarun Sir"],
-[165,"Vector Algebra","Introduction, Type of vector, Addition of Vector",1,"Thursday, November 13, 2025","Tarun Sir"],
-[166,"Vector Algebra","Properties, Collinear vector",2,"Friday, November 14, 2025","Tarun Sir"],
-[167,"Vector Algebra","Coplanar vector, Orthogonal system, Section formula",3,"Saturday, November 15, 2025","Tarun Sir"],
-[168,"Vector Algebra","Scalar (dot) product of two vector",4,"Monday, November 17, 2025","Tarun Sir"],
-[169,"Vector Algebra","Vector (cross) product",5,"Tuesday, November 18, 2025","Tarun Sir"],
-[170,"Vector Algebra","Scalar triple product (STP), Vector triple product (VTP)",6,"Wednesday, November 19, 2025","Tarun Sir"],
-[171,"Vector Algebra","Reciprocal system, Linearly dependent/independent vector, Applications",7,"Thursday, November 20, 2025","Tarun Sir"],
-[172,"Three Dimensional Geometry","Introduction, Section Formulae",1,"Friday, November 21, 2025","Tarun Sir"],
-[173,"Three Dimensional Geometry","Direction cosine, Direction Ratio, Line",2,"Saturday, November 22, 2025","Tarun Sir"],
-[174,"Three Dimensional Geometry","Angle between two line segment, Perpendicular distance",3,"Monday, November 24, 2025","Tarun Sir"],
-[175,"Three Dimensional Geometry","Plane, Position of Two points w.r.t. plane",4,"Tuesday, November 25, 2025","Tarun Sir"],
-[176,"Three Dimensional Geometry","Area of Triangle, Area between planes, Perpendicular distance, Angle bisector",5,"Wednesday, November 26, 2025","Tarun Sir"],
-[177,"Three Dimensional Geometry","Family of plane, Angle between line and plane, Coplanar lines, Skew line",6,"Thursday, November 27, 2025","Tarun Sir"],
-[178,"Complex Number","Introduction, Algebraic operations",1,"Friday, November 28, 2025","Tarun Sir"],
-[179,"Complex Number","Argand Plane, Conjugate of Complex",2,"Saturday, November 29, 2025","Tarun Sir"],
-[180,"Complex Number","Modulus of complex number",3,"Monday, December 1, 2025","Tarun Sir"],
-[181,"Complex Number","Argument of Complex numbers",4,"Tuesday, December 2, 2025","Tarun Sir"],
-[182,"Complex Number","Form of complex numbers",5,"Wednesday, December 3, 2025","Tarun Sir"],
-[183,"Complex Number","De Moivre's theorem",6,"Thursday, December 4, 2025","Tarun Sir"],
-[184,"Complex Number","Cube roots of unity, nth root of unity",7,"Friday, December 5, 2025","Tarun Sir"],
-[185,"Complex Number","Geometry of complex",8,"Saturday, December 6, 2025","Tarun Sir"],
-[186,"Complex Number","Geometry of complex",9,"Monday, December 8, 2025","Tarun Sir"],
-[187,"Probability","Introduction, Event, Some Results",1,"Tuesday, December 9, 2025","Tarun Sir"],
-[188,"Probability","Probability",2,"Wednesday, December 10, 2025","Tarun Sir"],
-[189,"Probability","Some theorems",3,"Thursday, December 11, 2025","Tarun Sir"],
-[190,"Probability","Independent events",4,"Friday, December 12, 2025","Tarun Sir"],
-[191,"Probability","Conditional probability",5,"Saturday, December 13, 2025","Tarun Sir"],
-[192,"Probability","Baye's Theorem",6,"Monday, December 15, 2025","Tarun Sir"],
-[193,"Probability","Random variable",7,"Tuesday, December 16, 2025","Tarun Sir"],
-[194,"Probability","Binomial theorem on probability, Uncountable uniform spaces",8,"Wednesday, December 17, 2025","Tarun Sir"],
-[195,"Statistics","Introduction, Variable, Relative and cumulative frequency",1,"Thursday, December 18, 2025","Tarun Sir"],
-[196,"Statistics","Mean",2,"Friday, December 19, 2025","Tarun Sir"],
-[197,"Statistics","Mode, Relation among mean median and mode",3,"Saturday, December 20, 2025","Tarun Sir"],
-[198,"Statistics","Measure of Dispersion, Variance",4,"Monday, December 22, 2025","Tarun Sir"],
-[199,"Solution of Triangle","Introduction, Sine rule, Cosine rule, Projection Formula",1,"Tuesday, December 23, 2025","Tarun Sir"],
-[200,"Solution of Triangle","Napier's Analogy, Auxiliary formulas, Area of triangle, Centres",2,"Wednesday, December 24, 2025","Tarun Sir"],
-[201,"Solution of Triangle","Regular Polygon, Solution of Triangle, Excentral triangle",3,"Friday, December 26, 2025","Tarun Sir"],
-];
-
-const PHYCHEM = [
-[1,"Some Basic Concepts of Chemistry","Nature of Matter, Classification, Properties, SI Units, Uncertainty in Measurement",1,"Monday, April 21, 2025","Rahul Dudi Sir"],
-[2,"Some Basic Concepts of Chemistry","Laws of Chemical Combinations",2,"Tuesday, April 22, 2025","Rahul Dudi Sir"],
-[3,"Some Basic Concepts of Chemistry","Dalton's Atomic Theory, Atomic Mass, Atomic Mass Unit",3,"Wednesday, April 23, 2025","Rahul Dudi Sir"],
-[4,"Some Basic Concepts of Chemistry","Gram Atomic Mass, Average Atomic Mass",4,"Thursday, April 24, 2025","Rahul Dudi Sir"],
-[5,"Some Basic Concepts of Chemistry","Molecular Mass, Gram Molecular Mass",5,"Friday, April 25, 2025","Rahul Dudi Sir"],
-[6,"Some Basic Concepts of Chemistry","Average Molecular Mass, Formula Mass",6,"Saturday, April 26, 2025","Rahul Dudi Sir"],
-[7,"Some Basic Concepts of Chemistry","Percentage Composition, Empirical and Molecular formula",7,"Monday, April 28, 2025","Rahul Dudi Sir"],
-[8,"Some Basic Concepts of Chemistry","Mole, Vapour density, Atomicity",8,"Tuesday, April 29, 2025","Rahul Dudi Sir"],
-[9,"Some Basic Concepts of Chemistry","Mole Concept",9,"Wednesday, April 30, 2025","Rahul Dudi Sir"],
-[10,"Some Basic Concepts of Chemistry","Concentration Terms & Application",10,"Friday, May 2, 2025","Rahul Dudi Sir"],
-[11,"Some Basic Concepts of Chemistry","Concentration Terms & Application",11,"Saturday, May 3, 2025","Rahul Dudi Sir"],
-[12,"Some Basic Concepts of Chemistry","Stoichiometry and Stoichiometric Calculations, Gravimetric Analysis",12,"Monday, May 5, 2025","Rahul Dudi Sir"],
-[13,"Some Basic Concepts of Chemistry","Sequential Reaction, POAC, Oleum Labelling, Eudiometry",13,"Tuesday, May 6, 2025","Rahul Dudi Sir"],
-[14,"Redox Reaction","Introduction",1,"Wednesday, May 7, 2025","Rahul Dudi Sir"],
-[15,"Redox Reaction","Balancing of Redox Reaction, Types of Redox Reaction, n-Factor",2,"Thursday, May 8, 2025","Rahul Dudi Sir"],
-[16,"Redox Reaction","Law of Equivalence, Redox Titration",3,"Friday, May 9, 2025","Rahul Dudi Sir"],
-[17,"Redox Reaction","Iodometric and Iodimetric Titration, Redox Reactions in Electrode process",4,"Saturday, May 10, 2025","Rahul Dudi Sir"],
-[18,"Redox Reaction","Iodometric and Iodimetric Titration, Redox Reactions in Electrode process",5,"Monday, May 12, 2025","Rahul Dudi Sir"],
-[19,"Solutions","Binary Solution, Concentration Terms",1,"Tuesday, May 13, 2025","Rahul Dudi Sir"],
-[20,"Solutions","Solubility, Vapour Pressure, Vapour Pressure of Liquid Solutions",2,"Wednesday, May 14, 2025","Rahul Dudi Sir"],
-[21,"Solutions","Vapour Pressure, Determination of Vapour Pressure, Vapour Pressure of Liquid Solutions",3,"Thursday, May 15, 2025","Rahul Dudi Sir"],
-[22,"Solutions","Ideal and Non-ideal Solutions, Colligative Properties",4,"Friday, May 16, 2025","Rahul Dudi Sir"],
-[23,"Solutions","Osmosis, Osmotic Pressure",5,"Saturday, May 17, 2025","Rahul Dudi Sir"],
-[24,"Solutions","Abnormal Molar Masses",6,"Monday, May 19, 2025","Rahul Dudi Sir"],
-[25,"Solutions","Van't Hoff Factor and Abnormality in Molar Mass",7,"Tuesday, May 20, 2025","Rahul Dudi Sir"],
-[26,"Solutions","Abnormal Molar Masses, Van't Hoff Factor and Abnormality in Molar Mass",8,"Wednesday, May 21, 2025","Rahul Dudi Sir"],
-[27,"Chemical Kinetics","Introduction, Rate of Reaction, Rate Law, Rate constant, Order and molecularity",1,"Thursday, May 22, 2025","Rahul Dudi Sir"],
-[28,"Chemical Kinetics","Integrated Rate Equations, Numericals on First Order Reactions",2,"Friday, May 23, 2025","Rahul Dudi Sir"],
-[29,"Chemical Kinetics","Pseudo First Order Reaction, Experimental Determination of Order, Collision Theory",3,"Saturday, May 24, 2025","Rahul Dudi Sir"],
-[30,"Chemical Kinetics","Concept of Activation Energy and Transition State Theory",4,"Monday, May 26, 2025","Rahul Dudi Sir"],
-[31,"Chemical Kinetics","Effect of Temperature, Temperature Dependence of Rate, Potential Energy Curves",5,"Tuesday, May 27, 2025","Rahul Dudi Sir"],
-[32,"Chemical Kinetics","Parallel Reactions, Sequential Decay, Reversible Reaction",6,"Wednesday, May 28, 2025","Rahul Dudi Sir"],
-[33,"Chemical Kinetics","Effect of Catalyst, Enzyme Catalysis, Nuclear Chemistry, Radioactive Series",7,"Thursday, May 29, 2025","Rahul Dudi Sir"],
-[34,"Thermodynamics","Introduction, Basic terms, Classification of system, State of system",1,"Friday, May 30, 2025","Rahul Dudi Sir"],
-[35,"Thermodynamics","Types of properties, Thermodynamic Processes, Work, heat, internal energy, 1st Law, Enthalpy",2,"Saturday, May 31, 2025","Rahul Dudi Sir"],
-[36,"Thermodynamics","Heat Capacity",3,"Monday, June 2, 2025","Rahul Dudi Sir"],
-[37,"Thermodynamics","Calculation of Q, W, ΔU & ΔH in Various Processes",4,"Tuesday, June 3, 2025","Rahul Dudi Sir"],
-[38,"Thermodynamics","Thermochemistry, Enthalpy of a substance, Enthalpy of reaction, Laws of Thermochemistry",5,"Wednesday, June 4, 2025","Rahul Dudi Sir"],
-[39,"Thermodynamics","Enthalpy change for different reactions, Kirchoff's Law",6,"Thursday, June 5, 2025","Rahul Dudi Sir"],
-[40,"Thermodynamics","Calorimetry, Limitation of 1st law, Spontaneous process, Entropy, 2nd Law",7,"Saturday, June 7, 2025","Rahul Dudi Sir"],
-[41,"Thermodynamics","Entropy Change of Solids and Liquids Upon Heating",8,"Monday, June 9, 2025","Rahul Dudi Sir"],
-[42,"Thermodynamics","Standard absolute molar entropy, Entropy Change of Reaction, Gibbs Free Energy",9,"Tuesday, June 10, 2025","Rahul Dudi Sir"],
-[43,"Chemical Equilibrium","Introduction, Characteristics, Law of mass action",1,"Wednesday, June 11, 2025","Rahul Dudi Sir"],
-[44,"Chemical Equilibrium","Variation of equilibrium constant with stoichiometric coefficients",2,"Thursday, June 12, 2025","Rahul Dudi Sir"],
-[45,"Chemical Equilibrium","Reaction Quotient, Equilibrium Constant of Various equilibrium",3,"Friday, June 13, 2025","Rahul Dudi Sir"],
-[46,"Chemical Equilibrium","Degree of dissociation, Le Chatelier's principle, Effect of temperature on Kc",4,"Saturday, June 14, 2025","Rahul Dudi Sir"],
-[47,"Chemical Equilibrium","Free energy and chemical equilibrium, Physical Equilibrium",5,"Monday, June 16, 2025","Rahul Dudi Sir"],
-[48,"Ionic Equilibrium","Type of electrolytes, Different theory for acid and base, Autoionization of water",1,"Tuesday, June 17, 2025","Rahul Dudi Sir"],
-[49,"Ionic Equilibrium","The pH-Scale, Ionisation of weak electrolyte",2,"Wednesday, June 18, 2025","Rahul Dudi Sir"],
-[50,"Ionic Equilibrium","Common ion effect and levelling effect",3,"Thursday, June 19, 2025","Rahul Dudi Sir"],
-[51,"Ionic Equilibrium","pH-Calculation, Buffer Solution",4,"Friday, June 20, 2025","Rahul Dudi Sir"],
-[52,"Ionic Equilibrium","Salt hydrolysis, Indicator",5,"Saturday, June 21, 2025","Rahul Dudi Sir"],
-[53,"Ionic Equilibrium","Acid-base titration, Solubility and Solubility product",6,"Monday, June 23, 2025","Rahul Dudi Sir"],
-[54,"Electrochemistry","Introduction, Electrochemical Cell, Galvanic Cells, Liquid Junction Potential",1,"Tuesday, June 24, 2025","Rahul Dudi Sir"],
-[55,"Electrochemistry","Electrochemical Cell, Electrode potential, Electrochemical Series",2,"Wednesday, June 25, 2025","Rahul Dudi Sir"],
-[56,"Electrochemistry","Nernst Equation, Equilibrium Constant and emf, Gibbs Energy, Concentration Cell",3,"Thursday, June 26, 2025","Rahul Dudi Sir"],
-[57,"Electrochemistry","Electrolytes, Electrolytic cell, Faraday's Laws, Metallic/Electrolytic Conductors",4,"Friday, June 27, 2025","Rahul Dudi Sir"],
-[58,"Electrochemistry","Measurement of Conductance, Molar Conductivity, Equivalent Conductivity",5,"Saturday, June 28, 2025","Rahul Dudi Sir"],
-[59,"Electrochemistry","Molar & Equivalent Conductivity relation, Variation with Concentration, Kohlrausch's Law",6,"Monday, June 30, 2025","Rahul Dudi Sir"],
-[60,"Electrochemistry","Absolute Ionic Mobilities, Conductometric Titrations, Fuel Cells, Corrosion",7,"Tuesday, July 1, 2025","Rahul Dudi Sir"],
-[61,"Structure of Atom","Introduction",1,"Wednesday, July 2, 2025","Rahul Dudi Sir"],
-[62,"Structure of Atom","Fundamental Particles, Discovery of Fundamental Particles",2,"Thursday, July 3, 2025","Rahul Dudi Sir"],
-[63,"Structure of Atom","Atomic Models",3,"Friday, July 4, 2025","Rahul Dudi Sir"],
-[64,"Structure of Atom","Nature of Light, Electromagnetic Spectrum, Planck's Quantum, Applications",4,"Saturday, July 5, 2025","Rahul Dudi Sir"],
-[65,"Structure of Atom","Bohr's Model for Hydrogen Atom",5,"Monday, July 7, 2025","Rahul Dudi Sir"],
-[66,"Structure of Atom","Ionization Energy of Hydrogen and Hydrogen-Like Particles",6,"Tuesday, July 8, 2025","Rahul Dudi Sir"],
-[67,"Structure of Atom","Spectrum: Evidence for Quantized Electronic Energy Levels",7,"Wednesday, July 9, 2025","Rahul Dudi Sir"],
-[68,"Structure of Atom","Quantum Mechanical Model, Quantum Number, Rules for Filling electrons, Exchange and Pairing energy",8,"Thursday, July 10, 2025","Rahul Dudi Sir"],
-[69,"State of Matter (Rec.)","Introduction, Gas Laws, Ideal Gas Equation, Dalton's Law, Graham's Law, Kinetic Theory, Real Gases, Van der Waal's Equation, Liquid State",1,"Saturday, December 20, 2025","Rahul Dudi Sir"],
-[70,"The Solid State (Rec.)","Introduction, Crystalline solids, Cubic unit cell, Close packing, Voids, Ionic Solids, Defects, Electrical properties",1,"Monday, December 22, 2025","Rahul Dudi Sir"],
-[71,"Surface Chemistry (Rec.)","Introduction, Adsorption, Adsorption Isotherm, Catalysis, Colloidal State, Colloids, Emulsion",1,"Tuesday, December 23, 2025","Rahul Dudi Sir"],
-];
-
-const ORGCHEM = [
-[1,"Some Basic Principles & Techniques: IUPAC Nomenclature","Structural Representation of organic compound",1,"Monday, August 11, 2025","Rohit Sir"],
-[2,"Some Basic Principles & Techniques: IUPAC Nomenclature","Some important definition",2,"Tuesday, August 12, 2025","Rohit Sir"],
-[3,"Some Basic Principles & Techniques: IUPAC Nomenclature","IUPAC System of Nomenclature",3,"Wednesday, August 13, 2025","Rohit Sir"],
-[4,"Some Basic Principles & Techniques: IUPAC Nomenclature","IUPAC System of Nomenclature",4,"Thursday, August 14, 2025","Rohit Sir"],
-[5,"Some Basic Principles & Techniques: IUPAC Nomenclature","IUPAC System of Nomenclature",5,"Saturday, August 16, 2025","Rohit Sir"],
-[6,"Some Basic Principles & Techniques: IUPAC Nomenclature","Nomenclature of hydrocarbon",6,"Monday, August 18, 2025","Rohit Sir"],
-[7,"Some Basic Principles & Techniques: IUPAC Nomenclature","Nomenclature of organic compound without carbon containing group",7,"Tuesday, August 19, 2025","Rohit Sir"],
-[8,"Some Basic Principles & Techniques: IUPAC Nomenclature","Nomenclature of organic compound which contain polyfunctional group",8,"Wednesday, August 20, 2025","Rohit Sir"],
-[9,"Some Basic Principles & Techniques: IUPAC Nomenclature","Nomenclature of some other compound",9,"Thursday, August 21, 2025","Rohit Sir"],
-[10,"Some Basic Principles & Techniques: GOC","Bond fission, Reaction intermediate",1,"Friday, August 22, 2025","Rohit Sir"],
-[11,"Some Basic Principles & Techniques: GOC","Reaction Reagents",2,"Saturday, August 23, 2025","Rohit Sir"],
-[12,"Some Basic Principles & Techniques: GOC","Electronic displacement in organic compound",3,"Monday, August 25, 2025","Rohit Sir"],
-[13,"Some Basic Principles & Techniques: GOC","Inductive effect",4,"Tuesday, August 26, 2025","Rohit Sir"],
-[14,"Some Basic Principles & Techniques: GOC","Resonance effect",5,"Thursday, August 28, 2025","Rohit Sir"],
-[15,"Some Basic Principles & Techniques: GOC","Mesomeric effect",6,"Friday, August 29, 2025","Rohit Sir"],
-[16,"Some Basic Principles & Techniques: GOC","Steric Inhibition of Resonance (SIR effect)",7,"Saturday, August 30, 2025","Rohit Sir"],
-[17,"Some Basic Principles & Techniques: GOC","Hyper conjugation effect",8,"Monday, September 1, 2025","Rohit Sir"],
-[18,"Some Basic Principles & Techniques: GOC","Electromeric effect",9,"Tuesday, September 2, 2025","Rohit Sir"],
-[19,"Some Basic Principles & Techniques: GOC","Types of Organic Reactions",10,"Wednesday, September 3, 2025","Rohit Sir"],
-[20,"Some Basic Principles & Techniques: GOC","Aromaticity",11,"Thursday, September 4, 2025","Rohit Sir"],
-[21,"Some Basic Principles & Techniques: GOC","Basic Strength of Organic Bases, Acidic Strength of Organic Acids",12,"Friday, September 5, 2025","Rohit Sir"],
-[22,"Some Basic Principles & Techniques: Isomerism","Isomerism",1,"Saturday, September 6, 2025","Rohit Sir"],
-[23,"Some Basic Principles & Techniques: Isomerism","Conformational isomerism",2,"Monday, September 8, 2025","Rohit Sir"],
-[24,"Some Basic Principles & Techniques: Isomerism","Conformational isomerism",3,"Tuesday, September 9, 2025","Rohit Sir"],
-[25,"Some Basic Principles & Techniques: Isomerism","Configurational isomerism and its types",4,"Wednesday, September 10, 2025","Rohit Sir"],
-[26,"Some Basic Principles & Techniques: Isomerism","Geometrical isomerism",5,"Thursday, September 11, 2025","Rohit Sir"],
-[27,"Some Basic Principles & Techniques: Isomerism","Properties of geometrical isomers",6,"Friday, September 12, 2025","Rohit Sir"],
-[28,"Some Basic Principles & Techniques: Isomerism","Properties of geometrical isomers",7,"Saturday, September 13, 2025","Rohit Sir"],
-[29,"Some Basic Principles & Techniques: Isomerism","Nomenclature of geometrical isomer",8,"Monday, September 15, 2025","Rohit Sir"],
-[30,"Some Basic Principles & Techniques: Isomerism","Nomenclature of geometrical isomer",9,"Tuesday, September 16, 2025","Rohit Sir"],
-[31,"Some Basic Principles & Techniques: Isomerism","Optical isomerism",10,"Wednesday, September 17, 2025","Rohit Sir"],
-[32,"Some Basic Principles & Techniques: Isomerism","Optical isomerism",11,"Thursday, September 18, 2025","Rohit Sir"],
-[33,"Some Basic Principles & Techniques: Isomerism","Optical isomerism",12,"Friday, September 19, 2025","Rohit Sir"],
-[34,"Some Basic Principles & Techniques: Isomerism","Optical isomerism",13,"Saturday, September 20, 2025","Rohit Sir"],
-[35,"Some Basic Principles & Techniques: Isomerism","Optical isomerism",14,"Monday, September 22, 2025","Rohit Sir"],
-[36,"Hydrocarbon","Introduction, Alkane, Preparation of alkane, Physical properties of alkane",1,"Tuesday, September 23, 2025","Rohit Sir"],
-[37,"Hydrocarbon","Chemical properties of alkane, Uses of Alkane",2,"Wednesday, September 24, 2025","Rohit Sir"],
-[38,"Hydrocarbon","Preparation of alkene, Properties of alkene, Physical properties of alkene",3,"Thursday, September 25, 2025","Rohit Sir"],
-[39,"Hydrocarbon","Chemical properties of alkene, Uses of alkene, Test of unsaturation",4,"Friday, September 26, 2025","Rohit Sir"],
-[40,"Hydrocarbon","Preparation of alkyne, Physical properties of alkyne",5,"Saturday, September 27, 2025","Rohit Sir"],
-[41,"Hydrocarbon","Chemical properties of alkyne, Uses of alkyne, Aromatic hydrocarbon",6,"Monday, September 29, 2025","Rohit Sir"],
-[42,"Hydrocarbon","Benzene, Preparation of benzene, Physical properties of benzene",7,"Tuesday, September 30, 2025","Rohit Sir"],
-[43,"Hydrocarbon","Chemical properties of benzene, Uses of benzene",8,"Wednesday, October 1, 2025","Rohit Sir"],
-[44,"Hydrocarbon","Electrophilic substitution of mono-substituted benzene",9,"Friday, October 3, 2025","Rohit Sir"],
-[45,"Hydrocarbon","Preparation of Toluene, Physical properties of toluene",10,"Saturday, October 4, 2025","Rohit Sir"],
-[46,"Hydrocarbon","Chemical properties of toluene",11,"Monday, October 6, 2025","Rohit Sir"],
-[47,"Hydrocarbon","Uses of toluene",12,"Tuesday, October 7, 2025","Rohit Sir"],
-[48,"Haloalkanes and Haloarenes","Substitution and Elimination",1,"Wednesday, October 8, 2025","Rohit Sir"],
-[49,"Haloalkanes and Haloarenes","Substitution and Elimination",2,"Thursday, October 9, 2025","Rohit Sir"],
-[50,"Haloalkanes and Haloarenes","Substitution and Elimination",3,"Friday, October 10, 2025","Rohit Sir"],
-[51,"Haloalkanes and Haloarenes","Substitution and Elimination",4,"Saturday, October 11, 2025","Rohit Sir"],
-[52,"Haloalkanes and Haloarenes","Substitution and Elimination",5,"Monday, October 13, 2025","Rohit Sir"],
-[53,"Haloalkanes and Haloarenes","Substitution and Elimination",6,"Tuesday, October 14, 2025","Rohit Sir"],
-[54,"Haloalkanes and Haloarenes","Substitution and Elimination",7,"Wednesday, October 15, 2025","Rohit Sir"],
-[55,"Haloalkanes and Haloarenes","Substitution and Elimination",8,"Thursday, October 16, 2025","Rohit Sir"],
-[56,"Alcohols, Phenols and Ethers","Reduction",1,"Friday, October 17, 2025","Rohit Sir"],
-[57,"Alcohols, Phenols and Ethers","Reduction",2,"Friday, October 24, 2025","Rohit Sir"],
-[58,"Alcohols, Phenols and Ethers","Oxidation",3,"Saturday, October 25, 2025","Rohit Sir"],
-[59,"Alcohols, Phenols and Ethers","POC",4,"Wednesday, October 29, 2025","Rohit Sir"],
-[60,"Alcohols, Phenols and Ethers","Carbene and Nitrene",5,"Thursday, October 30, 2025","Rohit Sir"],
-[61,"Alcohols, Phenols and Ethers","Carbene and Nitrene",6,"Friday, October 31, 2025","Rohit Sir"],
-[62,"Aldehydes, Ketones and Carboxylic Acids","Introduction, Structure of Carbonyl group, Nomenclature, Methods of preparation",1,"Saturday, November 1, 2025","Rohit Sir"],
-[63,"Aldehydes, Ketones and Carboxylic Acids","Methods of preparation, Physical Properties, Chemical Reactions, Nucleophilic Addition",2,"Monday, November 3, 2025","Rohit Sir"],
-[64,"Aldehydes, Ketones and Carboxylic Acids","Aldol Condensation, Perkin, Cannizzaro, Wittig, Benzoin, Reduction Reactions",3,"Tuesday, November 4, 2025","Rohit Sir"],
-[65,"Aldehydes, Ketones and Carboxylic Acids","Miscellaneous Reactions, Analysis, Carboxylic acids, Naming of Amides",4,"Wednesday, November 5, 2025","Rohit Sir"],
-[66,"Aldehydes, Ketones and Carboxylic Acids","Chemical Reactions of carboxylic acid, Decarboxylation, HVZ Reaction",5,"Thursday, November 6, 2025","Rohit Sir"],
-[67,"Aldehydes, Ketones and Carboxylic Acids","General Methods & Reactions of Carboxylic acids, Acid Chlorides, Amides, Ester, Acid anhydrides",6,"Friday, November 7, 2025","Rohit Sir"],
-[68,"Amines","Physical Properties and POC",1,"Saturday, November 8, 2025","Rohit Sir"],
-[69,"Biomolecules","Introduction, Carbohydrates, Glucose, Fructose, Disaccharides, Polysaccharides",1,"Monday, November 10, 2025","Rohit Sir"],
-[70,"Biomolecules","Proteins & Amino acid, Structure of Proteins, Vitamins, Nucleic Acids, Polymers",2,"Tuesday, November 11, 2025","Rohit Sir"],
-[71,"Polymers (Rec.)","Introduction, Classification, Types of Polymerisation, Addition & Condensation Polymers, Synthetic Rubber, Biodegradable Polymer",1,"Wednesday, December 24, 2025","Rohit Sir"],
-[72,"Chemistry in Everyday Life (Rec.)","Introduction, Drugs and their Classification, Drug-Target Interaction, Therapeutic Action, Chemicals in Food",1,"Friday, December 26, 2025","Rohit Sir"],
-[73,"Environmental Chemistry (Rec.)","Introduction, Environmental Pollution, Atmospheric Pollution, Water pollution, Soil pollution, Green chemistry",1,"Saturday, December 27, 2025","Rohit Sir"],
-];
-
-const INOCHEM = [
-[1,"Classification of Elements and Periodicity","Need for Classification, Historical Development, Magic Numbers",1,"Friday, July 11, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[2,"Classification of Elements and Periodicity","Modern Periodic Law, Present Form of the Periodic Table, Merits of Long Form",2,"Saturday, July 12, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[3,"Classification of Elements and Periodicity","Electronic Configuration of Elements, Division of Elements into s, p, d and f Blocks",3,"Monday, July 14, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[4,"Classification of Elements and Periodicity","Division of Elements into s, p, d and f Blocks, and Their Characteristics",4,"Tuesday, July 15, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[5,"Classification of Elements and Periodicity","Classification as Metals, Non-Metals and Metalloids, Anomalous Properties of Second Period Elements",5,"Wednesday, July 16, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[6,"Classification of Elements and Periodicity","Diagonal Relationship, Bridge Elements, Typical Elements, Nomenclature of Elements with Z > 100",6,"Thursday, July 17, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[7,"Classification of Elements and Periodicity","Periodic Properties, Screening Effect, Effective Nuclear Charge",7,"Friday, July 18, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[8,"Classification of Elements and Periodicity","Periodic Trends in Physical Properties, Periodic Properties",8,"Saturday, July 19, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[9,"Classification of Elements and Periodicity","Scales of Electronegativity, Factors affecting electronegativity, Periodicity in Electronegativity",9,"Monday, July 21, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[10,"Classification of Elements and Periodicity","Application of Electronegativity, Hydration Energy, Lattice Energy, Melting and Boiling Points",10,"Tuesday, July 22, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[11,"Chemical Bonding and Molecular Structure","Introduction, Ionic or Electrovalent Bond, Lattice Energy",1,"Wednesday, July 23, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[12,"Chemical Bonding and Molecular Structure","Kössel-Lewis Approach to Chemical Bonding",2,"Thursday, July 24, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[13,"Chemical Bonding and Molecular Structure","Kössel-Lewis Approach to Chemical Bonding",3,"Friday, July 25, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[14,"Chemical Bonding and Molecular Structure","Resonating Structure, Resonance Energy, VSEPR Theory",4,"Saturday, July 26, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[15,"Chemical Bonding and Molecular Structure","Valence Bond Theory (VBT)",5,"Monday, July 28, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[16,"Chemical Bonding and Molecular Structure","Valence Bond Theory (VBT), VSEPR Theory",6,"Tuesday, July 29, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[17,"Chemical Bonding and Molecular Structure","Hybridisation",7,"Wednesday, July 30, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[18,"Chemical Bonding and Molecular Structure","Determination of Number of π-π Bonds, Dipole Moment",8,"Thursday, July 31, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[19,"Chemical Bonding and Molecular Structure","Polarisability and Fajan's Rule, Polarity of Covalent Bonds",9,"Friday, August 1, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[20,"Chemical Bonding and Molecular Structure","Linear Combination of Atomic Orbitals (LCAO)",10,"Saturday, August 2, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[21,"Chemical Bonding and Molecular Structure","Molecular Orbital Theory (MOT)",11,"Monday, August 4, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[22,"Chemical Bonding and Molecular Structure","Shapes of the Molecular Orbitals",12,"Tuesday, August 5, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[23,"Chemical Bonding and Molecular Structure","Bond Enthalpy, Bond Dissociation Enthalpy, Bond Parameters",13,"Wednesday, August 6, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[24,"Chemical Bonding and Molecular Structure","Hydrogen Bonds, Inter Molecular Forces",14,"Thursday, August 7, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[25,"Chemical Bonding and Molecular Structure","Back Bonding, Bridge bonding",15,"Saturday, August 9, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[26,"Coordination Compounds","Shape, Double salt, Co-ordination or Complex Compounds",1,"Wednesday, November 12, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[27,"Coordination Compounds","Perfect Complex, Imperfect complex",2,"Thursday, November 13, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[28,"Coordination Compounds","Various terms used in co-ordination compound",3,"Friday, November 14, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[29,"Coordination Compounds","Classification of ligand",4,"Saturday, November 15, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[30,"Coordination Compounds","Classification of ligand",5,"Monday, November 17, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[31,"Coordination Compounds","Werner theory",6,"Tuesday, November 18, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[32,"Coordination Compounds","Effective atomic number",7,"Wednesday, November 19, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[33,"Coordination Compounds","Nomenclature of co-ordination compound, Valence bond theory",8,"Thursday, November 20, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[34,"Coordination Compounds","Valence bond theory",9,"Friday, November 21, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[35,"Coordination Compounds","Crystal field theory",10,"Saturday, November 22, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[36,"Coordination Compounds","Stability of complexes",11,"Monday, November 24, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[37,"Coordination Compounds","Isomerism in co-ordination compounds",12,"Tuesday, November 25, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[38,"Coordination Compounds","Organometallic compounds",13,"Wednesday, November 26, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[39,"Coordination Compounds","Application of Co-ordination compounds",14,"Thursday, November 27, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[40,"Coordination Compounds","Application of Co-ordination compounds",15,"Friday, November 28, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[41,"Principles of Qualitative Analysis: Salt Analysis","Introduction",1,"Saturday, November 29, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[42,"Principles of Qualitative Analysis: Salt Analysis","Analysis of Anions (Acid Radicals)",2,"Monday, December 1, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[43,"Principles of Qualitative Analysis: Salt Analysis","Individual Test of Anions, Class A Radicals: Group 1",3,"Tuesday, December 2, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[44,"Principles of Qualitative Analysis: Salt Analysis","Group I — anions which evolve gases on reaction with dil. HCl/H2SO4",4,"Wednesday, December 3, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[45,"Principles of Qualitative Analysis: Salt Analysis","Group I — anions which evolve gases on reaction with dil. HCl/H2SO4",5,"Thursday, December 4, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[46,"Principles of Qualitative Analysis: Salt Analysis","Class B Radicals: Group II Radicals",6,"Friday, December 5, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[47,"Principles of Qualitative Analysis: Salt Analysis","Analysis of Cations (Basic Radicals), Separation of Cations",7,"Saturday, December 6, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[48,"Principles of Qualitative Analysis: Salt Analysis","Identification of Basic Radical",8,"Monday, December 8, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[49,"Principles of Qualitative Analysis: Salt Analysis","Some Important Concept",9,"Tuesday, December 9, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[50,"Principles of Qualitative Analysis: Salt Analysis","Some Important Concept",10,"Wednesday, December 10, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[51,"P-Block Elements","Group 13, 14 Elements — Physical & Chemical Properties",1,"Thursday, December 11, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[52,"P-Block Elements","Group 14 Elements — Chemical Properties, Allotropes of carbon, Silicon compounds",2,"Friday, December 12, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[53,"P-Block Elements","Group 15 — Nitrogen Family, Dinitrogen, Compounds of Nitrogen",3,"Saturday, December 13, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[54,"P-Block Elements","Oxoacids of Nitrogen, Phosphorous, Group 16 (Oxygen Family), Group 17 (Halogens), Group 18 (Noble Gases)",4,"Monday, December 15, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[55,"The d and f-Block Elements","Introduction, Electronic Configuration, Physical Properties, General Properties, Lanthanides",1,"Tuesday, December 16, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[56,"General Principles & Processes of Isolation of Metals (Rec.)","Introduction, Main steps in metallurgy, Alloys, Furnaces, Metallurgy of Some Metal",1,"Wednesday, December 17, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[57,"Hydrogen and its Compound (Rec.)","Position of H in Periodic Table, Dihydrogen, Isotopes, Preparation, Properties, Uses, Hydrides, Water, Hardness",1,"Thursday, December 18, 2025","Rahul Dudi Sir / Amitabh Sir"],
-[58,"S-Block Elements (Rec.)","Group 1 & Group 2 Elements — Physical, Chemical Properties, Uses, Important Compounds, Anomalous properties",1,"Friday, December 19, 2025","Rahul Dudi Sir / Amitabh Sir"],
-];
-
-// ─── TESTS DATA ────────────────────────────────────────────────────────────
-const TESTS = [
-{sno:1,name:"Short Test -1",date:"Sunday, May 11, 2025",type:"Part Test",pattern:"Short Test",
-  phy:["Mathematical Tools (Complete chapter)"],
-  chem:["Some Basic Concepts of Chemistry (complete)","Redox Reaction (partial)"],
-  math:["Basic Mathematics: Number system, Wavy Curve Method"]},
-{sno:2,name:"JEE Main-1",date:"Sunday, May 25, 2025",type:"Part Test",pattern:"JEE Main",
-  phy:["Mathematical Tools (Complete)","Motion in a Straight Line (Complete)"],
-  chem:["Some Basic Concepts of Chemistry (Complete)","Redox Reaction (Complete)","Solutions (partial)"],
-  math:["Basic Mathematics (Complete)"]},
-{sno:3,name:"JEE Main-2",date:"Sunday, June 8, 2025",type:"Part Test",pattern:"JEE Main",
-  phy:["Motion in a Plane (Complete)","Relative Motion (Complete)","Laws of Motion (Complete)"],
-  chem:["Solutions (Complete)","Chemical Kinetics (partial)"],
-  math:["Quadratic Equations (Complete)","Sequence and Series (Complete)"]},
-{sno:4,name:"JEE Advanced-1",date:"Sunday, June 22, 2025",type:"Part Test",pattern:"JEE Advanced",
-  phy:["Mathematical Tools","Motion in a Straight Line","Motion in a Plane","Relative Motion","Laws of Motion","Work, Energy and Power","Circular Motion"],
-  chem:["Some Basic Concepts of Chemistry","Redox Reaction","Solutions","Chemical Kinetics","Thermodynamics"],
-  math:["Basic Mathematics","Quadratic Equations","Sequence and Series","Trigonometric Functions","Trigonometric Equation"]},
-{sno:5,name:"JEE Main-3",date:"Sunday, July 6, 2025",type:"Part Test",pattern:"JEE Main",
-  phy:["Centre of Mass & System of Particles (Complete)","Rotational Motion (partial)"],
-  chem:["Chemical Equilibrium (Complete)","Ionic Equilibrium (Complete)","Electrochemistry (partial)"],
-  math:["Permutations and Combinations (Complete)"]},
-{sno:6,name:"JEE Main-4",date:"Sunday, July 20, 2025",type:"Part Test",pattern:"JEE Main",
-  phy:["Rotational Motion (Complete)"],
-  chem:["Electrochemistry (Complete)","Structure of Atom (Complete)"],
-  math:["Binomial theorem (Complete)","Straight Lines (Complete)"]},
-{sno:7,name:"JEE Advanced-2",date:"Sunday, August 3, 2025",type:"Part Test",pattern:"JEE Advanced",
-  phy:["Centre of Mass & System of Particles","Rotational Motion","Oscillations"],
-  chem:["Chemical Equilibrium","Ionic Equilibrium","Electrochemistry","Structure of Atom","Classification of Elements and Periodicity in Properties"],
-  math:["Permutations and Combinations","Binomial theorem","Straight Lines","Circles","Conic Sections: Parabola"]},
-{sno:8,name:"JEE Main-5",date:"Sunday, August 17, 2025",type:"Part Test",pattern:"JEE Main",
-  phy:["Ray Optics and Optical Instruments (Complete)","Dual Nature (Complete)"],
-  chem:["Chemical Bonding and Molecular Structure (Complete)"],
-  math:["Conic Sections: Ellipse (Complete)","Conic Sections: Hyperbola (Complete)"]},
-{sno:9,name:"JEE Main-6",date:"Sunday, August 31, 2025",type:"Part Test",pattern:"JEE Main",
-  phy:["Atoms (Complete)","Nuclei (Complete)"],
-  chem:["Some Basic Principles & Techniques: IUPAC Nomenclature (Complete)"],
-  math:["Determinants (Complete)"]},
-{sno:10,name:"JEE Advanced-3",date:"Sunday, September 14, 2025",type:"Part Test",pattern:"JEE Advanced",
-  phy:["Ray Optics","Dual Nature","Atoms","Nuclei","Thermal Properties of Matter","Kinetic Theory"],
-  chem:["Chemical Bonding and Molecular Structure","IUPAC Nomenclature (Complete)","General Organic Chemistry (Complete)"],
-  math:["Conic Sections: Ellipse","Conic Sections: Hyperbola","Determinants","Matrices","Sets"]},
-{sno:11,name:"JEE Main-7",date:"Sunday, September 28, 2025",type:"Part Test",pattern:"JEE Main",
-  phy:["Thermodynamics (Complete)","Mechanical Properties of Solids (Complete)","Mechanical Properties of Fluids (Complete)"],
-  chem:["Some Basic Principles & Techniques: Isomerism (Complete)"],
-  math:["Relations and Functions (Complete)","Inverse Trigonometric Functions (Complete)"]},
-{sno:12,name:"JEE Main-8",date:"Sunday, October 12, 2025",type:"Part Test",pattern:"JEE Main",
-  phy:["Electric Charges and Fields & Potential (Complete)"],
-  chem:["Hydrocarbon (Complete)","Haloalkanes and Haloarenes: Optical Isomerism"],
-  math:["Limit, Continuity and Differentiability (Complete)","Method of Differentiation (Complete)"]},
-{sno:13,name:"JEE Advanced-4",date:"Sunday, October 26, 2025",type:"Part Test",pattern:"JEE Advanced",
-  phy:["Thermodynamics","Mechanical Properties of Solids","Mechanical Properties of Fluids","Electric Charges and Fields & Potential","Gravitation"],
-  chem:["Some Basic Principles & Techniques: Isomerism","Hydrocarbon","Haloalkanes and Haloarenes","Alcohols, Phenols and Ethers"],
-  math:["Relations and Functions","Inverse Trigonometric Functions","Limit, Continuity and Differentiability","Method of Differentiation"]},
-{sno:14,name:"JEE Main-9",date:"Sunday, November 9, 2025",type:"Part Test",pattern:"JEE Main",
-  phy:["Current Electricity (Complete)"],
-  chem:["Aldehydes, Ketones and Carboxylic Acids (partial)"],
-  math:["Application of Derivatives (Complete)","Indefinite Integration (Complete)"]},
-{sno:15,name:"JEE Main-10",date:"Sunday, November 23, 2025",type:"Part Test",pattern:"JEE Main",
-  phy:["Electrostatic Potential and Capacitance (Complete)","Moving Charges and Magnetism (Complete)"],
-  chem:["Aldehydes, Ketones and Carboxylic Acids (Complete)","Amines (Complete)","Biomolecules (Complete)","Purification and Analysis of Organic Compound (Complete)","Coordination Compounds (partial)"],
-  math:["Definite Integration (Complete)","Application of integrals (Complete)"]},
-{sno:16,name:"JEE Advanced-5",date:"Sunday, December 7, 2025",type:"Part Test",pattern:"JEE Advanced",
-  phy:["Current Electricity","Electrostatic Potential and Capacitance","Moving Charges and Magnetism","Magnetism and Matter","Electromagnetic Induction"],
-  chem:["Aldehydes, Ketones and Carboxylic Acids","Amines","Biomolecules","Purification and Analysis of Organic Compound","Coordination Compounds"],
-  math:["Application of Derivatives","Indefinite Integration","Definite Integration","Application of integrals","Differential Equation","Vector Algebra"]},
-{sno:17,name:"JEE Main-11",date:"Sunday, December 21, 2025",type:"Part Test",pattern:"JEE Main",
-  phy:["Alternating Current (Complete)","Waves (Complete)","Electromagnetic Waves (Complete)"],
-  chem:["Principles of Qualitative Analysis: Salt analysis (Complete)","P-block Elements (Complete)","The d and f-Block Elements (Complete)"],
-  math:["Three Dimensional Geometry (Complete)","Complex Number (Complete)"]},
-{sno:18,name:"JEE Main-12",date:"Sunday, January 4, 2026",type:"Full Test",pattern:"JEE Main",
-  phy:["Full Syllabus"],chem:["Full Syllabus"],math:["Full Syllabus"]},
-{sno:19,name:"JEE Main-13",date:"Sunday, January 18, 2026",type:"Full Test",pattern:"JEE Main",
-  phy:["Full Syllabus"],chem:["Full Syllabus"],math:["Full Syllabus"]},
-{sno:20,name:"JEE Main-14",date:"Sunday, February 1, 2026",type:"Full Test",pattern:"JEE Main",
-  phy:["Full Syllabus"],chem:["Full Syllabus"],math:["Full Syllabus"]},
-{sno:21,name:"JEE Main-15",date:"Sunday, February 22, 2026",type:"Full Test",pattern:"JEE Main",
-  phy:["Full Syllabus"],chem:["Full Syllabus"],math:["Full Syllabus"]},
-{sno:22,name:"JEE Advanced-7",date:"Sunday, March 8, 2026",type:"Full Test",pattern:"JEE Advanced",
-  phy:["Full Syllabus"],chem:["Full Syllabus"],math:["Full Syllabus"]},
-{sno:23,name:"JEE Main-16",date:"Sunday, March 22, 2026",type:"Full Test",pattern:"JEE Main",
-  phy:["Full Syllabus"],chem:["Full Syllabus"],math:["Full Syllabus"]},
-{sno:24,name:"JEE Advanced-8",date:"Sunday, April 19, 2026",type:"Full Test",pattern:"JEE Advanced",
-  phy:["Full Syllabus"],chem:["Full Syllabus"],math:["Full Syllabus"]},
-{sno:25,name:"JEE Advanced-9",date:"Sunday, May 3, 2026",type:"Full Test",pattern:"JEE Advanced",
-  phy:["Full Syllabus"],chem:["Full Syllabus"],math:["Full Syllabus"]},
-{sno:26,name:"JEE Advanced-10",date:"Sunday, May 17, 2026",type:"Full Test",pattern:"JEE Advanced",
-  phy:["Full Syllabus"],chem:["Full Syllabus"],math:["Full Syllabus"]},
-];
-
-
-// ─── FIREBASE CONFIG — APNA CONFIG YAHAN DAALO ────────────────────────────
-const firebaseConfig = {
-  apiKey: "AIzaSyCwEVZdXAKuj93GfImHGXdvTcoC9z6Atjc",
-  authDomain: "jeee-72d9e.firebaseapp.com",
-  projectId: "jeee-72d9e",
-  storageBucket: "jeee-72d9e.firebasestorage.app",
-  messagingSenderId: "193307419180",
-  appId: "1:193307419180:web:b1e0555d1753bf9248a789",
-  measurementId: "G-EZK23EY81P"
-};
-
-let db = null, uid = null;
-const progressData = {};
-const TABLE_IDS = ['tbl-physics','tbl-math','tbl-phychem','tbl-orgchem','tbl-inochem'];
-
-function initFirebase() {
-  try {
-    if (firebaseConfig.apiKey === "PASTE_YOUR_API_KEY") {
-      document.getElementById('firebase-config-notice').style.display = 'block';
-      hideLoading();
-      return;
-    }
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
-    firebase.auth().signInAnonymously()
-      .then(cred => { uid = cred.user.uid; return db.collection('jee_progress').doc(uid).get(); })
-      .then(snap => {
-        if (snap.exists) {
-          const data = snap.data();
-          for (const key in data) progressData[key] = new Set(data[key] || []);
-        }
-        applyAllProgress();
-        hideLoading();
-      })
-      .catch(err => { console.error('Firebase:', err); hideLoading(); });
-  } catch(e) { console.error(e); hideLoading(); }
-}
-
-function saveToFirestore() {
-  if (!db || !uid) return;
-  const toSave = {};
-  for (const key in progressData) toSave[key] = [...progressData[key]];
-  db.collection('jee_progress').doc(uid).set(toSave).catch(console.error);
-}
-
-function hideLoading() {
-  document.getElementById('loading-overlay').style.display = 'none';
-}
-
-// ─── APPLY SAVED STATE ─────────────────────────────────────────────────────
-function applyAllProgress() {
-  TABLE_IDS.forEach(applyTableProgress);
-  applyTestProgress();
-}
-
-function applyTableProgress(tblId) {
-  const done = progressData[tblId] || new Set();
-  const tbody = document.querySelector(`#${tblId} tbody`);
-  if (!tbody) return;
-  const rows = [...tbody.querySelectorAll('tr')];
-  const pending = [], doneRows = [];
-  rows.forEach(row => {
-    const sno = parseInt(row.dataset.sno);
-    const cb = row.querySelector('input[type="checkbox"]');
-    if (done.has(sno)) { row.classList.add('done'); if(cb) cb.checked = true; doneRows.push(row); }
-    else { row.classList.remove('done'); if(cb) cb.checked = false; pending.push(row); }
-  });
-  pending.sort((a,b) => parseInt(a.dataset.sno)-parseInt(b.dataset.sno));
-  doneRows.sort((a,b) => parseInt(a.dataset.sno)-parseInt(b.dataset.sno));
-  tbody.innerHTML = '';
-  [...pending, ...doneRows].forEach(r => tbody.appendChild(r));
-  updateProgress(tblId);
-}
-
-function applyTestProgress() {
-  const done = progressData['tests'] || new Set();
-  const container = document.getElementById('tests-container');
-  const doneContainer = document.getElementById('tests-done-container');
-  const divider = document.getElementById('tests-divider');
-  const all = [...container.querySelectorAll('.test-card'), ...doneContainer.querySelectorAll('.test-card')];
-  all.forEach(card => {
-    const sno = parseInt(card.dataset.sno);
-    const cb = card.querySelector('input[type="checkbox"]');
-    if (done.has(sno)) { card.classList.add('done'); if(cb) cb.checked = true; doneContainer.appendChild(card); }
-    else { card.classList.remove('done'); if(cb) cb.checked = false; container.appendChild(card); }
-  });
-  divider.style.display = doneContainer.children.length ? 'block' : 'none';
-  updateTestsProgress();
-}
-
-// ─── BUILD TABLE ───────────────────────────────────────────────────────────
-function buildTable(data, tbodySelector, countId, shownId) {
-  const tbody = document.querySelector(`#${tbodySelector} tbody`);
-  tbody.innerHTML = data.map(d => {
-    const date = shiftYear(d[4]);
-    return `<tr data-sno="${d[0]}" data-search="${[d[1],d[2],date,d[5]].join(' ').toLowerCase()}">
-      <td class="check-col"><input type="checkbox" onchange="toggleDone(this,'${tbodySelector}',${d[0]})"></td>
-      <td class="sno">${d[0]}</td>
-      <td class="chapter-col">${d[1]}</td>
-      <td class="topic-col">${d[2]}</td>
-      <td><span class="lec-num">L${d[3]}</span></td>
-      <td class="date-col">${date}</td>
-      <td class="faculty-col">${d[5]}</td>
-    </tr>`;
-  }).join('');
-  document.getElementById(countId).textContent = data.length;
-  document.getElementById(shownId).textContent = `${data.length} rows`;
-}
-
-// ─── TOGGLE LECTURE ────────────────────────────────────────────────────────
-function toggleDone(cb, tblId, sno) {
-  const tr = cb.closest('tr');
-  const tbody = tr.closest('tbody');
-  if (!progressData[tblId]) progressData[tblId] = new Set();
-  if (cb.checked) {
-    progressData[tblId].add(sno);
-    tr.classList.add('done');
-    setTimeout(() => tbody.appendChild(tr), 280);
-  } else {
-    progressData[tblId].delete(sno);
-    tr.classList.remove('done');
-    const pendingRows = [...tbody.querySelectorAll('tr:not(.done)')];
-    const after = pendingRows.find(r => parseInt(r.dataset.sno) > sno);
-    if (after) tbody.insertBefore(tr, after);
-    else { const firstDone = tbody.querySelector('tr.done'); firstDone ? tbody.insertBefore(tr, firstDone) : tbody.appendChild(tr); }
-  }
-  saveToFirestore();
-  updateProgress(tblId);
-}
-
-// ─── TOGGLE TEST ───────────────────────────────────────────────────────────
-function toggleTestDone(cb, sno) {
-  const card = cb.closest('.test-card');
-  const container = document.getElementById('tests-container');
-  const doneContainer = document.getElementById('tests-done-container');
-  const divider = document.getElementById('tests-divider');
-  if (!progressData['tests']) progressData['tests'] = new Set();
-  if (cb.checked) {
-    progressData['tests'].add(sno);
-    card.classList.add('done');
-    setTimeout(() => { doneContainer.appendChild(card); divider.style.display = 'block'; }, 300);
-  } else {
-    progressData['tests'].delete(sno);
-    card.classList.remove('done');
-    const pendingCards = [...container.querySelectorAll('.test-card')];
-    const after = pendingCards.find(c => parseInt(c.dataset.sno) > sno);
-    after ? container.insertBefore(card, after) : container.appendChild(card);
-    if (!doneContainer.children.length) divider.style.display = 'none';
-  }
-  saveToFirestore();
-  updateTestsProgress();
-}
-
-// ─── BUILD TESTS ───────────────────────────────────────────────────────────
-function buildTests() {
-  const container = document.getElementById('tests-container');
-  const doneContainer = document.getElementById('tests-done-container');
-  container.innerHTML = ''; doneContainer.innerHTML = '';
-  TESTS.forEach(t => {
-    const date = shiftYear(t.date);
-    const patternClass = t.pattern.includes('Advanced') ? 'chip-pattern' : 'chip-type';
-    const card = document.createElement('div');
-    card.className = 'test-card';
-    card.dataset.sno = t.sno;
-    card.dataset.search = [t.name, date, t.pattern, t.phy.join(' '), t.chem.join(' '), t.math.join(' ')].join(' ').toLowerCase();
-    card.innerHTML = `<div class="test-header"><div>
-      <div class="test-name">#${t.sno} ${shiftYear(t.name)}</div>
-      <div class="test-meta">
-        <span class="chip chip-date">📅 ${date}</span>
-        <span class="chip chip-type">${t.type}</span>
-        <span class="chip ${patternClass}">${t.pattern}</span>
+    <div class="header-center">
+      <div class="day-chip">
+        <span class="day-chip-label">DAY</span>
+        <span class="day-chip-num" id="dayNumber">--</span>
       </div>
-      <div class="test-checkbox-wrap">
-        <input type="checkbox" id="tchk-${t.sno}" onchange="toggleTestDone(this,${t.sno})">
-        <label for="tchk-${t.sno}">Mark as Completed</label>
+      <div class="date-text" id="todayDate">Loading...</div>
+    </div>
+
+    <div class="header-right">
+      <div class="countdown-badge" id="examCountdown">-- days to JEE</div>
+      <div class="toggle-wrap">
+        <span class="toggle-icon">☀️</span>
+        <label class="mode-toggle">
+          <input type="checkbox" id="modeToggle" />
+          <span class="mode-slider"></span>
+        </label>
+        <span class="toggle-icon">🌙</span>
       </div>
-    </div></div>
-    <div class="test-subjects">
-      <div class="subject-block phy"><div class="subject-block-title">⚡ Physics</div><ul>${t.phy.map(x=>`<li>${x}</li>`).join('')}</ul></div>
-      <div class="subject-block chem"><div class="subject-block-title">🧪 Chemistry</div><ul>${t.chem.map(x=>`<li>${x}</li>`).join('')}</ul></div>
-      <div class="subject-block math"><div class="subject-block-title">∑ Mathematics</div><ul>${t.math.map(x=>`<li>${x}</li>`).join('')}</ul></div>
-    </div>`;
-    container.appendChild(card);
-  });
-}
+    </div>
+  </header>
 
-// ─── PROGRESS ─────────────────────────────────────────────────────────────
-function updateProgress(tblId) {
-  const map = {
-    'tbl-physics':  ['phy-progress-bar','phy-progress-label'],
-    'tbl-math':     ['math-progress-bar','math-progress-label'],
-    'tbl-phychem':  ['phychem-progress-bar','phychem-progress-label'],
-    'tbl-orgchem':  ['orgchem-progress-bar','orgchem-progress-label'],
-    'tbl-inochem':  ['inochem-progress-bar','inochem-progress-label'],
-  };
-  if (!map[tblId]) return;
-  const rows = document.querySelectorAll(`#${tblId} tbody tr`);
-  const total = rows.length, done = [...rows].filter(r=>r.classList.contains('done')).length;
-  const pct = total ? Math.round(done/total*100) : 0;
-  const [barId, lblId] = map[tblId];
-  const bar = document.getElementById(barId), lbl = document.getElementById(lblId);
-  if (bar) bar.style.width = pct+'%';
-  if (lbl) lbl.textContent = `${done} / ${total} done  (${pct}%)`;
-}
+  <!-- ============================================================
+       MAIN CONTENT
+  ============================================================ -->
+  <main class="main-wrap">
+    <div class="dashboard">
 
-function updateTestsProgress() {
-  const total = TESTS.length;
-  const done = (progressData['tests'] || new Set()).size;
-  const pct = Math.round(done/total*100);
-  document.getElementById('tests-progress-bar').style.width = pct+'%';
-  document.getElementById('tests-progress-label').textContent = `${done} / ${total} done  (${pct}%)`;
-}
+      <!-- ── CARD 1: Today's Lectures ─────────────────────────── -->
+      <section class="card lecture-card" id="card-lectures">
+        <div class="card-header">
+          <h2 class="card-title">📚 Today's Lectures</h2>
+          <div class="pill pill-accent" id="lectureProgress">0 / 3</div>
+        </div>
 
-// ─── INIT ──────────────────────────────────────────────────────────────────
-buildTable(PHYSICS, 'tbl-physics', 'phy-count', 'phy-shown');
-buildTable(MATH, 'tbl-math', 'math-count', 'math-shown');
-buildTable(PHYCHEM, 'tbl-phychem', 'phychem-count', 'phychem-shown');
-buildTable(ORGCHEM, 'tbl-orgchem', 'orgchem-count', 'orgchem-shown');
-buildTable(INOCHEM, 'tbl-inochem', 'inochem-count', 'inochem-shown');
-buildTests();
-initFirebase();
+        <ul class="lec-list">
+          <!-- PHYSICS -->
+          <li class="lec-item" id="lecItemPhysics">
+            <div class="subject-tag tag-phy">PHY</div>
+            <div class="lec-body">
+              <p class="lec-num" id="physLecNum">Physics Lec --</p>
+              <p class="lec-topic" id="physTopic">Loading…</p>
+            </div>
+            <label class="cb-wrap">
+              <input type="checkbox" id="chkPhysics" />
+              <span class="cb-box"></span>
+            </label>
+          </li>
 
-// ─── TAB SWITCH ───────────────────────────────────────────────────────────
-function switchTab(id, btn) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('sec-'+id).classList.add('active');
-  btn.classList.add('active');
-  filterAll();
-}
+          <!-- MATHS -->
+          <li class="lec-item" id="lecItemMaths">
+            <div class="subject-tag tag-mth">MTH</div>
+            <div class="lec-body">
+              <p class="lec-num" id="mthLecNum">Maths Lec --</p>
+              <p class="lec-topic" id="mthTopic">Loading…</p>
+            </div>
+            <label class="cb-wrap">
+              <input type="checkbox" id="chkMaths" />
+              <span class="cb-box"></span>
+            </label>
+          </li>
 
-// ─── SEARCH / FILTER ──────────────────────────────────────────────────────
-function filterAll() {
-  const q = document.getElementById('globalSearch').value.toLowerCase().trim();
-  TABLE_IDS.forEach(id => {
-    const key = id.replace('tbl-','').replace('-','') + '-shown';
-    const shownMap = {'tbl-physics':'phy-shown','tbl-math':'math-shown','tbl-phychem':'phychem-shown','tbl-orgchem':'orgchem-shown','tbl-inochem':'inochem-shown'};
-    let shown = 0;
-    document.querySelectorAll(`#${id} tbody tr`).forEach(tr => {
-      const match = !q || tr.dataset.search.includes(q);
-      tr.style.display = match ? '' : 'none';
-      if(match) shown++;
-    });
-    const el = document.getElementById(shownMap[id]);
-    if(el) el.textContent = `${shown} rows`;
-  });
-  document.querySelectorAll('#tests-container .test-card, #tests-done-container .test-card').forEach(card => {
-    card.style.display = (!q || card.dataset.search.includes(q)) ? '' : 'none';
-  });
-}
-</script>
+          <!-- CHEMISTRY -->
+          <li class="lec-item" id="lecItemChem">
+            <div class="subject-tag tag-chm">CHM</div>
+            <div class="lec-body">
+              <p class="lec-num" id="chmLecNum">Chemistry Lec --</p>
+              <p class="lec-topic" id="chmTopic">Loading…</p>
+            </div>
+            <label class="cb-wrap">
+              <input type="checkbox" id="chkChem" />
+              <span class="cb-box"></span>
+            </label>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ── CARD 2: Daily Score ───────────────────────────────── -->
+      <section class="card score-card" id="card-score">
+        <div class="card-header">
+          <h2 class="card-title">⚡ Daily Score</h2>
+          <span class="score-badge" id="scoreBadge">0 / 5</span>
+        </div>
+
+        <div class="score-ring-wrap">
+          <svg class="score-ring" viewBox="0 0 120 120">
+            <circle class="ring-track" cx="60" cy="60" r="48" />
+            <circle class="ring-fill"  cx="60" cy="60" r="48" id="ringFill" />
+          </svg>
+          <div class="ring-center">
+            <span class="ring-val" id="ringVal">0</span>
+            <span class="ring-max">/5</span>
+          </div>
+        </div>
+
+        <div class="score-items">
+          <div class="s-item" id="si-phy">
+            <span class="s-dot"></span>
+            <span class="s-label">Physics Lecture</span>
+          </div>
+          <div class="s-item" id="si-mth">
+            <span class="s-dot"></span>
+            <span class="s-label">Maths Lecture</span>
+          </div>
+          <div class="s-item" id="si-chm">
+            <span class="s-dot"></span>
+            <span class="s-label">Chemistry Lecture</span>
+          </div>
+          <div class="s-item" id="si-rev">
+            <span class="s-dot"></span>
+            <span class="s-label">Revision Session</span>
+            <label class="mini-cb">
+              <input type="checkbox" id="chkRevision" />
+              <span></span>
+            </label>
+          </div>
+          <div class="s-item" id="si-prac">
+            <span class="s-dot"></span>
+            <span class="s-label">Practice Session</span>
+            <label class="mini-cb">
+              <input type="checkbox" id="chkPractice" />
+              <span></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── CARD 3: Question Tracker ──────────────────────────── -->
+      <section class="card question-card" id="card-questions">
+        <div class="card-header">
+          <h2 class="card-title">🎯 Question Tracker</h2>
+          <div class="today-q-badge">Today: <strong id="todayQTotal">0</strong></div>
+        </div>
+
+        <div class="q-inputs">
+          <div class="q-row">
+            <span class="q-tag tag-phy">PHY</span>
+            <input type="number" class="q-input" id="qPhy" placeholder="0" min="0" />
+            <span class="q-unit">Qs</span>
+          </div>
+          <div class="q-row">
+            <span class="q-tag tag-mth">MTH</span>
+            <input type="number" class="q-input" id="qMth" placeholder="0" min="0" />
+            <span class="q-unit">Qs</span>
+          </div>
+          <div class="q-row">
+            <span class="q-tag tag-chm">CHM</span>
+            <input type="number" class="q-input" id="qChm" placeholder="0" min="0" />
+            <span class="q-unit">Qs</span>
+          </div>
+        </div>
+
+        <button class="btn-primary" id="btnLogQ">
+          <span>Log Questions</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+
+        <div class="q-stats-grid">
+          <div class="q-stat">
+            <p class="q-stat-label">Weekly</p>
+            <p class="q-stat-val" id="statWeekly">0</p>
+          </div>
+          <div class="q-stat">
+            <p class="q-stat-label">Monthly</p>
+            <p class="q-stat-val" id="statMonthly">0</p>
+          </div>
+          <div class="q-stat">
+            <p class="q-stat-label">All-Time</p>
+            <p class="q-stat-val" id="statTotal">0</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── CARD 4: Upcoming Schedule ────────────────────────── -->
+      <section class="card upcoming-card" id="card-upcoming">
+        <div class="card-header">
+          <h2 class="card-title">📅 Upcoming Schedule</h2>
+          <span class="pill pill-muted">Next 2 Days</span>
+        </div>
+        <div class="upcoming-grid" id="upcomingGrid">
+          <!-- Filled by JS -->
+        </div>
+      </section>
+
+      <!-- ── CARD 5: Analytics Chart ───────────────────────────── -->
+      <section class="card chart-card" id="card-chart">
+        <div class="card-header">
+          <h2 class="card-title">📊 7-Day Performance</h2>
+          <div class="chart-legend">
+            <span class="leg-dot leg-phy"></span><span>Physics</span>
+            <span class="leg-dot leg-mth"></span><span>Maths</span>
+            <span class="leg-dot leg-chm"></span><span>Chem</span>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="perfChart"></canvas>
+        </div>
+      </section>
+
+    </div><!-- /.dashboard -->
+  </main>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+  <!-- Firebase setup notice -->
+  <div class="firebase-notice" id="fbNotice">
+    ⚙️ Firebase not configured — data saved locally only.
+    <button onclick="document.getElementById('fbNotice').remove()">✕</button>
+  </div>
+
+  <!-- Firebase v9 Modular SDK + App Script -->
+  <script type="module" src="script.js"></script>
 </body>
 </html>
