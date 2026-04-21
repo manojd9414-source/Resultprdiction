@@ -1,2241 +1,412 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>Prayas JEE 2.0 — Study Tracker</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <title>JEE CBT — PDF to Exam Converter</title>
 
   <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-  <style>
-/* ================================================================
-   PRAYAS JEE 2.0 STUDY TRACKER — STYLESHEET
-   Dual Mode: Light (White + Blue) | Dark (Navy + Neon Blue)
-   Optimised for Samsung Galaxy Tab A9+ & Mobile
-   ================================================================ */
-
-/* ============================================================
-   CSS CUSTOM PROPERTIES (DESIGN TOKENS)
-   ============================================================ */
-:root {
-  --radius-sm:  8px;
-  --radius-md:  14px;
-  --radius-lg:  20px;
-  --radius-xl:  28px;
-  --transition: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* Subject colours — same in both modes */
-  --phy-clr:    #1a73e8;
-  --mth-clr:    #1da462;
-  --chm-clr:    #e53935;
-
-  /* Score ring circumference: 2 * π * 48 ≈ 301.6 */
-  --ring-c: 301.6;
-}
-
-/* ── LIGHT MODE ─────────────────────────────────────────────── */
-body.light-mode {
-  --bg:          #eef2ff;
-  --bg-card:     #ffffff;
-  --bg-row:      #f4f7ff;
-  --acc:         #1a73e8;
-  --acc-2:       #4285f4;
-  --acc-soft:    #e8f0fe;
-  --text-1:      #1a1f36;
-  --text-2:      #4d5568;
-  --text-3:      #9aa0af;
-  --border:      rgba(26, 115, 232, 0.14);
-  --shadow-card: 0 2px 16px rgba(26,115,232,0.07), 0 1px 4px rgba(0,0,0,0.04);
-  --shadow-lift: 0 8px 32px rgba(26,115,232,0.13);
-  --glow:        rgba(26,115,232,0.18);
-  --dot-off:     #dde3f5;
-  --success:     #1da462;
-  --gradient-bg: linear-gradient(135deg, #eef2ff 0%, #f0f4ff 50%, #eaf1ff 100%);
-
-  --phy-bg:  #e8f0fe;
-  --mth-bg:  #e6f4ec;
-  --chm-bg:  #fdecea;
-  color-scheme: light;
-}
-
-/* ── DARK MODE ──────────────────────────────────────────────── */
-body.dark-mode {
-  --bg:          #030d1e;
-  --bg-card:     #091428;
-  --bg-row:      #0d1c35;
-  --acc:         #00b4ff;
-  --acc-2:       #0080ff;
-  --acc-soft:    rgba(0,180,255,0.10);
-  --text-1:      #dceeff;
-  --text-2:      #7aa3c0;
-  --text-3:      #3d607c;
-  --border:      rgba(0,180,255,0.12);
-  --shadow-card: 0 2px 20px rgba(0,0,0,0.45);
-  --shadow-lift: 0 8px 40px rgba(0,180,255,0.12);
-  --glow:        rgba(0,180,255,0.25);
-  --dot-off:     #0f2340;
-  --success:     #00e5a0;
-  --gradient-bg: linear-gradient(135deg, #030d1e 0%, #050f20 60%, #030d1e 100%);
-
-  --phy-bg:  rgba(0,180,255,0.10);
-  --mth-bg:  rgba(0,229,160,0.10);
-  --chm-bg:  rgba(255,80,80,0.10);
-  --phy-clr: #00b4ff;
-  --mth-clr: #00e5a0;
-  --chm-clr: #ff6060;
-  color-scheme: dark;
-}
-
-/* ============================================================
-   BASE RESET
-   ============================================================ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
-button { font-family: inherit; cursor: pointer; border: none; background: none; }
-input  { font-family: inherit; }
-ul { list-style: none; }
-
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--gradient-bg);
-  color: var(--text-1);
-  min-height: 100vh;
-  transition: background var(--transition), color var(--transition);
-  -webkit-font-smoothing: antialiased;
-}
-
-/* Subtle grid pattern overlay */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.35;
-}
-
-/* ============================================================
-   HEADER
-   ============================================================ */
-.app-header {
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 28px;
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  transition: background var(--transition), border-color var(--transition);
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-mark {
-  font-size: 2rem;
-  line-height: 1;
-  filter: drop-shadow(0 0 10px var(--acc));
-  animation: pulse-glow 3s ease-in-out infinite;
-}
-
-@keyframes pulse-glow {
-  0%, 100% { filter: drop-shadow(0 0 6px var(--acc)); }
-  50%       { filter: drop-shadow(0 0 14px var(--acc)); }
-}
-
-.app-title {
-  font-family: 'Exo 2', sans-serif;
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: var(--acc);
-  letter-spacing: -0.4px;
-  line-height: 1.1;
-}
-
-.app-subtitle {
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--text-3);
-  margin-top: 1px;
-}
-
-/* Header Centre */
-.header-center {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  justify-content: center;
-}
-
-.day-chip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: var(--acc);
-  color: #fff;
-  border-radius: var(--radius-md);
-  padding: 5px 14px;
-  min-width: 58px;
-  line-height: 1;
-  box-shadow: 0 0 16px var(--glow);
-}
-
-.day-chip-label {
-  font-family: 'Exo 2', sans-serif;
-  font-size: 0.52rem;
-  font-weight: 700;
-  letter-spacing: 2px;
-  opacity: 0.85;
-}
-
-.day-chip-num {
-  font-family: 'Exo 2', sans-serif;
-  font-size: 1.6rem;
-  font-weight: 900;
-}
-
-.date-text {
-  font-size: 0.82rem;
-  color: var(--text-2);
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-/* Header Right */
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  justify-content: flex-end;
-}
-
-.countdown-badge {
-  background: var(--acc-soft);
-  color: var(--acc);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 5px 14px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  font-family: 'Exo 2', sans-serif;
-  white-space: nowrap;
-}
-
-/* Mode Toggle */
-.toggle-wrap {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.toggle-icon { font-size: 1rem; line-height: 1; }
-
-.mode-toggle {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 27px;
-  cursor: pointer;
-}
-
-.mode-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
-
-.mode-slider {
-  position: absolute;
-  inset: 0;
-  background: var(--bg-row);
-  border: 1px solid var(--border);
-  border-radius: 27px;
-  transition: var(--transition);
-}
-
-.mode-slider::before {
-  content: '';
-  position: absolute;
-  width: 21px;
-  height: 21px;
-  top: 2px;
-  left: 2px;
-  background: var(--acc);
-  border-radius: 50%;
-  transition: var(--transition);
-  box-shadow: 0 0 8px var(--glow);
-}
-
-.mode-toggle input:checked + .mode-slider::before {
-  transform: translateX(23px);
-}
-
-/* ============================================================
-   MAIN WRAP & DASHBOARD GRID
-   ============================================================ */
-.main-wrap {
-  position: relative;
-  z-index: 1;
-  padding: 24px;
-}
-
-.dashboard {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto;
-  gap: 20px;
-  max-width: 1440px;
-  margin: 0 auto;
-}
-
-/* Grid placement */
-.lecture-card  { grid-column: 1; }
-.score-card    { grid-column: 2; }
-.question-card { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto; column-gap: 24px; }
-.upcoming-card { grid-column: 1 / -1; }
-.chart-card    { grid-column: 1 / -1; }
-
-/* ============================================================
-   CARD BASE
-   ============================================================ */
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 26px;
-  box-shadow: var(--shadow-card);
-  transition:
-    background var(--transition),
-    border-color var(--transition),
-    box-shadow var(--transition),
-    transform 0.2s ease;
-  animation: fade-in 0.5s ease both;
-}
-
-.card:hover {
-  box-shadow: var(--shadow-lift);
-  transform: translateY(-2px);
-}
-
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.card:nth-child(1) { animation-delay: 0.05s; }
-.card:nth-child(2) { animation-delay: 0.10s; }
-.card:nth-child(3) { animation-delay: 0.15s; }
-.card:nth-child(4) { animation-delay: 0.20s; }
-.card:nth-child(5) { animation-delay: 0.25s; }
-
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.card-title {
-  font-family: 'Exo 2', sans-serif;
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-1);
-  letter-spacing: -0.2px;
-}
-
-/* Pills */
-.pill {
-  padding: 4px 14px;
-  border-radius: 20px;
-  font-family: 'Exo 2', sans-serif;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.pill-accent {
-  background: var(--acc-soft);
-  color: var(--acc);
-  border: 1px solid var(--acc);
-}
-
-.pill-muted {
-  background: var(--bg-row);
-  color: var(--text-3);
-  border: 1px solid var(--border);
-}
-
-/* ============================================================
-   LECTURE CARD
-   ============================================================ */
-.lec-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.lec-item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  background: var(--bg-row);
-  border: 1px solid var(--border);
-  transition: background var(--transition), border-color var(--transition), opacity var(--transition);
-  cursor: pointer;
-}
-
-.lec-item.done {
-  opacity: 0.55;
-}
-
-.lec-item.done .lec-num {
-  text-decoration: line-through;
-  text-decoration-color: var(--acc);
-}
-
-.subject-tag {
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Exo 2', sans-serif;
-  font-weight: 900;
-  font-size: 0.6rem;
-  letter-spacing: 0.5px;
-}
-
-.tag-phy { background: var(--phy-bg); color: var(--phy-clr); }
-.tag-mth { background: var(--mth-bg); color: var(--mth-clr); }
-.tag-chm { background: var(--chm-bg); color: var(--chm-clr); }
-
-.lec-body { flex: 1; min-width: 0; }
-
-.lec-num {
-  font-weight: 600;
-  font-size: 0.88rem;
-  color: var(--text-1);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color var(--transition);
-}
-
-.lec-topic {
-  font-size: 0.74rem;
-  color: var(--text-3);
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Custom Checkbox */
-.cb-wrap {
-  flex-shrink: 0;
-  position: relative;
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-}
-
-.cb-wrap input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  position: absolute;
-}
-
-.cb-box {
-  position: absolute;
-  inset: 0;
-  border-radius: 6px;
-  border: 2px solid var(--acc);
-  background: transparent;
-  transition: var(--transition);
-}
-
-.cb-wrap input:checked ~ .cb-box {
-  background: var(--acc);
-  box-shadow: 0 0 8px var(--glow);
-}
-
-.cb-box::after {
-  content: '';
-  position: absolute;
-  display: none;
-  left: 7px;
-  top: 3px;
-  width: 5px;
-  height: 10px;
-  border: solid #fff;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-.cb-wrap input:checked ~ .cb-box::after { display: block; }
-
-/* ============================================================
-   SCORE CARD
-   ============================================================ */
-.score-badge {
-  font-family: 'Exo 2', sans-serif;
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--acc);
-}
-
-.score-ring-wrap {
-  position: relative;
-  width: 130px;
-  height: 130px;
-  margin: 0 auto 22px;
-}
-
-.score-ring {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-  overflow: visible;
-}
-
-.ring-track {
-  fill: none;
-  stroke: var(--dot-off);
-  stroke-width: 10;
-}
-
-.ring-fill {
-  fill: none;
-  stroke: var(--acc);
-  stroke-width: 10;
-  stroke-linecap: round;
-  stroke-dasharray: var(--ring-c);
-  stroke-dashoffset: var(--ring-c);
-  transition: stroke-dashoffset 0.85s cubic-bezier(0.4, 0, 0.2, 1);
-  filter: drop-shadow(0 0 6px var(--acc));
-}
-
-.ring-center {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-}
-
-.ring-val {
-  font-family: 'Exo 2', sans-serif;
-  font-size: 2.4rem;
-  font-weight: 900;
-  color: var(--text-1);
-  line-height: 1;
-}
-
-.ring-max {
-  font-family: 'Exo 2', sans-serif;
-  font-size: 0.95rem;
-  color: var(--text-3);
-  align-self: flex-end;
-  margin-bottom: 4px;
-}
-
-.score-items {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.s-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.83rem;
-  color: var(--text-2);
-}
-
-.s-item:last-child { border: none; }
-
-.s-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  background: var(--dot-off);
-  transition: background var(--transition), box-shadow var(--transition);
-}
-
-.s-item.active .s-dot {
-  background: var(--success);
-  box-shadow: 0 0 8px var(--success);
-}
-
-.s-item.active .s-label {
-  color: var(--text-1);
-  font-weight: 500;
-}
-
-.mini-cb {
-  margin-left: auto;
-  cursor: pointer;
-}
-
-.mini-cb input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--acc);
-  cursor: pointer;
-}
-
-/* ============================================================
-   QUESTION TRACKER CARD
-   (uses grid layout within the card)
-   ============================================================ */
-.question-card .card-header { grid-column: 1 / -1; margin-bottom: 16px; }
-
-.today-q-badge {
-  font-size: 0.82rem;
-  color: var(--text-3);
-}
-
-.today-q-badge strong {
-  font-family: 'Exo 2', sans-serif;
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--acc);
-}
-
-/* Left column: inputs */
-.q-inputs { grid-column: 1; align-self: start; }
-
-.q-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.q-tag {
-  width: 46px;
-  padding: 7px 6px;
-  border-radius: var(--radius-sm);
-  text-align: center;
-  font-family: 'Exo 2', sans-serif;
-  font-weight: 900;
-  font-size: 0.6rem;
-  letter-spacing: 0.4px;
-  flex-shrink: 0;
-}
-
-.q-input {
-  flex: 1;
-  background: var(--bg-row);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 10px 14px;
-  color: var(--text-1);
-  font-family: 'Exo 2', sans-serif;
-  font-size: 1rem;
-  font-weight: 700;
-  transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
-  outline: none;
-}
-
-.q-input:focus {
-  border-color: var(--acc);
-  box-shadow: 0 0 0 3px var(--acc-soft);
-}
-
-.q-input::placeholder { color: var(--text-3); font-weight: 400; font-family: 'DM Sans', sans-serif; }
-
-.q-unit {
-  font-size: 0.75rem;
-  color: var(--text-3);
-  font-weight: 500;
-  min-width: 16px;
-}
-
-/* Right column: button + stats */
-.btn-primary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 13px 20px;
-  background: var(--acc);
-  color: #fff;
-  border-radius: var(--radius-md);
-  font-family: 'Exo 2', sans-serif;
-  font-weight: 700;
-  font-size: 0.95rem;
-  letter-spacing: 0.2px;
-  transition: var(--transition);
-  box-shadow: 0 4px 18px var(--glow);
-  grid-column: 2;
-  align-self: start;
-}
-
-.btn-primary:hover {
-  background: var(--acc-2);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px var(--glow);
-}
-
-.btn-primary:active { transform: translateY(0); }
-
-.q-stats-grid {
-  grid-column: 2;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.q-stat {
-  background: var(--bg-row);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 14px 10px;
-  text-align: center;
-  transition: background var(--transition), border-color var(--transition);
-}
-
-.q-stat-label {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  color: var(--text-3);
-  font-weight: 600;
-  margin-bottom: 5px;
-}
-
-.q-stat-val {
-  font-family: 'Exo 2', sans-serif;
-  font-size: 1.6rem;
-  font-weight: 900;
-  color: var(--acc);
-  line-height: 1;
-}
-
-/* ============================================================
-   UPCOMING SCHEDULE CARD
-   ============================================================ */
-.upcoming-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.up-day {
-  background: var(--bg-row);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 18px;
-  transition: background var(--transition), border-color var(--transition);
-}
-
-.up-day-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.up-day-date {
-  font-family: 'Exo 2', sans-serif;
-  font-weight: 700;
-  font-size: 0.88rem;
-  color: var(--acc);
-}
-
-.up-day-num {
-  font-size: 0.7rem;
-  font-weight: 600;
-  background: var(--acc-soft);
-  color: var(--acc);
-  padding: 3px 10px;
-  border-radius: 10px;
-  font-family: 'Exo 2', sans-serif;
-}
-
-.up-lec-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 7px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.78rem;
-  color: var(--text-2);
-}
-
-.up-lec-row:last-child { border: none; }
-
-.up-tag {
-  flex-shrink: 0;
-  padding: 3px 6px;
-  border-radius: 5px;
-  font-family: 'Exo 2', sans-serif;
-  font-weight: 900;
-  font-size: 0.55rem;
-  letter-spacing: 0.4px;
-}
-
-/* ============================================================
-   CHART CARD
-   ============================================================ */
-.chart-legend {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.75rem;
-  color: var(--text-2);
-}
-
-.leg-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.leg-phy { background: var(--phy-clr); }
-.leg-mth { background: var(--mth-clr); }
-.leg-chm { background: var(--chm-clr); }
-
-.chart-wrap {
-  height: 280px;
-  position: relative;
-}
-
-/* ============================================================
-   TOAST
-   ============================================================ */
-.toast {
-  position: fixed;
-  bottom: 28px;
-  right: 28px;
-  background: var(--bg-card);
-  border: 1px solid var(--acc);
-  color: var(--text-1);
-  padding: 13px 22px;
-  border-radius: var(--radius-md);
-  font-size: 0.84rem;
-  font-weight: 500;
-  box-shadow: var(--shadow-lift);
-  opacity: 0;
-  transform: translateY(12px) scale(0.97);
-  pointer-events: none;
-  z-index: 9999;
-  transition: opacity 0.28s, transform 0.28s;
-  max-width: 320px;
-}
-
-.toast.show {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-/* ============================================================
-   FIREBASE NOTICE
-   ============================================================ */
-.firebase-notice {
-  position: fixed;
-  bottom: 28px;
-  left: 28px;
-  background: #fff3cd;
-  border: 1px solid #ffc107;
-  color: #664d03;
-  border-radius: var(--radius-md);
-  padding: 10px 16px;
-  font-size: 0.8rem;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  z-index: 999;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-}
-
-body.dark-mode .firebase-notice {
-  background: #1e1500;
-  border-color: #d97706;
-  color: #fbbf24;
-}
-
-.firebase-notice button {
-  background: none;
-  border: none;
-  font-size: 1rem;
-  cursor: pointer;
-  color: inherit;
-  opacity: 0.7;
-}
-
-.firebase-notice button:hover { opacity: 1; }
-
-/* ============================================================
-   SCROLLBAR
-   ============================================================ */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
-::-webkit-scrollbar-thumb:hover { background: var(--acc); }
-
-/* ============================================================
-   RESPONSIVE — Samsung Galaxy Tab A9+ (landscape ~1340px)
-   ============================================================ */
-@media (min-width: 1200px) {
-  .dashboard {
-    grid-template-columns: 1.1fr 0.9fr;
-  }
-
-  .question-card {
-    grid-column: 1 / -1;
-    grid-template-columns: 1fr auto 1fr;
-    column-gap: 28px;
-  }
-
-  .question-card .card-header { grid-column: 1 / -1; }
-  .q-inputs   { grid-column: 1; }
-  .btn-primary { grid-column: 2; align-self: start; margin-top: 4px; min-width: 160px; }
-  .q-stats-grid { grid-column: 3; margin-top: 0; align-self: start; }
-}
-
-/* ============================================================
-   RESPONSIVE — Tablet portrait ~768px–1199px
-   ============================================================ */
-@media (max-width: 1199px) and (min-width: 640px) {
-  .main-wrap { padding: 18px; }
-  .dashboard { gap: 16px; }
-
-  .question-card {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .question-card .card-header { grid-column: 1 / -1; }
-  .q-inputs    { grid-column: 1; }
-  .btn-primary { grid-column: 2; align-self: start; }
-  .q-stats-grid {
-    grid-column: 1 / -1;
-    grid-template-columns: repeat(3, 1fr);
-    margin-top: 10px;
-  }
-}
-
-/* ============================================================
-   RESPONSIVE — Mobile (<640px)
-   ============================================================ */
-@media (max-width: 639px) {
-  .app-header {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
-    padding: 12px 16px;
-    gap: 10px;
-  }
-
-  .header-left  { grid-column: 1; grid-row: 1; }
-  .header-right { grid-column: 2; grid-row: 1; justify-content: flex-end; }
-  .header-center {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    justify-content: flex-start;
-    gap: 10px;
-  }
-
-  .countdown-badge { display: none; }
-  .app-title { font-size: 1rem; }
-  .logo-mark { font-size: 1.5rem; }
-
-  .main-wrap { padding: 14px; }
-
-  .dashboard {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .lecture-card,
-  .score-card,
-  .question-card,
-  .upcoming-card,
-  .chart-card {
-    grid-column: 1;
-  }
-
-  .card { padding: 18px; border-radius: var(--radius-lg); }
-
-  /* Question card on mobile */
-  .question-card {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .question-card .card-header { margin-bottom: 0; }
-
-  .btn-primary { margin-top: 4px; }
-
-  .q-stats-grid {
-    grid-template-columns: repeat(3, 1fr);
-    margin-top: 4px;
-  }
-
-  .upcoming-grid { grid-template-columns: 1fr; }
-
-  .chart-wrap { height: 220px; }
-
-  .toast { left: 14px; right: 14px; bottom: 16px; max-width: 100%; }
-  .firebase-notice { left: 14px; right: 14px; bottom: 80px; font-size: 0.75rem; }
-}
-
-/* ============================================================
-   MICRO-INTERACTIONS
-   ============================================================ */
-.lec-item { user-select: none; }
-
-.lec-item:hover {
-  background: var(--acc-soft);
-  border-color: var(--acc);
-}
-
-.q-stat:hover {
-  border-color: var(--acc);
-  background: var(--acc-soft);
-}
-
-.up-day:hover {
-  border-color: var(--acc);
-}
-
-/* Number input spinners hidden */
-input[type=number]::-webkit-outer-spin-button,
-input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
-input[type=number] { -moz-appearance: textfield; }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css"/>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+    onload="window.katexReady = true"></script>
+
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <link rel="stylesheet" href="style.css"/>
 </head>
+<body>
 
-<body class="light-mode">
+<!-- ═══════════════════════════════════════════
+     SCREEN 1 — UPLOAD
+═══════════════════════════════════════════ -->
+<div id="uploadScreen" class="screen active">
 
-  <!-- ============================================================
-       HEADER
-  ============================================================ -->
-  <header class="app-header">
-    <div class="header-left">
-      <div class="logo-mark">⚡</div>
+  <header class="upload-header">
+    <div class="brand">
+      <div class="brand-badge">JEE</div>
       <div class="brand-text">
-        <h1 class="app-title">Prayas JEE 2.0</h1>
-        <p class="app-subtitle">Study Tracker</p>
+        <span class="brand-title">CBT Platform</span>
+        <span class="brand-sub">PDF → Exam Converter</span>
       </div>
     </div>
-
-    <div class="header-center">
-      <div class="day-chip">
-        <span class="day-chip-label">DAY</span>
-        <span class="day-chip-num" id="dayNumber">--</span>
-      </div>
-      <div class="date-text" id="todayDate">Loading...</div>
-    </div>
-
-    <div class="header-right">
-      <div class="countdown-badge" id="examCountdown">-- days to JEE</div>
-      <div class="toggle-wrap">
-        <span class="toggle-icon">☀️</span>
-        <label class="mode-toggle">
-          <input type="checkbox" id="modeToggle" />
-          <span class="mode-slider"></span>
-        </label>
-        <span class="toggle-icon">🌙</span>
-      </div>
+    <div class="header-actions">
+      <button class="theme-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">
+        <span id="themeIcon">🌙</span>
+      </button>
     </div>
   </header>
 
-  <!-- ============================================================
-       MAIN CONTENT
-  ============================================================ -->
-  <main class="main-wrap">
-    <div class="dashboard">
+  <main class="upload-main">
+    <div class="upload-container">
 
-      <!-- ── CARD 1: Today's Lectures ─────────────────────────── -->
-      <section class="card lecture-card" id="card-lectures">
-        <div class="card-header">
-          <h2 class="card-title">📚 Today's Lectures</h2>
-          <div class="pill pill-accent" id="lectureProgress">0 / 3</div>
-        </div>
-
-        <ul class="lec-list">
-          <!-- PHYSICS -->
-          <li class="lec-item" id="lecItemPhysics">
-            <div class="subject-tag tag-phy">PHY</div>
-            <div class="lec-body">
-              <p class="lec-num" id="physLecNum">Physics Lec --</p>
-              <p class="lec-topic" id="physTopic">Loading…</p>
-            </div>
-            <label class="cb-wrap">
-              <input type="checkbox" id="chkPhysics" />
-              <span class="cb-box"></span>
-            </label>
-          </li>
-
-          <!-- MATHS -->
-          <li class="lec-item" id="lecItemMaths">
-            <div class="subject-tag tag-mth">MTH</div>
-            <div class="lec-body">
-              <p class="lec-num" id="mthLecNum">Maths Lec --</p>
-              <p class="lec-topic" id="mthTopic">Loading…</p>
-            </div>
-            <label class="cb-wrap">
-              <input type="checkbox" id="chkMaths" />
-              <span class="cb-box"></span>
-            </label>
-          </li>
-
-          <!-- CHEMISTRY -->
-          <li class="lec-item" id="lecItemChem">
-            <div class="subject-tag tag-chm">CHM</div>
-            <div class="lec-body">
-              <p class="lec-num" id="chmLecNum">Chemistry Lec --</p>
-              <p class="lec-topic" id="chmTopic">Loading…</p>
-            </div>
-            <label class="cb-wrap">
-              <input type="checkbox" id="chkChem" />
-              <span class="cb-box"></span>
-            </label>
-          </li>
-        </ul>
-      </section>
-
-      <!-- ── CARD 2: Daily Score ───────────────────────────────── -->
-      <section class="card score-card" id="card-score">
-        <div class="card-header">
-          <h2 class="card-title">⚡ Daily Score</h2>
-          <span class="score-badge" id="scoreBadge">0 / 5</span>
-        </div>
-
-        <div class="score-ring-wrap">
-          <svg class="score-ring" viewBox="0 0 120 120">
-            <circle class="ring-track" cx="60" cy="60" r="48" />
-            <circle class="ring-fill"  cx="60" cy="60" r="48" id="ringFill" />
+      <!-- Hero -->
+      <div class="upload-hero">
+        <div class="hero-icon">
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+            <rect width="56" height="56" rx="14" fill="url(#heroGrad)"/>
+            <path d="M16 40V16H32L40 24V40H16Z" stroke="white" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+            <path d="M32 16V24H40" stroke="white" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+            <path d="M28 34V26" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M24 30L28 26L32 30" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="heroGrad" x1="0" y1="0" x2="56" y2="56">
+                <stop offset="0%" stop-color="#1565c0"/>
+                <stop offset="100%" stop-color="#0097a7"/>
+              </linearGradient>
+            </defs>
           </svg>
-          <div class="ring-center">
-            <span class="ring-val" id="ringVal">0</span>
-            <span class="ring-max">/5</span>
+        </div>
+        <h1>JEE Mock Test Generator</h1>
+        <p>Upload a question paper PDF → AI extracts all 75 questions → Practice in a real NTA-style CBT interface</p>
+      </div>
+
+      <!-- Upload Zone -->
+      <div class="upload-zone" id="uploadZone"
+           onclick="document.getElementById('pdfInput').click()"
+           ondragover="handleDragOver(event)"
+           ondragleave="handleDragLeave(event)"
+           ondrop="handleDrop(event)">
+        <div class="upload-zone-content">
+          <div class="upload-zone-icon">📄</div>
+          <p class="upload-zone-primary">Drop PDF here or <span class="upload-link">click to browse</span></p>
+          <p class="upload-zone-secondary">JEE Main / Advanced question papers · Max 50MB</p>
+        </div>
+        <input type="file" id="pdfInput" accept=".pdf" hidden onchange="handleFileSelect(event)"/>
+      </div>
+
+      <!-- File Info (shown after selection) -->
+      <div class="file-info-bar" id="fileInfoBar" style="display:none">
+        <span class="file-icon">📋</span>
+        <div class="file-details">
+          <span class="file-name" id="fileName">document.pdf</span>
+          <span class="file-size" id="fileSize">0 MB</span>
+        </div>
+        <button class="file-clear-btn" onclick="removeFile()" title="Remove file">✕</button>
+      </div>
+
+      <!-- API Key -->
+      <div class="config-card">
+        <div class="config-section">
+          <label class="config-label">Gemini API Key</label>
+          <div class="api-key-row">
+            <input type="password" id="apiKeyInput"
+              class="config-input"
+              placeholder="AIza... (leave blank for Demo Mode)"/>
+            <button class="icon-btn" onclick="toggleKeyVisibility()" title="Show/hide key">👁</button>
           </div>
+          <p class="config-note">Key stays in your browser only — never stored on any server.</p>
         </div>
 
-        <div class="score-items">
-          <div class="s-item" id="si-phy">
-            <span class="s-dot"></span>
-            <span class="s-label">Physics Lecture</span>
+        <div class="config-row-split">
+          <div class="config-section half">
+            <label class="config-label">Questions</label>
+            <select class="config-select" id="totalQuestions">
+              <option value="75" selected>75 — JEE Main</option>
+              <option value="54">54 — JEE Adv.</option>
+              <option value="30">30 — Section</option>
+            </select>
           </div>
-          <div class="s-item" id="si-mth">
-            <span class="s-dot"></span>
-            <span class="s-label">Maths Lecture</span>
-          </div>
-          <div class="s-item" id="si-chm">
-            <span class="s-dot"></span>
-            <span class="s-label">Chemistry Lecture</span>
-          </div>
-          <div class="s-item" id="si-rev">
-            <span class="s-dot"></span>
-            <span class="s-label">Revision Session</span>
-            <label class="mini-cb">
-              <input type="checkbox" id="chkRevision" />
-              <span></span>
-            </label>
-          </div>
-          <div class="s-item" id="si-prac">
-            <span class="s-dot"></span>
-            <span class="s-label">Practice Session</span>
-            <label class="mini-cb">
-              <input type="checkbox" id="chkPractice" />
-              <span></span>
-            </label>
+          <div class="config-section half">
+            <label class="config-label">Duration</label>
+            <select class="config-select" id="duration">
+              <option value="180" selected>180 min (3 hrs)</option>
+              <option value="120">120 min (2 hrs)</option>
+              <option value="60">60 min (1 hr)</option>
+            </select>
           </div>
         </div>
-      </section>
+      </div>
 
-      <!-- ── CARD 3: Question Tracker ──────────────────────────── -->
-      <section class="card question-card" id="card-questions">
-        <div class="card-header">
-          <h2 class="card-title">🎯 Question Tracker</h2>
-          <div class="today-q-badge">Today: <strong id="todayQTotal">0</strong></div>
-        </div>
-
-        <div class="q-inputs">
-          <div class="q-row">
-            <span class="q-tag tag-phy">PHY</span>
-            <input type="number" class="q-input" id="qPhy" placeholder="0" min="0" />
-            <span class="q-unit">Qs</span>
-          </div>
-          <div class="q-row">
-            <span class="q-tag tag-mth">MTH</span>
-            <input type="number" class="q-input" id="qMth" placeholder="0" min="0" />
-            <span class="q-unit">Qs</span>
-          </div>
-          <div class="q-row">
-            <span class="q-tag tag-chm">CHM</span>
-            <input type="number" class="q-input" id="qChm" placeholder="0" min="0" />
-            <span class="q-unit">Qs</span>
-          </div>
-        </div>
-
-        <button class="btn-primary" id="btnLogQ">
-          <span>Log Questions</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
-
-        <div class="q-stats-grid">
-          <div class="q-stat">
-            <p class="q-stat-label">Weekly</p>
-            <p class="q-stat-val" id="statWeekly">0</p>
-          </div>
-          <div class="q-stat">
-            <p class="q-stat-label">Monthly</p>
-            <p class="q-stat-val" id="statMonthly">0</p>
-          </div>
-          <div class="q-stat">
-            <p class="q-stat-label">All-Time</p>
-            <p class="q-stat-val" id="statTotal">0</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── CARD 4: Upcoming Schedule ────────────────────────── -->
-      <section class="card upcoming-card" id="card-upcoming">
-        <div class="card-header">
-          <h2 class="card-title">📅 Upcoming Schedule</h2>
-          <span class="pill pill-muted">Next 2 Days</span>
-        </div>
-        <div class="upcoming-grid" id="upcomingGrid">
-          <!-- Filled by JS -->
-        </div>
-      </section>
-
-      <!-- ── CARD 5: Analytics Chart ───────────────────────────── -->
-      <section class="card chart-card" id="card-chart">
-        <div class="card-header">
-          <h2 class="card-title">📊 7-Day Performance</h2>
-          <div class="chart-legend">
-            <span class="leg-dot leg-phy"></span><span>Physics</span>
-            <span class="leg-dot leg-mth"></span><span>Maths</span>
-            <span class="leg-dot leg-chm"></span><span>Chem</span>
-          </div>
-        </div>
-        <div class="chart-wrap">
-          <canvas id="perfChart"></canvas>
-        </div>
-      </section>
-
-    </div><!-- /.dashboard -->
-  </main>
-
-  <!-- Toast notification -->
-  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
-
-  <!-- Firebase setup notice -->
-  <div class="firebase-notice" id="fbNotice">
-    ⚙️ Firebase not configured — data saved locally only.
-    <button onclick="document.getElementById('fbNotice').remove()">✕</button>
-  </div>
-
-  <!-- ── GOOGLE LOGIN OVERLAY ───────────────────────────────── -->
-  <div id="loginOverlay" style="
-    display: none;
-    position: fixed; inset: 0; z-index: 9999;
-    background: var(--gradient-bg);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 28px;
-  ">
-    <!-- grid pattern same as body -->
-    <div style="
-      position: absolute; inset: 0; pointer-events: none;
-      background-image: linear-gradient(var(--border) 1px, transparent 1px),
-                        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 40px 40px; opacity: 0.35;
-    "></div>
-
-    <div style="position: relative; text-align: center;">
-      <div style="font-size: 3.5rem; filter: drop-shadow(0 0 18px var(--acc)); margin-bottom: 12px;">⚡</div>
-      <h1 style="font-family:'Exo 2',sans-serif; font-size:1.8rem; font-weight:900; color:var(--acc); letter-spacing:-0.5px;">Prayas JEE 2.0</h1>
-      <p style="font-size:0.75rem; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--text-3); margin-top:4px;">Study Tracker</p>
-    </div>
-
-    <div style="
-      position: relative;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 36px 40px;
-      box-shadow: var(--shadow-lift);
-      text-align: center;
-      max-width: 360px; width: 90%;
-    ">
-      <p style="font-size:1rem; font-weight:600; color:var(--text-1); margin-bottom:6px;">Welcome Back!</p>
-      <p style="font-size:0.82rem; color:var(--text-3); margin-bottom:28px;">Sign in to sync your study data across all devices.</p>
-
-      <button id="btnGoogleLogin" style="
-        display: flex; align-items: center; justify-content: center; gap: 12px;
-        width: 100%; padding: 14px 20px;
-        background: var(--acc); color: #fff;
-        border: none; border-radius: 14px; cursor: pointer;
-        font-family:'Exo 2',sans-serif; font-size:0.95rem; font-weight:700;
-        box-shadow: 0 4px 20px var(--glow);
-        transition: 0.25s cubic-bezier(0.4,0,0.2,1);
-      ">
-        <svg width="20" height="20" viewBox="0 0 48 48">
-          <path fill="#fff" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21c10.5 0 20-7.6 20-21 0-1.3-.2-2.7-.5-4z"/>
-        </svg>
-        Sign in with Google
+      <!-- Buttons -->
+      <button class="primary-btn" id="convertBtn" onclick="startConversion()">
+        <span class="btn-icon">⚡</span> Generate CBT Exam
+      </button>
+      <button class="ghost-btn" onclick="loadDemoMode()">
+        ✨ Try Demo Mode — No PDF required
       </button>
 
-      <p id="loginError" style="margin-top:14px; font-size:0.78rem; color:#e53935; display:none;"></p>
+      <!-- Feature Chips -->
+      <div class="features-row">
+        <div class="feature-chip">🔢 KaTeX Math</div>
+        <div class="feature-chip">🖼️ Diagram Upload</div>
+        <div class="feature-chip">💾 Auto-Save</div>
+        <div class="feature-chip">📱 Tab Optimized</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 2 — PROCESSING
+═══════════════════════════════════════════ -->
+<div id="processingScreen" class="screen">
+  <div class="processing-wrap">
+    <div class="proc-spinner">
+      <div class="proc-ring r1"></div>
+      <div class="proc-ring r2"></div>
+      <div class="proc-ring r3"></div>
+      <span class="proc-emoji">⚡</span>
+    </div>
+    <h2 id="procTitle">Reading PDF…</h2>
+    <p id="procSubtitle">Extracting text from your question paper</p>
+    <div class="proc-progress-wrap">
+      <div class="proc-progress-bar" id="procBar" style="width:5%"></div>
+    </div>
+    <div class="proc-steps">
+      <div class="proc-step active" id="pStep1"><span class="ps-dot"></span><span>Reading PDF</span></div>
+      <div class="proc-step" id="pStep2"><span class="ps-dot"></span><span>Calling AI API</span></div>
+      <div class="proc-step" id="pStep3"><span class="ps-dot"></span><span>Parsing Questions</span></div>
+      <div class="proc-step" id="pStep4"><span class="ps-dot"></span><span>Building Interface</span></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 3 — CBT EXAM
+═══════════════════════════════════════════ -->
+<div id="examScreen" class="screen">
+
+  <!-- TOP BAR -->
+  <div class="exam-topbar">
+    <div class="etb-left">
+      <button class="palette-toggle-btn" id="paletteToggleBtn" onclick="togglePaletteDrawer()" title="Question Palette">
+        <span class="hamburger-icon">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
+      <div class="etb-brand">
+        <span class="etb-name">JEE CBT</span>
+        <span class="etb-subject" id="topbarSubject">Physics</span>
+      </div>
     </div>
 
-    <p style="position:relative; font-size:0.72rem; color:var(--text-3);">Your data stays private — linked only to your Google account.</p>
+    <div class="etb-center">
+      <div class="timer-widget" id="timerWidget">
+        <svg class="timer-svg" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+          <circle id="timerArc" cx="18" cy="18" r="15.9" fill="none" stroke="#00e5ff"
+            stroke-width="2" stroke-linecap="round" stroke-dasharray="100 100"
+            transform="rotate(-90 18 18)" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-text">
+          <span class="timer-label">Time Left</span>
+          <span class="timer-value" id="timerDisplay">03:00:00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="etb-right">
+      <button class="etb-btn" onclick="showSummary()">📊 Summary</button>
+      <button class="etb-btn submit-btn" onclick="confirmSubmit()">Submit Test</button>
+      <button class="theme-btn-sm" onclick="toggleTheme()"><span id="themeIconExam">🌙</span></button>
+    </div>
   </div>
 
-  <!-- ============================================================
-       INLINE SCRIPT (merged from script.js)
-  ============================================================ -->
-  <script type="module">
-/* ================================================================
-   PRAYAS JEE 2.0 STUDY TRACKER — script.js
-   Firebase v9+ Modular SDK | Firestore | Chart.js
-   ================================================================
+  <!-- SECTION TABS -->
+  <div class="section-tabs-bar">
+    <button class="sec-tab active" data-sec="Physics" onclick="filterSection('Physics',this)">⚛ Physics</button>
+    <button class="sec-tab" data-sec="Chemistry" onclick="filterSection('Chemistry',this)">🧪 Chemistry</button>
+    <button class="sec-tab" data-sec="Maths" onclick="filterSection('Maths',this)">∑ Maths</button>
+    <button class="sec-tab sec-all" data-sec="All" onclick="filterSection('All',this)">All</button>
+  </div>
 
-   ⚙️  SETUP INSTRUCTIONS:
-   1. Go to https://console.firebase.google.com
-   2. Create a project → Add a Web App → Copy your config below
-   3. Enable Firestore Database (Start in Test Mode for now)
-   4. Replace the placeholder values in FIREBASE_CONFIG
+  <!-- BODY: Question + Palette -->
+  <div class="exam-body">
 
-   📱 CROSS-DEVICE SYNC:
-   For the same data on your Tab and Phone, set USER_ID to a
-   fixed string (e.g., "my_jee_2026") instead of the auto-generated one.
-   Both devices will then read/write the same Firestore document.
-   ================================================================ */
+    <!-- QUESTION PANEL (left) -->
+    <div class="question-panel" id="questionPanel">
 
-import { initializeApp }        from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getFirestore,
-  doc, setDoc, getDoc, getDocs,
-  collection
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-/* ================================================================
-   🔴 REPLACE THIS WITH YOUR FIREBASE CONFIG
-   ================================================================ */
-const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyA_LVqRRrKKKj9NrHGPe4sEAKGt4uQVq14",
-  authDomain:        "prayas-ae663.firebaseapp.com",
-  projectId:         "prayas-ae663",
-  storageBucket:     "prayas-ae663.firebasestorage.app",
-  messagingSenderId: "589042712025",
-  appId:             "1:589042712025:web:e7ef6f2d27e46fda9f2dc8"
-};
-
-/* ================================================================
-   👤 USER ID — set dynamically from Google Auth (uid)
-   ================================================================ */
-let USER_ID = null;
-
-/* ================================================================
-   FIREBASE INITIALISATION
-   ================================================================ */
-let db       = null;
-let auth     = null;
-let firebaseOk = false;
-
-try {
-  if (!FIREBASE_CONFIG.apiKey.startsWith("YOUR")) {
-    const app = initializeApp(FIREBASE_CONFIG);
-    db         = getFirestore(app);
-    auth       = getAuth(app);
-    firebaseOk = true;
-    const notice = document.getElementById("fbNotice");
-    if (notice) notice.remove();
-  }
-} catch (err) {
-  console.warn("Firebase init failed:", err);
-}
-
-/* ================================================================
-   GOOGLE AUTH — LOGIN / LOGOUT
-   ================================================================ */
-const overlay = document.getElementById("loginOverlay");
-
-function showLoginOverlay() {
-  // Ensure body class is applied so CSS vars work in overlay
-  if (!document.body.className) document.body.className = "light-mode";
-  overlay.style.display = "flex";
-}
-
-function hideLoginOverlay() {
-  overlay.style.display = "none";
-}
-
-document.getElementById("btnGoogleLogin").addEventListener("click", async () => {
-  const btn = document.getElementById("btnGoogleLogin");
-  const errEl = document.getElementById("loginError");
-  btn.disabled = true;
-  btn.textContent = "Signing in…";
-  errEl.style.display = "none";
-  try {
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
-    // onAuthStateChanged will handle the rest
-  } catch (e) {
-    errEl.textContent = "Sign-in failed. Please try again.";
-    errEl.style.display = "block";
-    btn.disabled = false;
-    btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 48 48"><path fill="#fff" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21c10.5 0 20-7.6 20-21 0-1.3-.2-2.7-.5-4z"/></svg> Sign in with Google`;
-  }
-});
-
-// Add logout button to header right (after DOM loads)
-function injectLogoutButton(user) {
-  const headerRight = document.querySelector(".header-right");
-  let logoutBtn = document.getElementById("btnLogout");
-  if (!logoutBtn) {
-    logoutBtn = document.createElement("button");
-    logoutBtn.id = "btnLogout";
-    logoutBtn.title = user.email;
-    logoutBtn.style.cssText = `
-      display:flex; align-items:center; gap:8px;
-      background:var(--bg-row); border:1px solid var(--border);
-      border-radius:20px; padding:5px 12px 5px 6px;
-      cursor:pointer; transition:0.25s;
-      font-family:'DM Sans',sans-serif; font-size:0.78rem;
-      font-weight:500; color:var(--text-2);
-    `;
-    logoutBtn.innerHTML = `
-      <img src="${user.photoURL}" width="22" height="22"
-           style="border-radius:50%; object-fit:cover;"
-           onerror="this.style.display='none'" />
-      <span>${user.displayName?.split(" ")[0] || "Me"}</span>
-      <span style="opacity:0.5; font-size:0.7rem;">✕</span>
-    `;
-    logoutBtn.addEventListener("click", async () => {
-      await signOut(auth);
-      showLoginOverlay();
-    });
-    logoutBtn.addEventListener("mouseenter", () => {
-      logoutBtn.style.borderColor = "var(--acc)";
-      logoutBtn.style.color = "var(--text-1)";
-    });
-    logoutBtn.addEventListener("mouseleave", () => {
-      logoutBtn.style.borderColor = "var(--border)";
-      logoutBtn.style.color = "var(--text-2)";
-    });
-    headerRight.prepend(logoutBtn);
-  }
-}
-
-// Auth state listener — boots the app on login
-if (auth) {
-  // Show overlay immediately, wait for auth check
-  showLoginOverlay();
-
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      USER_ID = user.uid;  // Each Gmail = unique UID = own Firestore path
-      hideLoginOverlay();
-      injectLogoutButton(user);
-      await init();        // Boot app only after login confirmed
-    } else {
-      USER_ID = null;
-      showLoginOverlay();
-    }
-  });
-} else {
-  // Firebase not configured — fallback to localStorage
-  USER_ID = "prayas_jee_2026";
-  init();
-}
-
-/* ================================================================
-   CONSTANTS
-   ================================================================ */
-// Start date: 17 April 2026 (midnight, local time)
-const START_DATE      = new Date(2026, 3, 17, 0, 0, 0, 0); // Month is 0-indexed
-const JEE_EXAM_DATE   = new Date(2027, 0, 19, 0, 0, 0, 0); // ~JEE Main 2027
-
-/* ================================================================
-   PRAYAS JEE 2.0 LECTURE SCHEDULE
-   Each array maps Day-N → lecture content (cycles if longer)
-   ================================================================ */
-const PHY = [
-  { full: "Basic Mathematics & Vector Algebra",          short: "Vectors & Maths" },
-  { full: "Kinematics in 1D — Motion Equations",         short: "1D Kinematics" },
-  { full: "Kinematics in 2D & Projectile Motion",        short: "Projectile Motion" },
-  { full: "Newton's Laws of Motion",                     short: "Newton's Laws" },
-  { full: "Friction — Static, Kinetic & Rolling",        short: "Friction" },
-  { full: "Work, Energy & Power",                        short: "Work & Energy" },
-  { full: "Centre of Mass & Linear Momentum",            short: "COM & Momentum" },
-  { full: "Rotational Motion — Kinematics & Torque",     short: "Rotational Basics" },
-  { full: "Rotational Motion — Moment of Inertia",       short: "MOI & Theorems" },
-  { full: "Rolling Motion & Angular Momentum",           short: "Rolling & AM" },
-  { full: "Gravitation — Newton's Law & Field",          short: "Gravitation 1" },
-  { full: "Gravitation — Satellites & Escape Velocity",  short: "Satellites & KE" },
-  { full: "Mechanical Properties of Solids",             short: "Elasticity" },
-  { full: "Fluid Mechanics — Pressure & Pascal's Law",   short: "Fluid Pressure" },
-  { full: "Fluid Mechanics — Bernoulli & Viscosity",     short: "Bernoulli's Theorem" },
-  { full: "Surface Tension & Capillarity",               short: "Surface Tension" },
-  { full: "Thermal Expansion — Solids & Liquids",        short: "Thermal Expansion" },
-  { full: "Calorimetry & Modes of Heat Transfer",        short: "Calorimetry" },
-  { full: "Thermodynamics — First Law",                  short: "First Law of Thermo" },
-  { full: "Thermodynamics — Second Law & Heat Engines",  short: "Second Law of Thermo" },
-  { full: "Kinetic Theory of Gases",                     short: "KTG & Gas Laws" },
-  { full: "Simple Harmonic Motion — Basics",             short: "SHM Basics" },
-  { full: "SHM — Energy, Damped & Forced Oscillations",  short: "SHM Advanced" },
-  { full: "Waves — Transverse & Longitudinal",           short: "Wave Motion" },
-  { full: "Sound Waves & Doppler Effect",                short: "Sound & Doppler" },
-  { full: "Electrostatics — Coulomb's Law & E-Field",    short: "Electric Field" },
-  { full: "Electrostatics — Potential & Gauss's Law",    short: "Gauss's Law" },
-  { full: "Capacitors, Capacitance & Dielectrics",       short: "Capacitors" },
-  { full: "Current Electricity — Ohm's Law & Drift",     short: "Ohm's Law" },
-  { full: "Current Electricity — Kirchhoff's Laws",      short: "Kirchhoff's Laws" },
-  { full: "Wheatstone Bridge & Potentiometer",           short: "Wheatstone Bridge" },
-  { full: "Moving Charges — Biot-Savart Law",            short: "Biot-Savart Law" },
-  { full: "Moving Charges — Ampere's Law & Force",       short: "Ampere's Law" },
-  { full: "Magnetism & Matter — Dia, Para, Ferro",       short: "Magnetic Materials" },
-  { full: "EMI — Faraday's & Lenz's Laws",               short: "Faraday & Lenz" },
-  { full: "Inductance — Self & Mutual",                  short: "Inductance" },
-  { full: "AC Circuits — LCR & Resonance",               short: "AC Circuits" },
-  { full: "Electromagnetic Waves",                       short: "EM Waves" },
-  { full: "Ray Optics — Reflection & Refraction",        short: "Ray Optics 1" },
-  { full: "Ray Optics — Lenses, Prism & Instruments",    short: "Ray Optics 2" },
-  { full: "Wave Optics — Huygens & Interference",        short: "Wave Optics 1" },
-  { full: "Wave Optics — Diffraction & Polarisation",    short: "Wave Optics 2" },
-  { full: "Dual Nature of Radiation & Matter",           short: "Photoelectric Effect" },
-  { full: "Atomic Physics — Bohr Model & Spectra",       short: "Bohr's Model" },
-  { full: "Nuclei — Radioactivity & Nuclear Reactions",  short: "Nuclear Physics" },
-  { full: "Semiconductors — Diodes & Transistors",       short: "Semiconductors" },
-  { full: "Logic Gates & Communication Systems",         short: "Logic Gates" },
-  { full: "Revision — Mechanics (Units 1–10)",           short: "Revision: Mechanics" },
-];
-
-const MTH = [
-  { full: "Sets, Relations & Functions",                 short: "Sets & Relations" },
-  { full: "Inverse Trigonometric Functions",             short: "Inverse Trig" },
-  { full: "Matrices — Operations & Types",               short: "Matrices" },
-  { full: "Determinants & Applications",                 short: "Determinants" },
-  { full: "Continuity & Differentiability",              short: "Continuity" },
-  { full: "Differentiation — Rules & Methods",           short: "Differentiation" },
-  { full: "Applications of Derivatives — Tangents",      short: "Tangents & Normals" },
-  { full: "Applications of Derivatives — Maxima & Min.", short: "Maxima & Minima" },
-  { full: "Indefinite Integration",                      short: "Indefinite Integ." },
-  { full: "Definite Integration",                        short: "Definite Integ." },
-  { full: "Integration by Parts & Special Integrals",    short: "Integration by Parts" },
-  { full: "Area Under Curves & Between Curves",          short: "Area Under Curves" },
-  { full: "Differential Equations — Formation & Types",  short: "Differential Eqns" },
-  { full: "Vectors — Dot Product & Applications",        short: "Vectors 1" },
-  { full: "Vectors — Cross Product & Triple Product",    short: "Vectors 2" },
-  { full: "3D Geometry — Lines & Planes",                short: "3D Geometry" },
-  { full: "Probability — Classical & Axiomatic",         short: "Probability 1" },
-  { full: "Probability — Bayes' & Distributions",        short: "Probability 2" },
-  { full: "Complex Numbers — Basics & Argand Plane",     short: "Complex Numbers 1" },
-  { full: "Complex Numbers — Roots of Unity & Apps",     short: "Complex Numbers 2" },
-  { full: "Quadratic Equations & Inequalities",          short: "Quadratic Equations" },
-  { full: "Sequences & Series — AP, GP, HP",             short: "AP, GP, HP" },
-  { full: "Sequences & Series — Special Sums",           short: "Special Sums" },
-  { full: "Permutations & Combinations",                 short: "Permutations & Comb." },
-  { full: "Binomial Theorem & Applications",             short: "Binomial Theorem" },
-  { full: "Straight Lines — Equations & Angles",         short: "Straight Lines 1" },
-  { full: "Straight Lines — Distance & Family",          short: "Straight Lines 2" },
-  { full: "Circles — Standard Forms & Properties",       short: "Circles 1" },
-  { full: "Circles — Chords, Tangents & Normals",        short: "Circles 2" },
-  { full: "Parabola — Equation & Properties",            short: "Parabola" },
-  { full: "Ellipse — Equation & Properties",             short: "Ellipse" },
-  { full: "Hyperbola — Equation & Properties",           short: "Hyperbola" },
-  { full: "Trigonometry — Ratios & Identities",          short: "Trig Identities" },
-  { full: "Trigonometric Equations",                     short: "Trig Equations" },
-  { full: "Properties of Triangles",                     short: "Triangle Properties" },
-  { full: "Heights & Distances",                         short: "Heights & Distances" },
-  { full: "Mathematical Reasoning",                      short: "Math Reasoning" },
-  { full: "Statistics — Mean, Variance & SD",            short: "Statistics" },
-  { full: "Limits — Standard Limits & L'Hôpital",        short: "Limits" },
-  { full: "Logarithms, Exponentials & Surds",            short: "Logs & Exponentials" },
-  { full: "Revision — Algebra (All Units)",              short: "Revision: Algebra" },
-];
-
-const CHM = [
-  { full: "Mole Concept & Stoichiometry",                short: "Mole Concept" },
-  { full: "Atomic Structure — Quantum Numbers",          short: "Atomic Structure" },
-  { full: "Periodic Table & Periodic Properties",        short: "Periodic Properties" },
-  { full: "Chemical Bonding — Ionic & Covalent Bonds",   short: "Chemical Bonding 1" },
-  { full: "Chemical Bonding — VSEPR & Hybridisation",    short: "Hybridisation" },
-  { full: "Molecular Orbital Theory",                    short: "MOT" },
-  { full: "States of Matter — Gaseous State",            short: "Gaseous State" },
-  { full: "Chemical Thermodynamics — Enthalpy",          short: "Thermodynamics 1" },
-  { full: "Thermodynamics — Entropy & Gibb's Energy",    short: "Thermodynamics 2" },
-  { full: "Chemical Equilibrium — Kp, Kc & Le Chatelier",short: "Chemical Equilibrium" },
-  { full: "Ionic Equilibrium — pH, Buffer & Hydrolysis", short: "Ionic Equilibrium" },
-  { full: "Redox Reactions — Balancing & Oxidation No.", short: "Redox Reactions" },
-  { full: "Electrochemistry — Cells & EMF",              short: "Electrochemistry 1" },
-  { full: "Electrochemistry — Electrolysis & Faraday",   short: "Electrochemistry 2" },
-  { full: "Chemical Kinetics — Rate Laws & Order",       short: "Chemical Kinetics 1" },
-  { full: "Chemical Kinetics — Arrhenius Equation",      short: "Chemical Kinetics 2" },
-  { full: "Surface Chemistry — Adsorption & Colloids",   short: "Surface Chemistry" },
-  { full: "p-Block Elements — Groups 13 & 14",           short: "p-Block 1" },
-  { full: "p-Block Elements — Groups 15, 16 & 17",       short: "p-Block 2" },
-  { full: "d & f Block Elements — Transition Metals",    short: "d-Block Elements" },
-  { full: "Coordination Compounds — Nomenclature",       short: "Coordination Chem 1" },
-  { full: "Coordination Compounds — Isomerism & Bonding",short: "Coordination Chem 2" },
-  { full: "Metallurgy — Principles & Extraction",        short: "Metallurgy" },
-  { full: "General Organic Chemistry — Basics & IUPAC",  short: "GOC Basics" },
-  { full: "GOC — Isomerism & Reaction Mechanisms",       short: "GOC Mechanisms" },
-  { full: "Hydrocarbons — Alkanes & Cycloalkanes",       short: "Alkanes" },
-  { full: "Hydrocarbons — Alkenes & Alkynes",            short: "Alkenes & Alkynes" },
-  { full: "Aromatic Hydrocarbons & EAS Reactions",       short: "Aromatic Compounds" },
-  { full: "Haloalkanes & Haloarenes",                    short: "Haloalkanes" },
-  { full: "Alcohols, Phenols & Ethers",                  short: "Alcohols & Phenols" },
-  { full: "Aldehydes & Ketones — Reactions",             short: "Aldehydes & Ketones" },
-  { full: "Carboxylic Acids & Derivatives",              short: "Carboxylic Acids" },
-  { full: "Amines & Diazonium Salts",                    short: "Amines" },
-  { full: "Biomolecules — Carbohydrates & Proteins",     short: "Biomolecules" },
-  { full: "Polymers & Chemistry in Everyday Life",       short: "Polymers" },
-  { full: "s-Block Elements — Alkali & Alkaline Earth",  short: "s-Block Elements" },
-  { full: "Hydrogen & its Compounds — H2O2",             short: "Hydrogen Compounds" },
-  { full: "Solid State — Crystal & Defects",             short: "Solid State" },
-  { full: "Solutions — Raoult's Law & Colligative Props",short: "Solutions" },
-  { full: "Environmental Chemistry & Noble Gases",       short: "Environmental Chem" },
-  { full: "Revision — Physical Chemistry (All Units)",   short: "Revision: Phys Chem" },
-];
-
-/* ================================================================
-   LOCAL STORAGE HELPERS (fallback when Firebase not configured)
-   ================================================================ */
-const LS = {
-  get: (key) => {
-    try { return JSON.parse(localStorage.getItem("pj_" + key)); }
-    catch { return null; }
-  },
-  set: (key, val) => {
-    try { localStorage.setItem("pj_" + key, JSON.stringify(val)); }
-    catch { /* storage full */ }
-  }
-};
-
-/* ================================================================
-   STATE
-   ================================================================ */
-const state = {
-  darkMode: false,
-  dayNum: 1,
-  today: "",
-  dayData: {
-    lectures:  { physics: false, maths: false, chemistry: false },
-    revision:  false,
-    practice:  false,
-    questions: { physics: 0, maths: 0, chemistry: 0 }
-  }
-};
-
-/* ================================================================
-   UTILITY
-   ================================================================ */
-function dateStr(d) {
-  const y  = d.getFullYear();
-  const m  = String(d.getMonth() + 1).padStart(2, "0");
-  const dy = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${dy}`;
-}
-
-function calcDayNum(d = new Date()) {
-  const target = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const diffMs = target - START_DATE;
-  return Math.max(1, Math.floor(diffMs / 86400000) + 1);
-}
-
-function getLec(arr, dayN) {
-  return arr[(dayN - 1) % arr.length];
-}
-
-function showToast(msg, ms = 2600) {
-  const el = document.getElementById("toast");
-  el.textContent = msg;
-  el.classList.add("show");
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove("show"), ms);
-}
-
-/* ================================================================
-   FIRESTORE HELPERS
-   ================================================================ */
-async function fsGet(path) {
-  if (!firebaseOk) return null;
-  try {
-    const snap = await getDoc(doc(db, ...path.split("/")));
-    return snap.exists() ? snap.data() : null;
-  } catch (e) {
-    console.warn("Firestore read error:", e.message);
-    return null;
-  }
-}
-
-async function fsSet(path, data, merge = true) {
-  if (!firebaseOk) return false;
-  try {
-    await setDoc(doc(db, ...path.split("/")), data, { merge });
-    return true;
-  } catch (e) {
-    console.warn("Firestore write error:", e.message);
-    return false;
-  }
-}
-
-async function fsCollection(path) {
-  if (!firebaseOk) return {};
-  try {
-    const snap = await getDocs(collection(db, ...path.split("/")));
-    const result = {};
-    snap.forEach(d => { result[d.id] = d.data(); });
-    return result;
-  } catch (e) {
-    console.warn("Firestore collection error:", e.message);
-    return {};
-  }
-}
-
-/* ================================================================
-   HEADER — DAY INFO & COUNTDOWN
-   ================================================================ */
-function initHeader() {
-  const now = new Date();
-  state.dayNum = calcDayNum(now);
-  state.today  = dateStr(now);
-
-  document.getElementById("dayNumber").textContent = state.dayNum;
-
-  const opts = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-  document.getElementById("todayDate").textContent = now.toLocaleDateString("en-IN", opts);
-
-  const daysLeft = Math.ceil((JEE_EXAM_DATE - now) / 86400000);
-  document.getElementById("examCountdown").textContent =
-    daysLeft > 0 ? `${daysLeft} days to JEE` : "JEE Day! 🎯";
-}
-
-/* ================================================================
-   LECTURE PLANNER — POPULATE
-   ================================================================ */
-function populateLectures() {
-  const n = state.dayNum;
-  const ph = getLec(PHY, n);
-  const mt = getLec(MTH, n);
-  const ch = getLec(CHM, n);
-
-  document.getElementById("physLecNum").textContent = `Physics Lec ${n}`;
-  document.getElementById("mthLecNum").textContent  = `Maths Lec ${n}`;
-  document.getElementById("chmLecNum").textContent  = `Chemistry Lec ${n}`;
-
-  document.getElementById("physTopic").textContent  = ph.full;
-  document.getElementById("mthTopic").textContent   = mt.full;
-  document.getElementById("chmTopic").textContent   = ch.full;
-}
-
-/* ================================================================
-   LECTURE PLANNER — UPCOMING (Next 2 days)
-   ================================================================ */
-function populateUpcoming() {
-  const grid = document.getElementById("upcomingGrid");
-  grid.innerHTML = "";
-
-  for (let i = 1; i <= 2; i++) {
-    const futureDay  = state.dayNum + i;
-    const futureDate = new Date(START_DATE);
-    futureDate.setDate(futureDate.getDate() + futureDay - 1);
-
-    const dateLabel = futureDate.toLocaleDateString("en-IN",
-      { weekday: "short", month: "short", day: "numeric" });
-
-    const ph = getLec(PHY, futureDay);
-    const mt = getLec(MTH, futureDay);
-    const ch = getLec(CHM, futureDay);
-
-    const card = document.createElement("div");
-    card.className = "up-day";
-    card.innerHTML = `
-      <div class="up-day-header">
-        <span class="up-day-date">${dateLabel}</span>
-        <span class="up-day-num">Day ${futureDay}</span>
+      <div class="q-header">
+        <div class="q-meta-left">
+          <span class="q-num-badge" id="qNumBadge">Q.1</span>
+          <span class="q-subj-chip" id="qSubjChip">Physics</span>
+          <span class="q-type-chip" id="qTypeChip">Single Correct</span>
+        </div>
+        <div class="q-marks-right">
+          <span class="mark-correct">+4</span>
+          <span class="mark-wrong">-1</span>
+        </div>
       </div>
-      <div class="up-lec-row">
-        <span class="up-tag tag-phy">PHY</span>
-        <span>Lec ${futureDay} — ${ph.short}</span>
+
+      <div class="q-scroll-area">
+        <!-- Question text -->
+        <div class="q-text" id="qText">
+          <!-- Rendered by JS -->
+        </div>
+
+        <!-- Diagram Section -->
+        <div class="diagram-zone" id="diagramZone">
+          <div class="diagram-upload-row" id="diagramUploadRow">
+            <input type="file" id="diagramFileInput" accept="image/*" hidden onchange="attachDiagram(event)"/>
+            <button class="diagram-btn" onclick="document.getElementById('diagramFileInput').click()">
+              🖼️ Attach Diagram / Screenshot
+            </button>
+            <span class="diagram-hint">For questions that have figures in the PDF</span>
+          </div>
+          <div class="diagram-preview-row" id="diagramPreviewRow" style="display:none">
+            <img id="diagramImg" src="" alt="Question Diagram" class="diagram-img"/>
+            <button class="diagram-remove-btn" onclick="removeDiagram()">✕ Remove Image</button>
+          </div>
+        </div>
+
+        <!-- Options -->
+        <div class="options-list" id="optionsList">
+          <!-- Rendered by JS -->
+        </div>
       </div>
-      <div class="up-lec-row">
-        <span class="up-tag tag-mth">MTH</span>
-        <span>Lec ${futureDay} — ${mt.short}</span>
+
+      <!-- Navigation Bar -->
+      <div class="q-nav-bar">
+        <button class="qnav-btn back-btn" onclick="navigateQuestion('back')">◀ Back</button>
+        <div class="qnav-center">
+          <button class="qnav-btn mark-btn" id="markReviewBtn" onclick="markForReview()">🚩 Mark for Review</button>
+          <button class="qnav-btn clear-btn" onclick="clearResponse()">🗑 Clear</button>
+        </div>
+        <button class="qnav-btn save-btn" onclick="saveAndNext()">Save & Next ▶</button>
       </div>
-      <div class="up-lec-row">
-        <span class="up-tag tag-chm">CHM</span>
-        <span>Lec ${futureDay} — ${ch.short}</span>
-      </div>`;
-    grid.appendChild(card);
-  }
-}
+    </div>
 
-/* ================================================================
-   SCORE — COMPUTE & RENDER
-   ================================================================ */
-function renderScore() {
-  const { lectures, revision, practice } = state.dayData;
-  let score = 0;
-  if (lectures.physics)   score++;
-  if (lectures.maths)     score++;
-  if (lectures.chemistry) score++;
-  if (revision)           score++;
-  if (practice)           score++;
+    <!-- PALETTE PANEL (right / drawer) -->
+    <div class="palette-backdrop" id="paletteBackdrop" onclick="togglePaletteDrawer()"></div>
+    <div class="palette-panel" id="palettePanel">
+      <div class="palette-drag-handle"></div>
 
-  // Badge + ring value
-  document.getElementById("scoreBadge").textContent = `${score} / 5`;
-  document.getElementById("ringVal").textContent    = score;
+      <div class="palette-top">
+        <span class="palette-title">Question Palette</span>
+        <button class="palette-close-btn" onclick="togglePaletteDrawer()">✕</button>
+      </div>
 
-  // SVG ring: offset from full (301.6) down to 0 at score=5
-  const offset = 301.6 * (1 - score / 5);
-  document.getElementById("ringFill").style.strokeDashoffset = offset;
+      <div class="palette-candidate">
+        <div class="cand-avatar">👤</div>
+        <div class="cand-info">
+          <strong>Test Candidate</strong>
+          <span>JEE Main 2025</span>
+        </div>
+      </div>
 
-  // Score items
-  const map = [
-    { id: "si-phy",  active: lectures.physics   },
-    { id: "si-mth",  active: lectures.maths     },
-    { id: "si-chm",  active: lectures.chemistry },
-    { id: "si-rev",  active: revision           },
-    { id: "si-prac", active: practice           },
-  ];
+      <div class="palette-legend">
+        <div class="pl-item"><span class="pl-dot pl-answered"></span>Answered</div>
+        <div class="pl-item"><span class="pl-dot pl-not-answered"></span>Not Answered</div>
+        <div class="pl-item"><span class="pl-dot pl-marked"></span>Marked</div>
+        <div class="pl-item"><span class="pl-dot pl-not-visited"></span>Not Visited</div>
+        <div class="pl-item"><span class="pl-dot pl-answered-marked"></span>Ans+Marked</div>
+      </div>
 
-  map.forEach(({ id, active }) => {
-    const el = document.getElementById(id);
-    el.classList.toggle("active", active);
-  });
-}
+      <div class="palette-sections-wrap" id="paletteSectionsWrap">
+        <div class="pal-sec-label">⚛ Physics (1–25)</div>
+        <div class="pal-grid" id="palGridPhysics"></div>
 
-/* ================================================================
-   LECTURE PROGRESS BADGE
-   ================================================================ */
-function renderLectureProgress() {
-  const { physics, maths, chemistry } = state.dayData.lectures;
-  const count = [physics, maths, chemistry].filter(Boolean).length;
-  document.getElementById("lectureProgress").textContent = `${count} / 3`;
+        <div class="pal-sec-label">🧪 Chemistry (26–50)</div>
+        <div class="pal-grid" id="palGridChemistry"></div>
 
-  // Visual strikethrough / done class
-  const map = { physics: "lecItemPhysics", maths: "lecItemMaths", chemistry: "lecItemChem" };
-  Object.entries(map).forEach(([sub, id]) => {
-    document.getElementById(id).classList.toggle("done", state.dayData.lectures[sub]);
-  });
-}
+        <div class="pal-sec-label">∑ Maths (51–75)</div>
+        <div class="pal-grid" id="palGridMaths"></div>
+      </div>
 
-/* ================================================================
-   TODAY'S QUESTION TOTAL
-   ================================================================ */
-function renderTodayQTotal() {
-  const q = state.dayData.questions;
-  const total = (q.physics || 0) + (q.maths || 0) + (q.chemistry || 0);
-  document.getElementById("todayQTotal").textContent = total;
-}
+      <div class="palette-summary-bar">
+        <div class="psb-item"><span class="psb-num psb-answered" id="psAnswered">0</span><span>Ans</span></div>
+        <div class="psb-item"><span class="psb-num psb-not-answered" id="psNotAns">0</span><span>Not Ans</span></div>
+        <div class="psb-item"><span class="psb-num psb-marked" id="psMarked">0</span><span>Marked</span></div>
+        <div class="psb-item"><span class="psb-num psb-not-visited" id="psNotVis">75</span><span>Not Vis</span></div>
+      </div>
+    </div>
 
-/* ================================================================
-   LOAD TODAY'S DATA FROM FIRESTORE / LOCALSTORAGE
-   ================================================================ */
-async function loadTodayData() {
-  let data = null;
-  const path = `users/${USER_ID}/days/${state.today}`;
+  </div><!-- end exam-body -->
+</div><!-- end examScreen -->
 
-  if (firebaseOk) {
-    data = await fsGet(path);
-  } else {
-    data = LS.get(`day_${state.today}`);
-  }
 
-  if (data) {
-    state.dayData = {
-      lectures:  data.lectures  || { physics: false, maths: false, chemistry: false },
-      revision:  data.revision  || false,
-      practice:  data.practice  || false,
-      questions: data.questions || { physics: 0, maths: 0, chemistry: 0 }
-    };
-  }
+<!-- ═══════════════════════════════════════════
+     MODAL — SUMMARY
+═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="summaryModal" style="display:none" onclick="closeSummaryModal(event)">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <h3>📊 Test Summary</h3>
+      <button class="modal-close" onclick="closeSummary()">✕</button>
+    </div>
+    <div class="modal-body" id="summaryBody"></div>
+    <div class="modal-ftr">
+      <button class="modal-btn ghost" onclick="closeSummary()">Continue Test</button>
+      <button class="modal-btn primary" onclick="confirmSubmit()">Submit Test</button>
+    </div>
+  </div>
+</div>
 
-  // Sync checkboxes
-  document.getElementById("chkPhysics").checked = state.dayData.lectures.physics;
-  document.getElementById("chkMaths").checked   = state.dayData.lectures.maths;
-  document.getElementById("chkChem").checked     = state.dayData.lectures.chemistry;
-  document.getElementById("chkRevision").checked = state.dayData.revision;
-  document.getElementById("chkPractice").checked = state.dayData.practice;
+<!-- ═══════════════════════════════════════════
+     MODAL — SUBMIT CONFIRM
+═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="submitModal" style="display:none" onclick="closeSubmitModal(event)">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <h3>⚠️ Submit Test?</h3>
+      <button class="modal-close" onclick="document.getElementById('submitModal').style.display='none'">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Once submitted, you cannot change your answers. Are you sure?</p>
+      <div class="submit-preview" id="submitPreview"></div>
+    </div>
+    <div class="modal-ftr">
+      <button class="modal-btn ghost" onclick="document.getElementById('submitModal').style.display='none'">Go Back</button>
+      <button class="modal-btn danger" onclick="submitTest()">Submit Now</button>
+    </div>
+  </div>
+</div>
 
-  // Sync question inputs
-  const q = state.dayData.questions;
-  document.getElementById("qPhy").value = q.physics || "";
-  document.getElementById("qMth").value = q.maths   || "";
-  document.getElementById("qChm").value = q.chemistry || "";
 
-  renderLectureProgress();
-  renderScore();
-  renderTodayQTotal();
-}
+<!-- ═══════════════════════════════════════════
+     SCREEN 4 — RESULTS
+═══════════════════════════════════════════ -->
+<div id="resultScreen" class="screen">
+  <div class="result-wrap">
+    <div class="result-card">
+      <div class="result-hdr">
+        <div class="result-emoji">🎯</div>
+        <h2>Test Completed!</h2>
+        <p id="resultSubtitle">Your performance summary</p>
+      </div>
 
-/* ================================================================
-   SAVE TODAY'S DATA (merge)
-   ================================================================ */
-async function saveTodayData(partial) {
-  const path = `users/${USER_ID}/days/${state.today}`;
+      <div class="score-ring-container">
+        <svg class="score-ring-svg" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="82" fill="none" stroke="var(--border-color)" stroke-width="14"/>
+          <circle id="scoreArcEl" cx="100" cy="100" r="82" fill="none" stroke="url(#ringGrad)"
+            stroke-width="14" stroke-linecap="round"
+            stroke-dasharray="515.2" stroke-dashoffset="515.2"
+            transform="rotate(-90 100 100)"/>
+          <defs>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#1565c0"/>
+              <stop offset="100%" stop-color="#00bcd4"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="score-center-text">
+          <span class="score-num" id="resultScore">0</span>
+          <span class="score-denom" id="resultTotal">/300</span>
+        </div>
+      </div>
 
-  const payload = {
-    ...partial,
-    date:      state.today,
-    updatedAt: new Date().toISOString()
-  };
+      <div class="result-breakdown" id="resultBreakdown"></div>
 
-  const ok = await fsSet(path, payload, true);
+      <div class="result-actions">
+        <button class="primary-btn" onclick="resetApp()">🔄 New Test</button>
+        <button class="ghost-btn" onclick="reviewMode()">📖 Review Answers</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-  if (!ok) {
-    // Fallback: merge into localStorage
-    const existing = LS.get(`day_${state.today}`) || {};
-    LS.set(`day_${state.today}`, { ...existing, ...partial, date: state.today });
-  }
-}
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
 
-/* ================================================================
-   CHECKBOX HANDLERS — LECTURES
-   ================================================================ */
-function attachLectureCheckboxes() {
-  const map = {
-    chkPhysics:  "physics",
-    chkMaths:    "maths",
-    chkChem:     "chemistry"
-  };
-
-  Object.entries(map).forEach(([id, subject]) => {
-    document.getElementById(id).addEventListener("change", async (e) => {
-      state.dayData.lectures[subject] = e.target.checked;
-      renderLectureProgress();
-      renderScore();
-
-      await saveTodayData({ lectures: state.dayData.lectures });
-
-      const label = subject.charAt(0).toUpperCase() + subject.slice(1);
-      showToast(e.target.checked
-        ? `✅ ${label} lecture completed!`
-        : `↩️ ${label} lecture unmarked`);
-    });
-  });
-}
-
-/* ================================================================
-   CHECKBOX HANDLERS — REVISION & PRACTICE
-   ================================================================ */
-function attachRevisionPracticeCheckboxes() {
-  document.getElementById("chkRevision").addEventListener("change", async (e) => {
-    state.dayData.revision = e.target.checked;
-    renderScore();
-    await saveTodayData({ revision: e.target.checked });
-    showToast(e.target.checked ? "📖 Revision session logged!" : "↩️ Revision unmarked");
-  });
-
-  document.getElementById("chkPractice").addEventListener("change", async (e) => {
-    state.dayData.practice = e.target.checked;
-    renderScore();
-    await saveTodayData({ practice: e.target.checked });
-    showToast(e.target.checked ? "💪 Practice session logged!" : "↩️ Practice unmarked");
-  });
-}
-
-/* ================================================================
-   QUESTION TRACKER — LOG BUTTON
-   ================================================================ */
-function attachQuestionLogger() {
-  document.getElementById("btnLogQ").addEventListener("click", async () => {
-    const phy = parseInt(document.getElementById("qPhy").value) || 0;
-    const mth = parseInt(document.getElementById("qMth").value) || 0;
-    const chm = parseInt(document.getElementById("qChm").value) || 0;
-
-    state.dayData.questions = { physics: phy, maths: mth, chemistry: chm };
-    renderTodayQTotal();
-
-    await saveTodayData({ questions: state.dayData.questions });
-    await loadAnalytics();
-
-    const total = phy + mth + chm;
-    showToast(`🎯 ${total} questions logged for today!`);
-  });
-}
-
-/* ================================================================
-   ANALYTICS — LOAD & RENDER
-   ================================================================ */
-let perfChart = null;
-
-async function loadAnalytics() {
-  // ── Fetch all days (Firestore or LS) ──
-  let allData = {};
-
-  if (firebaseOk) {
-    allData = await fsCollection(`users/${USER_ID}/days`);
-  } else {
-    // Reconstruct from localStorage keys
-    for (const key of Object.keys(localStorage)) {
-      if (key.startsWith("pj_day_")) {
-        const dateKey = key.replace("pj_day_", "");
-        const d = LS.get(`day_${dateKey}`);
-        if (d) allData[dateKey] = d;
-      }
-    }
-  }
-
-  // ── Last 7 days ──
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const last7 = [];
-  const labels = [];
-
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
-    last7.push(dateStr(d));
-    labels.push(d.toLocaleDateString("en-IN", { weekday: "short" }));
-  }
-
-  const phyArr = [], mthArr = [], chmArr = [];
-
-  last7.forEach(ds => {
-    const row = allData[ds];
-    phyArr.push(row?.questions?.physics  || 0);
-    mthArr.push(row?.questions?.maths    || 0);
-    chmArr.push(row?.questions?.chemistry || 0);
-  });
-
-  // ── Totals ──
-  const sevenAgo  = new Date(today); sevenAgo.setDate(sevenAgo.getDate() - 7);
-  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-
-  let weekly = 0, monthly = 0, total = 0;
-
-  Object.entries(allData).forEach(([ds, row]) => {
-    const d = new Date(ds);
-    const q = (row.questions?.physics || 0)
-            + (row.questions?.maths   || 0)
-            + (row.questions?.chemistry || 0);
-    total += q;
-    if (d >= sevenAgo)   weekly  += q;
-    if (d >= monthStart) monthly += q;
-  });
-
-  document.getElementById("statWeekly").textContent  = weekly;
-  document.getElementById("statMonthly").textContent = monthly;
-  document.getElementById("statTotal").textContent   = total;
-
-  // ── Chart ──
-  renderChart(labels, phyArr, mthArr, chmArr);
-}
-
-/* ================================================================
-   CHART.JS — RENDER / RE-RENDER
-   ================================================================ */
-function renderChart(labels, phyArr, mthArr, chmArr) {
-  const dark = state.darkMode;
-
-  const colors = dark
-    ? { phy: "#00b4ff", mth: "#00e5a0", chm: "#ff6060",
-        grid: "rgba(255,255,255,0.05)", tick: "#7aa3c0",
-        tooltip_bg: "#091428", tooltip_title: "#dceeff", tooltip_body: "#7aa3c0" }
-    : { phy: "#1a73e8", mth: "#1da462", chm: "#e53935",
-        grid: "rgba(0,0,0,0.05)", tick: "#4d5568",
-        tooltip_bg: "#ffffff", tooltip_title: "#1a1f36", tooltip_body: "#4d5568" };
-
-  const ctx = document.getElementById("perfChart").getContext("2d");
-
-  if (perfChart) { perfChart.destroy(); perfChart = null; }
-
-  perfChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels,
-      datasets: [
-        {
-          label: "Physics",
-          data: phyArr,
-          backgroundColor: colors.phy + "55",
-          borderColor: colors.phy,
-          borderWidth: 2,
-          borderRadius: 6,
-          borderSkipped: false,
-        },
-        {
-          label: "Maths",
-          data: mthArr,
-          backgroundColor: colors.mth + "55",
-          borderColor: colors.mth,
-          borderWidth: 2,
-          borderRadius: 6,
-          borderSkipped: false,
-        },
-        {
-          label: "Chemistry",
-          data: chmArr,
-          backgroundColor: colors.chm + "55",
-          borderColor: colors.chm,
-          borderWidth: 2,
-          borderRadius: 6,
-          borderSkipped: false,
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: "index", intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: colors.tooltip_bg,
-          titleColor: colors.tooltip_title,
-          bodyColor: colors.tooltip_body,
-          borderColor: dark ? "rgba(0,180,255,0.25)" : "rgba(26,115,232,0.15)",
-          borderWidth: 1,
-          padding: 14,
-          cornerRadius: 12,
-          callbacks: {
-            footer: (items) => {
-              const sum = items.reduce((a, i) => a + i.raw, 0);
-              return `Total: ${sum} questions`;
-            }
-          }
-        }
-      },
-      scales: {
-        x: {
-          grid:   { color: colors.grid, drawBorder: false },
-          ticks:  { color: colors.tick, font: { family: "'DM Sans'", size: 12 } },
-          border: { display: false }
-        },
-        y: {
-          beginAtZero: true,
-          grid:   { color: colors.grid, drawBorder: false },
-          ticks:  {
-            color: colors.tick,
-            font: { family: "'DM Sans'", size: 12 },
-            precision: 0,
-            stepSize: 5
-          },
-          border: { display: false }
-        }
-      },
-      animation: {
-        duration: 600,
-        easing: "easeInOutQuart"
-      }
-    }
-  });
-}
-
-/* ================================================================
-   DARK MODE — TOGGLE & PERSIST
-   ================================================================ */
-async function loadDarkModePref() {
-  let dark = false;
-
-  if (firebaseOk) {
-    const pref = await fsGet(`users/${USER_ID}/settings/preferences`);
-    dark = pref?.darkMode ?? false;
-  } else {
-    dark = localStorage.getItem("pj_dark") === "true";
-  }
-
-  state.darkMode = dark;
-  applyDarkMode(dark);
-  document.getElementById("modeToggle").checked = dark;
-}
-
-function applyDarkMode(dark) {
-  document.body.className = dark ? "dark-mode" : "light-mode";
-  state.darkMode = dark;
-  localStorage.setItem("pj_dark", dark);
-}
-
-function attachModeToggle() {
-  document.getElementById("modeToggle").addEventListener("change", async (e) => {
-    applyDarkMode(e.target.checked);
-
-    // Re-render chart with new palette
-    await loadAnalytics();
-
-    // Persist
-    const ok = await fsSet(`users/${USER_ID}/settings/preferences`,
-      { darkMode: e.target.checked }, true);
-    if (!ok) localStorage.setItem("pj_dark", e.target.checked);
-  });
-}
-
-/* ================================================================
-   INIT — BOOT SEQUENCE
-   ================================================================ */
-async function init() {
-  // 1. Dark mode preference (before paint to avoid flash)
-  await loadDarkModePref();
-
-  // 2. Header dates
-  initHeader();
-
-  // 3. Lecture content
-  populateLectures();
-  populateUpcoming();
-
-  // 4. Wire up event listeners
-  attachLectureCheckboxes();
-  attachRevisionPracticeCheckboxes();
-  attachQuestionLogger();
-  attachModeToggle();
-
-  // 5. Load persisted day data
-  await loadTodayData();
-
-  // 6. Analytics + chart
-  await loadAnalytics();
-
-  console.log(
-    `%c⚡ Prayas JEE 2.0 Tracker\n` +
-    `%cDay ${state.dayNum} | User: ${USER_ID}\n` +
-    `Firebase: ${firebaseOk ? "✅ Connected" : "⚠️ Not configured (using localStorage)"}`,
-    "font-size:14px;font-weight:bold;color:#1a73e8",
-    "font-size:11px;color:#888"
-  );
-}
-
-// init() is called by onAuthStateChanged after login
-  </script>
+<script src="script.js"></script>
 </body>
 </html>
