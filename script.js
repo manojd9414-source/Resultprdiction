@@ -5,6 +5,7 @@
 
 // ── PDF.js worker setup ──────────────────────────────
 if (typeof pdfjsLib !== 'undefined') {
+  // Use CDN worker — same version as the main library
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
@@ -166,13 +167,20 @@ async function startConversion() {
 
   } catch (err) {
     console.error('Conversion error:', err);
-    if (err.message === 'NO_API_KEY' || err.message.includes('API')) {
-      showToast('⚠️ API issue — loading Demo mode instead.');
-      const questions = generateDemoQuestions();
-      const duration = parseInt(document.getElementById('duration').value, 10);
-      initExam(questions, duration);
+    showScreen('uploadScreen');
+
+    // Show a clear, specific error message to the user
+    if (err.message === 'NO_API_KEY') {
+      showToast('⚠️ No API key entered. Try Demo Mode instead.');
+    } else if (err.message.includes('API Error 400')) {
+      showToast('❌ Invalid API Key. Check your Gemini key and try again.');
+    } else if (err.message.includes('API Error 429')) {
+      showToast('❌ Gemini quota exceeded. Wait a minute or use Demo Mode.');
+    } else if (err.message.includes('invalid JSON')) {
+      showToast('❌ AI returned unexpected response. Try again or use Demo Mode.');
+    } else if (err.message.includes('API Error')) {
+      showToast('❌ API Error: ' + err.message + '. Try Demo Mode.');
     } else {
-      showScreen('uploadScreen');
       showToast('❌ Error: ' + err.message);
     }
   }
@@ -349,19 +357,22 @@ function scrollQuestionToTop() {
 
 function renderKaTeX(el) {
   if (!el) return;
+  // If KaTeX not yet loaded, retry after a short delay
+  if (!window.renderMathInElement) {
+    setTimeout(() => renderKaTeX(el), 200);
+    return;
+  }
   try {
-    if (window.renderMathInElement) {
-      renderMathInElement(el, {
-        delimiters: [
-          { left: '$$', right: '$$', display: true  },
-          { left: '$',  right: '$',  display: false },
-          { left: '\\[', right: '\\]', display: true  },
-          { left: '\\(', right: '\\)', display: false },
-        ],
-        throwOnError: false,
-        errorColor: '#cc0000',
-      });
-    }
+    renderMathInElement(el, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true  },
+        { left: '$',  right: '$',  display: false },
+        { left: '\\[', right: '\\]', display: true  },
+        { left: '\\(', right: '\\)', display: false },
+      ],
+      throwOnError: false,
+      errorColor: '#cc0000',
+    });
   } catch (e) { /* silently ignore KaTeX errors */ }
 }
 
