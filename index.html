@@ -210,7 +210,7 @@ body.dark #bottomNav{background:#12121a;border-color:#2a2a3a;}
 /* More button */
 #navMoreBtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:5px 2px 4px;border:none;background:transparent;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;border-radius:12px;}
 #navMoreBtn:active{transform:scale(0.93);}
-#navMoreBtn .nav-icon-wrap{background:#e8e8f0;width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+#navMoreBtn .nav-icon-wrap{background:#e8e8f0;width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.08);font-family:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif;}
 #navMoreBtn.open .nav-icon-wrap{background:#4f46e5;box-shadow:0 3px 12px rgba(79,70,229,.4);}
 body.dark #navMoreBtn .nav-icon-wrap{background:#1e1e2e;}
 #navMoreBtn .nav-label{font-size:9px;font-weight:700;letter-spacing:.2px;white-space:nowrap;line-height:1;color:#9ca3af;transition:color .15s;}
@@ -229,7 +229,7 @@ body.dark #drawerHandle{background:#3a3a4a;}
 #drawerGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
 .drawer-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;border:none;background:transparent;cursor:pointer;font-family:'Inter',sans-serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent;border-radius:14px;transition:all .15s;width:100%;}
 .drawer-btn:active{transform:scale(0.92);}
-.drawer-btn .nav-icon-wrap{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;transition:all .18s;box-shadow:0 2px 8px rgba(0,0,0,.10);}
+.drawer-btn .nav-icon-wrap{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;line-height:1;transition:all .18s;box-shadow:0 2px 8px rgba(0,0,0,.10);font-family:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif;}
 .drawer-btn .nav-label{font-size:10px;font-weight:700;color:#6b7280;letter-spacing:.2px;white-space:nowrap;}
 .drawer-btn.on .nav-label{color:#111827;font-weight:800;}
 body.dark .drawer-btn .nav-label{color:#9ca3af;}
@@ -251,9 +251,10 @@ body.dark .drawer-btn.on .nav-label{color:#e5e7eb;}
 .nav-icon-wrap{
   width:46px;height:46px;border-radius:14px;
   display:flex;align-items:center;justify-content:center;
-  font-size:22px;transition:all .18s;
+  font-size:22px;line-height:1;transition:all .18s;
   background:#e8e8f0;
   box-shadow:0 1px 3px rgba(0,0,0,0.08);
+  font-family:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif;
 }
 /* Each button gets its own tile colour */
 .nav-btn[data-sec="home"]    .nav-icon-wrap{background:#e0e7ff;}
@@ -599,7 +600,7 @@ body.dark .acs-clear-btn{background:#1a1a24;border-color:#2a2a3a;}
   <div class="tb-right">
     <div class="streak-badge" id="streakBadge">⭐ 0</div>
     <button class="dm-btn" id="notifBellBtn" onclick="openNotifSettings()" title="Notifications set karo" style="font-size:16px;">🔔</button>
-    <button class="dm-btn" id="dmToggleBtn" onclick="toggleDarkMode()" title="Dark/Light Mode">💀/button>
+    <button class="dm-btn" id="dmToggleBtn" onclick="toggleDarkMode()" title="Dark/Light Mode">💀</button>
     <button id="logoutBtn" onclick="confirmLogout()" style="background:transparent;border:1px solid var(--border);color:var(--text2);font-size:12px;padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:600;font-family:'Inter',sans-serif;">🚪 Logout</button>
     <button id="loginFromGuestBtn" onclick="loginFromGuest()" style="display:none;background:var(--blue);border:none;color:#fff;font-size:12px;padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:700;font-family:'Inter',sans-serif;">🔑 Login Karo</button>
   </div>
