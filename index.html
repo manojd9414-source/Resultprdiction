@@ -210,7 +210,7 @@ body.dark #bottomNav{background:#12121a;border-color:#2a2a3a;}
 /* More button */
 #navMoreBtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:5px 2px 4px;border:none;background:transparent;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;border-radius:12px;}
 #navMoreBtn:active{transform:scale(0.93);}
-#navMoreBtn .nav-icon-wrap{background:#e8e8f0;width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.08);font-family:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif;}
+#navMoreBtn .nav-icon-wrap{background:#e8e8f0;width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.08);}
 #navMoreBtn.open .nav-icon-wrap{background:#4f46e5;box-shadow:0 3px 12px rgba(79,70,229,.4);}
 body.dark #navMoreBtn .nav-icon-wrap{background:#1e1e2e;}
 #navMoreBtn .nav-label{font-size:9px;font-weight:700;letter-spacing:.2px;white-space:nowrap;line-height:1;color:#9ca3af;transition:color .15s;}
@@ -229,7 +229,7 @@ body.dark #drawerHandle{background:#3a3a4a;}
 #drawerGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
 .drawer-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;border:none;background:transparent;cursor:pointer;font-family:'Inter',sans-serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent;border-radius:14px;transition:all .15s;width:100%;}
 .drawer-btn:active{transform:scale(0.92);}
-.drawer-btn .nav-icon-wrap{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;line-height:1;transition:all .18s;box-shadow:0 2px 8px rgba(0,0,0,.10);font-family:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif;}
+.drawer-btn .nav-icon-wrap{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;transition:all .18s;box-shadow:0 2px 8px rgba(0,0,0,.10);}
 .drawer-btn .nav-label{font-size:10px;font-weight:700;color:#6b7280;letter-spacing:.2px;white-space:nowrap;}
 .drawer-btn.on .nav-label{color:#111827;font-weight:800;}
 body.dark .drawer-btn .nav-label{color:#9ca3af;}
@@ -702,29 +702,85 @@ body.dark .acs-clear-btn{background:#1a1a24;border-color:#2a2a3a;}
 
   <!-- TIMER SECTION -->
   <div class="sec" id="sec-timer">
+
+    <!-- TIMER HERO -->
     <div class="timer-hero">
       <div style="font-size:11px;opacity:.7;font-weight:700;letter-spacing:1px;">STUDY TIMER</div>
+      <div class="timer-display" id="studyDisp">00:00:00</div>
+      <div class="timer-sub" id="studySubLabel">Subject chunno aur start karo...</div>
+      <div class="sub-selector">
+        <button class="sub-btn on" id="sbph" onclick="selSub('physics')">&#x26A1; Physics</button>
+        <button class="sub-btn" id="sbch" onclick="selSub('chemistry')">Chem</button>
+        <button class="sub-btn" id="sbma" onclick="selSub('maths')">Maths</button>
+      </div>
+      <div class="timer-btns">
+        <button class="t-btn start" id="studyStartBtn" onclick="togStudyTimer()">&#x25B6; Start</button>
+        <button class="t-btn reset-btn" onclick="rstStudyTimer()">Reset</button>
+        <button class="t-btn reset-btn" onclick="enterDeepWork()">&#x1F3AF; Focus</button>
+      </div>
+      <div style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:10px;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:rgba(255,255,255,.8);font-weight:600;">
+          <input type="checkbox" id="pomToggle" onchange="togglePomodoro()" style="width:16px;height:16px;cursor:pointer;">
+          Pomodoro (25+5)
+        </label>
+        <span id="pomInfo" style="font-size:11px;color:rgba(255,255,255,.6);font-weight:600;">OFF</span>
+      </div>
+      <div id="pomPhaseLabel" class="pom-phase" style="display:none;margin-top:6px;"></div>
+    </div>
+
+    <!-- DAILY GOAL -->
+    <div class="card">
+      <div class="card-title">&#x1F3AF; Aaj Ka Goal</div>
+      <div class="goal-bar-bg"><div class="goal-bar-fill" id="goalBar" style="width:0%"></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:13px;font-weight:700;color:var(--text)" id="goalValDisp">0h 0m / 8h</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="number" class="goal-inp" id="goalInp" value="8" min="1" max="24" style="width:70px;">
+        <span style="font-size:13px;font-weight:600;color:var(--text2);">hours daily goal</span>
+        <button class="gen-btn" onclick="saveGoal()">Save</button>
+      </div>
+    </div>
+
+    <!-- SUBJECT TIME TODAY -->
+    <div class="card">
+      <div class="card-title">&#x1F4DA; Aaj Kitna Padha?</div>
+      <div class="sub-time-grid">
+        <div class="stc ph"><div class="stc-icon">&#x26A1;</div><div class="stc-name">Physics</div><div class="stc-val" id="ph-time">0h 0m</div></div>
+        <div class="stc ch"><div class="stc-icon">&#x1F9EA;</div><div class="stc-name">Chemistry</div><div class="stc-val" id="ch-time">0h 0m</div></div>
+        <div class="stc ma"><div class="stc-icon">&#x1F4D0;</div><div class="stc-name">Maths</div><div class="stc-val" id="ma-time">0h 0m</div></div>
+      </div>
+    </div>
+
+    <!-- WEEKLY GRAPH -->
+    <div class="card">
+      <div class="card-title">&#x1F4C5; Weekly Study</div>
+      <div class="week-graph" id="weekGraph"></div>
+      <div style="font-size:10px;color:var(--text3);text-align:center;font-weight:600;">Last 7 days</div>
+    </div>
 
     <!-- CHAPTER PLANNER -->
     <div class="card">
-      <div class="card-title">📖 Aaj Konse Chapters?</div>
+      <div class="card-title">&#x1F4D6; Aaj Konse Chapters?</div>
       <div style="display:flex;gap:6px;margin-bottom:12px;">
-        <button class="plan-stab" id="ptph" onclick="switchPlanSub('physics')" style="background:var(--blue);color:#fff;border-color:var(--blue);">⚡ Physics</button>
-        <button class="plan-stab" id="ptch" onclick="switchPlanSub('chemistry')">🧪 Chem</button>
-        <button class="plan-stab" id="ptma" onclick="switchPlanSub('maths')">📐 Maths</button>
+        <button class="plan-stab" id="ptph" onclick="switchPlanSub('physics')" style="background:var(--blue);color:#fff;border-color:var(--blue);">&#x26A1; Physics</button>
+        <button class="plan-stab" id="ptch" onclick="switchPlanSub('chemistry')">Chem</button>
+        <button class="plan-stab" id="ptma" onclick="switchPlanSub('maths')">Maths</button>
       </div>
       <div id="planChapList" style="max-height:250px;overflow-y:auto;"></div>
       <div id="planSelCount" style="margin-top:8px;text-align:center;font-size:13px;font-weight:600;color:var(--text2);"></div>
       <div id="planDoneArea" style="display:none;">
         <div style="margin-top:12px;padding-top:12px;border-top:2px dashed var(--border);">
-          <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;text-align:center;">✏️ Tick karo jab complete ho</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:10px;text-align:center;">Tick karo jab complete ho</div>
           <div id="planDoneList"></div>
           <div class="plan-prog-bar"><div class="plan-prog-fill" id="planProgFill" style="width:0%"></div></div>
           <div id="planDoneCount" style="text-align:center;font-size:12px;font-weight:600;color:var(--green);margin-top:6px;"></div>
         </div>
       </div>
     </div>
-    
+
+  </div><!-- end sec-timer -->
+
   <!-- ARENA SECTION -->
   <div class="sec" id="sec-arena">
     <div class="card">
@@ -801,7 +857,9 @@ body.dark .acs-clear-btn{background:#1a1a24;border-color:#2a2a3a;}
         <div id="mistakeLogItems"></div>
         <button onclick="saveMistakeLog()" class="gen-btn" style="width:100%;margin-top:8px;background:var(--red);">💾 Mistakes Firestore mein Save Karo</button>
       </div>
-      <button onclick="showNav('stats',document.querySelectorAll('.nav-btn')[4])" style="margin-top:12px;width:100%;padding:10px;border-radius:8px;border:1.5px solid var(--border);background:#fff;color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">📊 Stats mein dekho →</button>
+      <button onclick="showNav('stats',document.querySelector('.nav-btn[data-sec=stats]')||document.querySelector('.drawer-btn[data-sec=stats]'))" style="margin-top:12px;width:100%;padding:10px;border-radius:8px;border:1.5px solid var(--border);background:#fff;color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">&#x1F4CA; Stats mein dekho &#x2192;</button>
+    </div><!-- end res-card -->
+  </div><!-- end sec-arena -->
 
   <!-- STATS SECTION -->
   <div class="sec" id="sec-stats">
