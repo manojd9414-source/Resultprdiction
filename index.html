@@ -482,6 +482,64 @@ body.dark #globalBackBar{background:#1a1a24;border-color:#2a2a3a;}
 .dconfirm-ok.step2{background:#7f1d1d;animation:shake .3s ease;}
 @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
 
+
+/* ── DEEP WORK OVERLAY ── */
+.dw-overlay{display:none;position:fixed;inset:0;z-index:600;background:linear-gradient(135deg,#0d0d1a,#1e1b4b);flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+body.deep-work .dw-overlay{display:flex;}
+.dw-time{font-size:64px;font-weight:900;color:#fff;letter-spacing:4px;font-variant-numeric:tabular-nums;}
+.dw-msg{font-size:14px;color:rgba(255,255,255,.7);font-weight:600;text-align:center;padding:0 24px;}
+.dw-exit{padding:12px 28px;border-radius:12px;border:2px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-top:8px;}
+
+/* ── SYLLABUS ITEMS (still used by chapter planner) ── */
+.syl-ch-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;margin-bottom:6px;border:1.5px solid var(--border);background:#fff;cursor:pointer;user-select:none;}
+.syl-ch-item.dph{border-color:#c7d2fe;background:var(--bluelt);}
+.syl-ch-item.dch{border-color:#fed7aa;background:var(--orangelt);}
+.syl-ch-item.dma{border-color:#bbf7d0;background:var(--greenlt);}
+.syl-tick{width:20px;height:20px;border-radius:6px;border:2px solid var(--text3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;}
+.syl-ch-item.dph .syl-tick{background:var(--blue);border-color:var(--blue);color:#fff;}
+.syl-ch-item.dch .syl-tick{background:var(--orange);border-color:var(--orange);color:#fff;}
+.syl-ch-item.dma .syl-tick{background:var(--green);border-color:var(--green);color:#fff;}
+.syl-ch-num{font-size:11px;font-weight:700;color:var(--text3);min-width:22px;}
+.syl-ch-name{font-size:13px;font-weight:600;flex:1;}
+body.dark .syl-ch-item{background:#1a1a24;border-color:#2a2a3a;}
+body.dark .syl-ch-item.dph{background:#1e1b4b;border-color:#3730a3;}
+body.dark .syl-ch-item.dch{background:#431407;border-color:#9a3412;}
+body.dark .syl-ch-item.dma{background:#052e16;border-color:#166534;}
+
+/* ── SUBJECT PROGRESS BARS ── */
+.sub-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.sub-bar-lbl{font-size:11px;font-weight:700;min-width:80px;}
+.sub-bar-bg{flex:1;height:8px;background:var(--border);border-radius:99px;overflow:hidden;}
+.sub-bar-fill{height:100%;border-radius:99px;transition:width .4s;}
+.sub-bar-pct{font-size:11px;font-weight:800;min-width:32px;text-align:right;}
+
+/* ── BADGES ── */
+.badge-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.bdg{border-radius:var(--r2);padding:12px;text-align:center;border:1px solid var(--border);}
+.bdg.earned{border-color:#fde68a;}
+.bdg.locked{opacity:.5;}
+.bdg-ico{font-size:24px;margin-bottom:4px;}
+.bdg-name{font-size:12px;font-weight:800;color:var(--text);}
+.bdg-sub{font-size:10px;color:var(--text2);margin-top:2px;}
+
+/* ── ARENA CHAPTER STATS ── */
+.acs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.acs-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.acs-fbtn{padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);background:#fff;color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;}
+.acs-fbtn.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+.acs-clear-btn{padding:5px 10px;border-radius:8px;border:1.5px solid var(--border);background:#fff;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;}
+.acs-row{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;margin-bottom:5px;background:var(--bg);border:1px solid var(--border);}
+.acs-count{min-width:44px;text-align:center;font-size:16px;font-weight:900;color:var(--blue);background:#fff;border:1px solid var(--border);border-radius:7px;padding:3px 5px;}
+body.dark .acs-fbtn{background:#111118;border-color:#2a2a3a;color:var(--text2);}
+body.dark .acs-fbtn.on{background:var(--blue);color:#fff;}
+body.dark .acs-row{background:#111118;border-color:#2a2a3a;}
+body.dark .acs-count{background:#1a1a24;border-color:#2a2a3a;}
+body.dark .acs-clear-btn{background:#1a1a24;border-color:#2a2a3a;}
+
+/* ── POMODORO ── */
+.pom-phase{display:none;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-top:6px;}
+.pom-phase.study{background:#dbeafe;color:#1d4ed8;}
+.pom-phase.brk{background:#dcfce7;color:var(--green);}
 </style>
 </head>
 <body>
@@ -4715,6 +4773,32 @@ function drawerNav(name, btn){
   window.mcqHandleDrop=function(e){e.preventDefault();};
 
 
+
+
+// ── DARK MODE ──
+function toggleDarkMode(){
+  document.body.classList.toggle('dark');
+  try{ localStorage.setItem('jee_dark', document.body.classList.contains('dark')?'1':'0'); }catch(e){}
+  var btn = document.getElementById('dmToggleBtn');
+  if(btn) btn.textContent = document.body.classList.contains('dark') ? '☀️' : '💀';
+}
+(function(){
+  try{ if(localStorage.getItem('jee_dark')==='1'){ document.body.classList.add('dark'); var b=document.getElementById('dmToggleBtn'); if(b)b.textContent='☀️'; } }catch(e){}
+})();
+
+// ── LOGOUT ──
+function confirmLogout(){
+  var m = document.getElementById('logoutModal');
+  if(m) m.style.display='flex';
+}
+function closeLogoutModal(){
+  var m = document.getElementById('logoutModal');
+  if(m) m.style.display='none';
+}
+function doLogout(){
+  closeLogoutModal();
+  if(window._doLogoutFn) window._doLogoutFn();
+}
 
 document.addEventListener('visibilitychange', function(){
   if(document.visibilityState === 'hidden'){
