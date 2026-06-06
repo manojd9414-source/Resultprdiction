@@ -177,7 +177,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .streak-badge{display:flex;align-items:center;gap:4px;background:var(--orangelt);border:1px solid #fed7aa;border-radius:20px;padding:5px 10px;font-size:13px;font-weight:700;color:var(--orange);}
 
 /* MAIN WRAP */
-.wrap{max-width:520px;margin:0 auto;padding:70px 14px 180px;}
+.wrap{max-width:520px;margin:0 auto;padding:70px 14px 155px;}
 
 /* CARDS */
 .card{background:#fff;border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--shadow2);border:1px solid var(--border);}
@@ -557,7 +557,7 @@ body.dark .acs-clear-btn{background:#1a1a24;border-color:#2a2a3a;}
 
 
 <!-- LOADING SCREEN — shown while Firebase checks auth state -->
-<div id="loadingScreen" style="position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);pointer-events:auto;">
+<div id="loadingScreen" style="position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);">
   <div style="text-align:center;color:#fff;">
     <div style="font-size:56px;margin-bottom:16px;">🎯</div>
     <div style="font-size:20px;font-weight:900;margin-bottom:8px;">JEE 99ile Tracker</div>
@@ -3195,6 +3195,7 @@ function dconfirmNext(){
 }
 function dconfirmCancel(){
   document.getElementById('dconfirmOverlay').classList.remove('open');
+}
 
 // ═══════════════════════════════════════
 // TASKS — PRAYAS JEE 2027 SCHEDULE
